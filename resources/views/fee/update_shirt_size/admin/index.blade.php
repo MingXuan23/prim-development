@@ -119,7 +119,7 @@
             yuranTable = yuranTable.DataTable({
                 ordering: true,
                 processing: true,
-                serverSide: true,
+                serverSide: false,
                 dom: 'Bfrtip',
                 buttons: [
                     {
@@ -128,7 +128,10 @@
                         className: 'btn btn-success mb-2',
                         title: 'Pengemaskinian Saiz Baju',
                         exportOptions: {
-                            columns: ':not(:first-child)'  // exclude the indexing
+                            columns: ':not(:first-child)',  // exclude the indexing
+                            modifier: {
+                                page: 'all'
+                            }
                         }
                     }
                 ],
@@ -141,11 +144,10 @@
                 },
                 'columnDefs': [{
                     "targets": [0, 1, 2, 3, 4, 5, 6, 7],
-                    "className": "text-center",
-                    "width": "2%"
+                    "className": "text-center"
                 }],
                 order: [
-                    [1, 'asc']
+                    [0, 'asc']
                 ],
                 columns: [
                     {
@@ -155,7 +157,7 @@
                         render: function (data, type, row, meta) {
                             return meta.row + meta.settings._iDisplayStart + 1;
                         },
-                        "width": "5%"
+                        "width": "2%"
                     },
                     {
                         data: "fee_name",
@@ -198,7 +200,7 @@
                         "width": "20%"
                     }
                 ]
-            })
+            });
             // }
             // });
 

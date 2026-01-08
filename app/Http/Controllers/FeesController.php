@@ -348,7 +348,7 @@ class FeesController extends AppBaseController
                 ->where('fn.name', 'LIKE', '%BAJU%')
                 ->select(
                     'fn.id',
-                    'fn.name',
+                    'fn.name as fee_name',
                     'fn.desc',
                     'fn.quantity',
                     'fn.price',
