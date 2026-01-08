@@ -1678,6 +1678,7 @@ class StudentController extends Controller
                         ->select('students.id as id', 'students.nama as studentname', 'students.icno', 'classes.nama as classname', 'class_student.status', 'class_student.start_date')
                         ->where([
                             ['classes.id', $classid],
+                            ['class_organization.organization_id', $oid],
                             ['class_student.status', 1],
                         ])
                         ->orderBy('students.nama')
