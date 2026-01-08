@@ -222,7 +222,7 @@ class FeesController extends AppBaseController
 
         $fee = DB::table("fees_new")
             ->where("id", $request->get('fees_id'))
-            ->select('id', 'name', 'desc', 'quantity', 'price', 'totalAmount')
+            ->select('id', 'name', 'quantity', 'price', 'totalAmount')
             ->first();
 
         $organization = DB::table("organizations as o")
@@ -234,6 +234,7 @@ class FeesController extends AppBaseController
 
         $studentId = $request->get("student_id");
         $shirtSize = null;
+        $notesToSchool = null;
         $responseId = null;
         $formResponses = DB::table("form_responses")->get();
 
@@ -242,13 +243,14 @@ class FeesController extends AppBaseController
 
             if ($fee->id == $data->fees_id && $data->student_id == $studentId && $response->user_id == Auth::id()) {
                 $shirtSize = $data->shirt_size;
+                $notesToSchool = $data->notes_to_school;
                 $responseId = $response->id;
                 break;
             }
         }
 
 
-        return view('fee.update_shirt_size.buyer.edit', compact("fee", "organization", "studentId", "shirtSize", "responseId"));
+        return view('fee.update_shirt_size.buyer.edit', compact("fee", "organization", "studentId", "shirtSize", "notesToSchool", "responseId"));
     }
 
     // temporary function for users to update their shirt size
@@ -261,6 +263,10 @@ class FeesController extends AppBaseController
         if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Penjaga')) {
             return redirect('/home');
         }
+
+        $request->validate([
+            "shirt_size" => "required"
+        ]);
 
         $fee = DB::table("fees_new")
             ->where("id", $request->get("fees_id"))
@@ -288,7 +294,8 @@ class FeesController extends AppBaseController
             "total_amount" => $fee->totalAmount,
             "penjaga_name" => $penjagaName,
             "student_id" => $student->id,
-            "student_name" => $student->nama
+            "student_name" => $student->nama,
+            "notes_to_school" => $request->get("notes_to_school")
         );
 
         $jsonResponse = json_encode($response);
@@ -346,23 +353,60 @@ class FeesController extends AppBaseController
                 ->join('students as s', 'cs.student_id', '=', 's.id')
                 ->join('organization_user_student as ous', 'ous.student_id', '=', 's.id')
                 ->join('organization_user as ou', 'ou.id', '=', 'ous.organization_user_id')
+                ->leftJoin("form_responses as fr", function ($query) {
+                    $query
+                        ->whereRaw("JSON_EXTRACT(fr.response, '$.student_id') = s.id")
+                        ->whereRaw("JSON_EXTRACT(fr.response, '$.fees_id') = fn.id");
+                })
                 ->where("fn.organization_id", $organization_id)
                 ->where('sfn.status', 'Paid')
                 ->where('ou.user_id', $user_id)
                 ->where('fn.name', 'LIKE', '%BAJU%')
-                ->select('fn.id', 'fn.name as fee_name', 'fn.desc', 'fn.quantity', 'fn.price', 'fn.totalAmount', 's.id as student_id', 's.nama as student_name')
+                ->select(
+                    'fn.id',
+                    'fn.name as fee_name',
+                    'fn.desc',
+                    'fn.quantity',
+                    'fn.price',
+                    'fn.totalAmount',
+                    's.id as student_id',
+                    's.nama as student_name',
+                    'fr.response'
+                )
                 ->get();
         }
 
-        $table = Datatables::of($feesPaid);
+        $table = Datatables::of($feesPaid)
+            ->addColumn('notes_to_school', function ($row) {
+                if ($row->response == null) {
+                    return "<div class='text-center'>-</div>";
+                }
 
-        $table->addColumn('action', function ($row) {
-            return "<div class='d-flex justify-content-center'>" .
-                "<a class='btn btn-primary' href='" .
-                route('fees.updateShirtSize.buyer.editShirtSize', ['fees_id' => $row->id, 'student_id' => $row->student_id]) .
-                "'>Kemaskini</a>" .
-                "</div>";
-        });
+                $data = json_decode($row->response);
+
+                if ($data->notes_to_school == "") {
+                    return "<div class='text-center'>-</div>";
+                }
+
+                return "<div>" . $data->notes_to_school . "</div>";
+            })
+            ->addColumn('shirt_size', function ($row) {
+                if ($row->response == null) {
+                    return "<div class='text-center'>-</div>";
+                }
+
+                $data = json_decode($row->response);
+
+                return "<div>" . $data->shirt_size . "</div>";
+            })
+            ->addColumn('action', function ($row) {
+                return "<div class='d-flex justify-content-center'>" .
+                    "<a class='btn btn-primary' href='" .
+                    route('fees.updateShirtSize.buyer.editShirtSize', ['fees_id' => $row->id, 'student_id' => $row->student_id]) .
+                    "'>Kemaskini</a>" .
+                    "</div>";
+            })
+            ->rawColumns(['notes_to_school', 'shirt_size', 'action']);
 
         return $table->make(true);
     }
@@ -422,7 +466,17 @@ class FeesController extends AppBaseController
                 $response = json_decode($row->response);
 
                 return $response->shirt_size;
-            });
+            })
+            ->addColumn('notes_to_school', function ($row) {
+                $response = json_decode($row->response);
+
+                if (!isset($response->notes_to_school) || $response->notes_to_school == '') {
+                    return "<div>-</div>";
+                }
+
+                return $response->notes_to_school;
+            })
+            ->rawColumns(['notes_to_school']);
 
         return $table->make(true);
     }
