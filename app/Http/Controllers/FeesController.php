@@ -341,10 +341,22 @@ class FeesController extends AppBaseController
         if (Auth::user()->hasRole('Superadmin')) {
             $feesPaid = DB::table("fees_new as fn")
                 ->join('student_fees_new as sfn', 'fn.id', '=', 'sfn.fees_id')
+                ->join('class_student as cs', 'cs.id', '=', 'sfn.class_student_id')
+                ->join('students as s', 's.id', '=', 'cs.student_id')
                 ->where("fn.organization_id", $organization_id)
                 ->where('sfn.status', 'Paid')
                 ->where('fn.name', 'LIKE', '%BAJU%')
-                ->select('fn.id', 'fn.name', 'fn.desc', 'fn.quantity', 'fn.price', 'fn.totalAmount')
+                ->select(
+                    'fn.id',
+                    'fn.name',
+                    'fn.desc',
+                    'fn.quantity',
+                    'fn.price',
+                    'fn.totalAmount',
+                    's.id as student_id',
+                    's.nama as student_name',
+                    'fr.response'
+                )
                 ->get();
         } else {
             $feesPaid = DB::table("fees_new as fn")
@@ -384,7 +396,7 @@ class FeesController extends AppBaseController
 
                 $data = json_decode($row->response);
 
-                if ($data->notes_to_school == "") {
+                if (!isset($data->notes_to_school) || $data->notes_to_school == "") {
                     return "<div class='text-center'>-</div>";
                 }
 
@@ -471,7 +483,7 @@ class FeesController extends AppBaseController
                 $response = json_decode($row->response);
 
                 if (!isset($response->notes_to_school) || $response->notes_to_school == '') {
-                    return "<div>-</div>";
+                    return "<div class='text-center'>-</div>";
                 }
 
                 return $response->notes_to_school;
