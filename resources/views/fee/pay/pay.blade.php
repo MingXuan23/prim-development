@@ -143,7 +143,7 @@
 
                 <div class="row mb-4">
                     <div class="col-6">
-                        <h5 class=" mb-3">Caj yang dikenakan </h5>
+                        <h5 class=" mb-3">Bayaran Pemprosesan Yuran </h5>
                     </div>
                     <div class="col-6">
                         <h5 class="float-right mb-3">RM<span id="amount">
