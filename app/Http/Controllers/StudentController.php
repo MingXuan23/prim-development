@@ -11,6 +11,7 @@ use App\Models\ClassModel;
 use App\Models\Organization;
 use App\Models\Student;
 use App\Models\Parents;
+use Illuminate\Http\JsonResponse;
 use PDF;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -546,7 +547,7 @@ class StudentController extends Controller
             ->where('status', 1)
             ->get();
 
-        if (!$ifExitsCateA->isEmpty() && count($ifExits) == 0) {
+        if (!$ifExitsCateA->isEmpty() && empty($ifExits)) {
             foreach ($ifExitsCateA as $kateA) {
                 DB::table('fees_new_organization_user')->insert([
                     'status' => 'Debt',
@@ -704,7 +705,7 @@ class StudentController extends Controller
                 ->where('status', 1)
                 ->get();
 
-            if (!$ifExitsCateA->isEmpty() && count($ifExits) == 0) {
+            if (!$ifExitsCateA->isEmpty() && empty($ifExits)) {
                 foreach ($ifExitsCateA as $kateA) {
                     DB::table('fees_new_organization_user')->insert([
                         'status' => 'Debt',
@@ -2150,12 +2151,83 @@ class StudentController extends Controller
         }
     }
 
+    // method to get user
+    // if user does not exist, create new user
+    private function getOrCreateUser($student)
+    {
+        $parentUser = DB::table('users as u')
+            ->where(function ($query) use ($student) {
+                $query->where('u.telno', $student->parentTelno)
+                    ->orWhere('u.icno', $student->parentTelno);
+            })
+            ->first();
+
+        // if user does not exist
+        if (empty($parentUser)) {
+            // validation for email and telno
+            if (isset($student->parentEmail) && !empty($student->parentEmail)) {
+                // if parent have email
+                $validator = Validator::make((array) $student, [
+                    'parentTelno' => 'required|unique:users,telno',
+                    'parentEmail' => 'unique:users,email',
+                ]);
+            } else {
+                $validator = Validator::make((array) $student, [
+                    'parentTelno' => 'required|unique:users,telno',
+                ]);
+            }
+
+            // return back if email or telno invalid
+            if ($validator->fails()) {
+                // Handle validation failure, return response, or redirect back with errors
+                // For example:
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            // create new parent 
+            $newparent = new Parents([
+                'name' => $student->parentName,
+                'email' => $student->parentEmail ?? '',
+                'password' => Hash::make('abc123'),
+                'telno' => $student->parentTelno,
+                'remember_token' => Str::random(40),
+            ]);
+
+            $newparent->save();
+
+            // get the user again after user is created to check and create organization_user
+            $parentUser = DB::table('users')
+                ->where('id', $newparent->id)
+                ->first();
+        }
+
+        return $parentUser;
+    }
+
+    private function getOrCreateParentRelationship($parentUser, $co)
+    {
+        // check if organization_user with parent role exists
+        $parentRole = DB::table('organization_user')
+            ->where('user_id', $parentUser->id)
+            ->where('organization_id', $co->oid)
+            ->where('role_id', 6)
+            ->first();
+
+        // if not create a new organization_user with parent role (role_id of 6)
+        if (empty($parentRole)) {
+            DB::table('organization_user')->insert([
+                'organization_id' => $co->oid,
+                'user_id' => $parentUser->id,
+                'role_id' => 6,
+                'start_date' => now(),
+                'status' => 1,
+            ]);
+        }
+    }
 
     public function compareAddNewStudent(Request $request)
     {
-
         $student = json_decode($request->student);
-        //return response()->json(['data'=>$student->parentName]);
 
         $classid = $student->classId;
 
@@ -2164,113 +2236,19 @@ class StudentController extends Controller
             ->where('class_id', $classid)
             ->first();
 
+        // search if parent (or teacher) user exists
+        // if not create the user
+        $parentUser = $this->getOrCreateUser($student);
 
-
-        $ifExits = DB::table('users as u')
-            ->leftJoin('organization_user as ou', 'u.id', '=', 'ou.user_id')
-            ->where('u.telno', '=', $student->parentTelno)
-            ->where('ou.organization_id', $co->oid)
-            ->whereIn('ou.role_id', [5, 6, 21])
-            ->get();
-
-        if (count($ifExits) == 0) { // if not teacher or parent
-
-            $newparent = DB::table('users')
-                ->where(function ($query) use ($student) {
-                    $query
-                        ->where('telno', $student->parentTelno);
-                })
-                ->first();
-
-            // dd($newparent);
-
-            if (empty($newparent)) {
-                //if parent have email
-                if (isset($student->parentEmail) && !empty($student->parentEmail)) {
-                    $validator = Validator::make((array) $student, [
-                        'parentTelno' => 'required|unique:users,telno',
-                        'parentEmail' => 'unique:users,email',
-                    ]);
-
-                    if ($validator->fails()) {
-                        // Handle validation failure, return response, or redirect back with errors
-                        // For example:
-                        return response()->json(['errors' => $validator->errors()], 422);
-                    }
-
-                    $newparent = new Parents([
-                        'name' => $student->parentName,
-                        'email' => $student->parentEmail,
-                        'password' => Hash::make('abc123'),
-                        'telno' => $student->parentTelno,
-                        'remember_token' => Str::random(40),
-                    ]);
-                    $newparent->save();
-                } else {
-                    $validator = Validator::make((array) $student, [
-                        'parentTelno' => 'required|unique:users,telno',
-                    ]);
-
-                    if ($validator->fails()) {
-                        // Handle validation failure, return response, or redirect back with errors
-                        // For example:
-                        return response()->json(['errors' => $validator->errors()], 422);
-                    }
-
-                    $newparent = new Parents([
-                        'name' => $student->parentName,
-                        //'email'          =>  $request->get('parent_email'),
-                        'password' => Hash::make('abc123'),
-                        'telno' => $student->parentTelno,
-                        'remember_token' => Str::random(40),
-                    ]);
-                    $newparent->save();
-                }
-            }
-
-            // add parent role
-            $parentRole = DB::table('organization_user')
-                ->where('user_id', $newparent->id)
-                ->where('organization_id', $co->oid)
-                ->where('role_id', 6)
-                ->first();
-
-            if (empty($parentRole)) {
-                DB::table('organization_user')->insert([
-                    'organization_id' => $co->oid,
-                    'user_id' => $newparent->id,
-                    'role_id' => 6,
-                    'start_date' => now(),
-                    'status' => 1,
-                ]);
-            }
-        } else {
-            $newparent = DB::table('users')
-                ->where(function ($query) use ($student) {
-                    $query->where('name', $student->parentName)
-                        ->orWhere('telno', $student->parentTelno);
-                })
-                ->first();
-
-            $parentRole = DB::table('organization_user')
-                ->where('user_id', $newparent->id)
-                ->where('organization_id', $co->oid)
-                ->where('role_id', 6)
-                ->first();
-
-            // dd($parentRole);
-
-            if (empty($parentRole)) {
-                DB::table('organization_user')->insert([
-                    'organization_id' => $co->oid,
-                    'user_id' => $newparent->id,
-                    'role_id' => 6,
-                    'start_date' => now(),
-                    'status' => 1,
-                ]);
-            }
+        if ($parentUser instanceof JsonResponse) {
+            // return the json response to the frontend if error happens
+            return $parentUser;
         }
-        $this->assignStudentToParent($newparent->id, $student->parentTelno, $student, $classid, $ifExits);
+
+        // check if organization_user with parent role exists
+        $this->getOrCreateParentRelationship($parentUser, $co);
+
+        $this->assignStudentToParent($parentUser->id, $student->parentTelno, $student, $classid, $parentUser);
     }
 
     public function checkFeesBCWhenClassChanged($ifExitsCateBC, $studentFeesIDs, $student, $level_id, $new_class_student_id, $old_class_student_id)
