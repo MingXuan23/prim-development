@@ -2805,9 +2805,18 @@ class FeesController extends AppBaseController
                 ->get();
         }
 
+        // get the start year of the fees
+        $startYear = DB::table('fees_new')
+            ->where('organization_id', $organ->id)
+            ->whereYear('start_date', '<=', now()->year)
+            ->selectRaw('DISTINCT YEAR(start_date) as year');
+
+        // get the end year of the fees union with the start year fee
         $years = DB::table('fees_new')
             ->where('organization_id', $organ->id)
-            ->selectRaw('DISTINCT YEAR(start_date) as year')
+            ->whereYear('end_date', '<=', now()->year)
+            ->selectRaw('DISTINCT YEAR (end_date) as year')
+            ->union($startYear)
             ->orderByDesc('year')
             ->get();
 
@@ -2822,7 +2831,10 @@ class FeesController extends AppBaseController
         $lists = DB::table('fees_new')
             ->select('fees_new.*', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
             ->where('organization_id', $oid)
-            ->whereYear('start_date', $year)
+            ->where(function ($query) use ($year) {
+                $query->whereYear('start_date', $year)
+                    ->orWhereYear('end_date', $year);
+            })
             ->orderBy('category')
             ->orderBy('name')
             ->get();
