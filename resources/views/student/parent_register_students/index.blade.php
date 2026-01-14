@@ -125,7 +125,6 @@
                     // remove the initial data when the classes selection is being reselected
                     pendingRegistrationsTable.DataTable().clear().destroy();
 
-                    // add data to the yuran table to display all students with respective exportAllYuranStatus
                     pendingRegistrationsTable = pendingRegistrationsTable.DataTable({
                         ordering: true,
                         processing: true,

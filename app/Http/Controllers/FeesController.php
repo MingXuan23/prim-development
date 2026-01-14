@@ -2985,6 +2985,7 @@ class FeesController extends AppBaseController
 
     public function ExportAllYuranStatus(Request $request)
     {
+        $feeYear = $request->get('fee_year');
 
         if ($request->yuranExport == 0) {
             $filename = "LaporanSemuaYuran";
@@ -2999,6 +3000,10 @@ class FeesController extends AppBaseController
             $yuran = DB::table('fees_new')
                 ->where('organization_id', $request->organExport)
                 ->whereIn('status', $statusToExport)
+                ->where(function ($query) use ($feeYear) {
+                    $query->whereYear('start_date', $feeYear)
+                        ->orWhereYear('end_date', $feeYear);
+                })
                 ->orderBy('status', 'desc')
                 ->get();
         } else {
@@ -3016,7 +3021,7 @@ class FeesController extends AppBaseController
 
 
         if (!$orgtypeSwasta || count($orgtypeSwasta) == 0) {
-            return Excel::download(new ExportYuranStatus($yuran), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran, $feeYear), $filename . '.xlsx');
         } else {
             return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }

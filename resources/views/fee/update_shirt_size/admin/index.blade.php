@@ -115,7 +115,6 @@
             // remove the initial data when the classes selection is being reselected
             yuranTable.DataTable().clear().destroy();
 
-            // add data to the yuran table to display all students with respective exportAllYuranStatus
             yuranTable = yuranTable.DataTable({
                 ordering: true,
                 processing: true,
