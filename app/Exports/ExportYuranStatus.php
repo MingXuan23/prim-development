@@ -45,10 +45,15 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->join('fees_new_organization_user as fou', 'fou.organization_user_id', '=', 'ou.id')
                 ->where('ou.organization_id', $orgId)
                 ->where('fou.fees_new_id', $yuran->id)
-                ->where('cs.start_date', '<=', $this->feeYear . '-12-31')
                 ->where(function ($query) {
-                    $query->whereNull('cs.end_date')
-                        ->orWhere('cs.end_date', '>=', $this->feeYear . '-01-01');
+                    $query->where(function ($query) {
+                        $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                            ->where('cs.end_date', '>=', $this->feeYear . '-01-01');
+                    })
+                        ->orWhere(function ($query) {
+                            $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                                ->whereNull('cs.end_date');
+                        });
                 })
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'fou.status')
                 ->orderBy('c.nama')
@@ -62,10 +67,15 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->join('classes as c', 'c.id', 'co.class_id')
                 ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                 ->where('sfn.fees_id', $yuran->id)
-                ->where('cs.start_date', '<=', $this->feeYear . '-12-31')
                 ->where(function ($query) {
-                    $query->whereNull('cs.end_date')
-                        ->orWhere('cs.end_date', '>=', $this->feeYear . '-01-01');
+                    $query->where(function ($query) {
+                        $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                            ->where('cs.end_date', '>=', $this->feeYear . '-01-01');
+                    })
+                        ->orWhere(function ($query) {
+                            $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                                ->whereNull('cs.end_date');
+                        });
                 })
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status')
                 ->orderBy('c.nama')
