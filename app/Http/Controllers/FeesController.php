@@ -2831,10 +2831,8 @@ class FeesController extends AppBaseController
         $lists = DB::table('fees_new')
             ->select('fees_new.*', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
             ->where('organization_id', $oid)
-            ->where(function ($query) use ($year) {
-                $query->whereYear('start_date', $year)
-                    ->orWhereYear('end_date', $year);
-            })
+            ->where('start_date', '<=', $year . '-12-31')
+            ->where('end_date', '>=', $year . '-01-01')
             ->orderBy('category')
             ->orderBy('name')
             ->get();
@@ -2884,6 +2882,7 @@ class FeesController extends AppBaseController
             })
             ->where('fn.organization_id', $oid)
             ->whereYear('fn.start_date', $year)
+            ->orWhereYear('fn.end_date', $year)
             ->groupBy('fn.id')
             ->select('fn.id', DB::raw("CONCAT(fn.category, ' - ', fn.name) AS name"))
             ->orderBy('fn.category')
@@ -2985,6 +2984,7 @@ class FeesController extends AppBaseController
 
     public function ExportAllYuranStatus(Request $request)
     {
+        $feeYear = $request->get('fee_year');
 
         if ($request->yuranExport == 0) {
             $filename = "LaporanSemuaYuran";
@@ -2999,6 +2999,8 @@ class FeesController extends AppBaseController
             $yuran = DB::table('fees_new')
                 ->where('organization_id', $request->organExport)
                 ->whereIn('status', $statusToExport)
+                ->where('start_date', '<=', $feeYear . '-12-31')
+                ->where('end_date', '>=', $feeYear . '-01-01')
                 ->orderBy('status', 'desc')
                 ->get();
         } else {
@@ -3016,7 +3018,7 @@ class FeesController extends AppBaseController
 
 
         if (!$orgtypeSwasta || count($orgtypeSwasta) == 0) {
-            return Excel::download(new ExportYuranStatus($yuran), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran, $feeYear), $filename . '.xlsx');
         } else {
             return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }

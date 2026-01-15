@@ -13,9 +13,10 @@ use Maatwebsite\Excel\Concerns\Exportable;
 
 class ExportYuranStatus implements WithMultipleSheets
 {
-    public function __construct($yuran)
+    public function __construct($yuran, $feeYear)
     {
         $this->yuran = $yuran;
+        $this->feeYear = $feeYear;
     }
 
     /**
@@ -34,45 +35,48 @@ class ExportYuranStatus implements WithMultipleSheets
             if ($org->parent_org != null) {
                 $orgId = $org->parent_org;
             }
-            $feeStatus = DB::table('fees_new_organization_user as fou')
-                ->leftJoin('organization_user as ou', 'ou.id', 'fou.organization_user_id')
-                // ->leftJoin('transactions as t', 'fou.transaction_id', 't.id')
-                ->where('fou.fees_new_id', $yuran->id)
-                ->select('ou.user_id', 'fou.status')
-                ->distinct('fou.id')
-                ->get();
 
-            $student = DB::table('organization_user as ou')
-                ->leftJoin('organization_user_student as ous', 'ous.organization_user_id', 'ou.id')
-                ->leftJoin('students as s', 's.id', 'ous.student_id')
-                ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                ->leftJoin('classes as c', 'c.id', 'co.class_id')
+            $data = DB::table('organization_user as ou')
+                ->join('organization_user_student as ous', 'ous.organization_user_id', 'ou.id')
+                ->join('students as s', 's.id', 'ous.student_id')
+                ->join('class_student as cs', 'cs.student_id', 's.id')
+                ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                ->join('classes as c', 'c.id', 'co.class_id')
+                ->join('fees_new_organization_user as fou', 'fou.organization_user_id', '=', 'ou.id')
                 ->where('ou.organization_id', $orgId)
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'ou.user_id')
+                ->where('fou.fees_new_id', $yuran->id)
+                ->where(function ($query) {
+                    $query->where(function ($query) {
+                        $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                            ->where('cs.end_date', '>=', $this->feeYear . '-01-01');
+                    })
+                        ->orWhere(function ($query) {
+                            $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                                ->whereNull('cs.end_date');
+                        });
+                })
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'fou.status')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
                 ->get();
 
-            // dd($student);
-
-            $data = $feeStatus->map(function ($fee) use ($student) {
-                $studentItem = $student->where('user_id', $fee->user_id)->first();
-                return (object) array_merge((array) $studentItem, (array) $fee);
-            });
-
-            foreach ($data as &$item) {
-                unset($item->user_id);
-            }
         } else {
             $data = DB::table('students as s')
-                ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                ->leftJoin('classes as c', 'c.id', 'co.class_id')
-                ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
-                // ->leftJoin('fees_transactions_new as ftn', 'sfn.id', 'ftn.student_fees_id')
-                // ->leftJoin('transactions as t', 'fou.transaction_id', 't.id')
+                ->join('class_student as cs', 'cs.student_id', 's.id')
+                ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                ->join('classes as c', 'c.id', 'co.class_id')
+                ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                 ->where('sfn.fees_id', $yuran->id)
+                ->where(function ($query) {
+                    $query->where(function ($query) {
+                        $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                            ->where('cs.end_date', '>=', $this->feeYear . '-01-01');
+                    })
+                        ->orWhere(function ($query) {
+                            $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
+                                ->whereNull('cs.end_date');
+                        });
+                })
                 ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status')
                 ->orderBy('c.nama')
                 ->orderBy('s.nama')
@@ -141,7 +145,7 @@ class ExportYuranStatus implements WithMultipleSheets
             $sheets[] = new Sheet($data, $heading, $yuranItem->name . ($yuranItem->status == 1 ? ' (Aktif)' : ' (Tidak Aktif)'));
 
         }
-        //dd($sheets);
+
         return $sheets;
     }
 
