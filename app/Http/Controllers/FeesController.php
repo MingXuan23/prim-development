@@ -55,8 +55,8 @@ class FeesController extends AppBaseController
         DB::table('fees_new')
             ->whereDate('end_date', '<', Carbon::now()->toDateString())
             ->update([
-                'status' => '0'
-            ]);
+                    'status' => '0'
+                ]);
     }
 
 
@@ -111,11 +111,11 @@ class FeesController extends AppBaseController
         DB::table("fees_new")
             ->where("id", $id)
             ->update([
-                "name" => $request->get('name'),
-                "desc" => $request->get("description"),
-                "start_date" => $date_started,
-                "end_date" => $date_end
-            ]);
+                    "name" => $request->get('name'),
+                    "desc" => $request->get("description"),
+                    "start_date" => $date_started,
+                    "end_date" => $date_end
+                ]);
 
         if ($feeCategory->category == "Kategori A") {
             return redirect()->route('fees.A');
@@ -306,18 +306,18 @@ class FeesController extends AppBaseController
             // if user has not chosen shirt size before, create new response
             DB::table("form_responses")
                 ->insert([
-                    "response" => $jsonResponse,
-                    "purpose" => "Choose shirt size",
-                    "user_id" => Auth::id(),
-                    "organization_id" => $request->get('organization')
-                ]);
+                        "response" => $jsonResponse,
+                        "purpose" => "Choose shirt size",
+                        "user_id" => Auth::id(),
+                        "organization_id" => $request->get('organization')
+                    ]);
         } else {
             // if user has already chose shirt size before, update their previous response
             DB::table("form_responses")
                 ->where("id", $responseId)
                 ->update([
-                    "response" => $jsonResponse
-                ]);
+                        "response" => $jsonResponse
+                    ]);
         }
 
         return redirect()->route('fees.updateShirtSize.buyer.index')->with('success', 'Pilihan saiz baju anda telah disimpan.');
@@ -2550,8 +2550,8 @@ class FeesController extends AppBaseController
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('classes.id as id', 'classes.nama', 'classes.levelid')
             ->where([
-                ['class_organization.organization_id', $organization[0]->id]
-            ])
+                    ['class_organization.organization_id', $organization[0]->id]
+                ])
             ->orderBy('classes.nama')
             ->get();
 
@@ -2588,8 +2588,8 @@ class FeesController extends AppBaseController
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->select('classes.id as id', 'classes.nama', 'classes.levelid')
             ->where([
-                ['class_organization.organization_id', $organization[0]->id]
-            ])
+                    ['class_organization.organization_id', $organization[0]->id]
+                ])
             ->orderBy('classes.nama')
             ->get();
 
@@ -2786,9 +2786,9 @@ class FeesController extends AppBaseController
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
                 ->where([
-                    ['class_organization.organization_id', $organ->parent_org != null ? $organ->parent_org : $organ->id],
-                    ['classes.status', 1]
-                ])
+                        ['class_organization.organization_id', $organ->parent_org != null ? $organ->parent_org : $organ->id],
+                        ['classes.status', 1]
+                    ])
                 ->orderBy('classes.nama')
                 ->get();
         } else {
@@ -2797,10 +2797,10 @@ class FeesController extends AppBaseController
                 ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                 ->select('classes.id as cid', 'classes.nama as cname')
                 ->where([
-                    ['class_organization.organization_id', $organ->parent_org != null ? $organ->parent_org : $organ->id],
-                    ['classes.status', 1],
-                    ['organization_user.user_id', Auth::id()]
-                ])
+                        ['class_organization.organization_id', $organ->parent_org != null ? $organ->parent_org : $organ->id],
+                        ['classes.status', 1],
+                        ['organization_user.user_id', Auth::id()]
+                    ])
                 ->orderBy('classes.nama')
                 ->get();
         }
@@ -2884,6 +2884,7 @@ class FeesController extends AppBaseController
             })
             ->where('fn.organization_id', $oid)
             ->whereYear('fn.start_date', $year)
+            ->orWhereYear('fn.end_date', $year)
             ->groupBy('fn.id')
             ->select('fn.id', DB::raw("CONCAT(fn.category, ' - ', fn.name) AS name"))
             ->orderBy('fn.category')
@@ -3088,8 +3089,8 @@ class FeesController extends AppBaseController
             DB::table('fees_new')
                 ->where('id', '=', $id)
                 ->update([
-                    'status' => '0'
-                ]);
+                        'status' => '0'
+                    ]);
 
             Session::flash('success', 'Yuran Berjaya Ditutup');
             return View::make('layouts/flash-messages');
