@@ -2187,7 +2187,7 @@ class StudentController extends Controller
             // create new parent 
             $newparent = new Parents([
                 'name' => $student->parentName,
-                'email' => $student->parentEmail ?? '',
+                'email' => isset($student->parentEmail) ? $student->parentEmail : null,
                 'password' => Hash::make('abc123'),
                 'telno' => $student->parentTelno,
                 'remember_token' => Str::random(40),
