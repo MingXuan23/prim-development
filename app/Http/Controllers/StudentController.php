@@ -2368,7 +2368,7 @@ class StudentController extends Controller
     private function deleteRecurringFee($kateRec, $class_student_details)
     {
         // get the id student_fees_new to delete
-        $delete = DB::table('student_fees_new as sfn')
+        $deleteStudentFeesNew = DB::table('student_fees_new as sfn')
             ->where([
                 ['sfn.fees_id', $kateRec->id],
                 ['sfn.class_student_id', $class_student_details->id],
@@ -2376,8 +2376,13 @@ class StudentController extends Controller
             ])
             ->get()->pluck('id');
 
+        // delete fees_recurring 
+        DB::table('fees_recurring')
+            ->whereIn('student_fees_new_id', $deleteStudentFeesNew)
+            ->delete();
+
         // delete the student_fees_new
-        DB::table('student_fees_new')->whereIn('id', $delete)->delete();
+        DB::table('student_fees_new')->whereIn('id', $deleteStudentFeesNew)->delete();
     }
 
     public function compareTransferStudent(Request $request)
