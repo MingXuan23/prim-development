@@ -2376,6 +2376,11 @@ class StudentController extends Controller
             ])
             ->get()->pluck('id');
 
+        // delete fees_recurring
+        DB::table("fees_recurring")
+            ->whereIn('student_fees_new_id', $delete)
+            ->delete();
+
         // delete the student_fees_new
         DB::table('student_fees_new')->whereIn('id', $delete)->delete();
     }
