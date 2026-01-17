@@ -2317,6 +2317,69 @@ class StudentController extends Controller
         }
     }
 
+    private function updateOrAssignFeesRecurring($kateRec, $studentFeesIDs, $student, $cs_after_update, $new_class_student_id)
+    {
+        $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
+        $dateend = Carbon::parse($kateRec->end_date);
+        $totalDay = ($datestarted->diffInDays($dateend)) + 1;
+        $cs_startdate = Carbon::parse($cs_after_update->start_date);
+        $totalDayLeft = ($cs_startdate)->diffInDays($dateend);
+        if ($totalDayLeft > $totalDay || $datestarted->day == $cs_startdate->day) {
+            $totalDayLeft = $totalDay;
+        }
+        $finalAmount = $kateRec->totalAmount * ($totalDayLeft / $totalDay);
+        if ($finalAmount > $kateRec->totalAmount) {
+            $finalAmount = $kateRec->totalAmount;
+        }
+
+        if (in_array($kateRec->id, $studentFeesIDs)) {
+            $ifStudentFeesNewExist = DB::table('student_fees_new as sfn')
+                ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
+                ->where('sfn.fees_id', $kateRec->id)
+                ->where('cs.student_id', $student->studentId)
+                ->first();
+
+            DB::table('fees_recurring as fr')
+                ->where('fr.student_fees_new_id', $ifStudentFeesNewExist->id)
+                ->update([
+                    'totalDayLeft' => $totalDayLeft,
+                    'finalAmount' => $finalAmount,
+                    'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
+                    'created_at' => now(),
+                ]);
+        } else {
+            $student_fees_new = DB::table('student_fees_new')->insertGetId([
+                'status' => 'Debt',
+                'fees_id' => $kateRec->id,
+                'class_student_id' => $new_class_student_id
+            ]);
+
+            DB::table('fees_recurring')->insert([
+                'student_fees_new_id' => $student_fees_new,
+                'totalDay' => $totalDay,
+                'totalDayLeft' => $totalDayLeft,
+                'finalAmount' => $finalAmount,
+                'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
+                'created_at' => now(),
+            ]);
+        }
+    }
+
+    private function deleteRecurringFee($kateRec, $class_student_details)
+    {
+        // get the id student_fees_new to delete
+        $delete = DB::table('student_fees_new as sfn')
+            ->where([
+                ['sfn.fees_id', $kateRec->id],
+                ['sfn.class_student_id', $class_student_details->id],
+                ['sfn.status', '=', 'Debt'],
+            ])
+            ->get()->pluck('id');
+
+        // delete the student_fees_new
+        DB::table('student_fees_new')->whereIn('id', $delete)->delete();
+    }
+
     public function compareTransferStudent(Request $request)
     {
         set_time_limit(300);
@@ -2326,10 +2389,12 @@ class StudentController extends Controller
         $co = DB::table('class_organization as co')
             ->where('co.class_id', $student->newClass)
             ->first();
+
         $class = DB::table('classes as c')
             ->where('c.id', $student->newClass)
             ->first();
-        // dd($student);
+
+        // old class_student before moving class
         $class_student = DB::table('class_organization as co')
             ->join('class_student as cs', 'cs.organclass_id', 'co.id')
             ->where('cs.student_id', $student->id ?? $student->studentId)
@@ -2337,204 +2402,85 @@ class StudentController extends Controller
             ->select('co.*', 'cs.*', 'cs.id as class_student_id')
             ->where('co.class_id', $student->class_id ?? $student->oldClassId);
 
+        // getting the first in the list
         $class_student_details = $class_student->first();
-        //dd($class_student_details,$student);
+
+        // make the old class_student inactive
         $class_student->update([
-            //'cs.organclass_id'=>$co->id,
             'cs.end_date' => now(),
             'cs.status' => 0,
         ]);
 
+        // insert a new class_student for the new class
         $new_class_student_id = DB::table('class_student')->insertGetId([
             'organclass_id' => $co->id,
             'student_id' => $student->studentId,
             'status' => 1,
             'start_date' => now(),
-            //'fee_status'=>'Not Complete'
-
         ]);
 
-        //if inactive or graduated will not run this 
-        if ($class->levelid > 0) {
-            $ifExitsCateBC = DB::table('fees_new')
-                ->whereIn('category', ['Kategori B', 'Kategori C'])
-                ->where('organization_id', $co->organization_id)
-                ->where('status', 1)
-                ->get();
+        // if inactive or graduated, do nothing and return
+        if ($class->levelid <= 0) {
+            return;
+        }
 
-            // dd($class_student->get());
-            $studentHaveFees = DB::table('student_fees_new as sfn')
-                ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
-                ->whereIn('sfn.class_student_id', [$new_class_student_id, $class_student_details->id])
-                ->get();
+        // get all kategori B & C fees from current organization
+        $ifExitsCateBC = DB::table('fees_new')
+            ->whereIn('category', ['Kategori B', 'Kategori C'])
+            ->where('organization_id', $co->organization_id)
+            ->where('status', 1)
+            ->get();
 
-            $studentFeesIDs = $studentHaveFees->pluck('fees_id')->toArray();
+        // get the previous student_fees_id
+        $studentFeesIDs = DB::table('student_fees_new as sfn')
+            ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
+            ->whereIn('sfn.class_student_id', [$new_class_student_id, $class_student_details->id])
+            ->get()
+            ->pluck('fees_id')
+            ->toArray();
 
-            $this->checkFeesBCWhenClassChanged($ifExitsCateBC, $studentFeesIDs, $student, $class->levelid, $new_class_student_id, $class_student_details->id);
+        // assign appropriate fees for kategori B & C to student
+        $this->checkFeesBCWhenClassChanged($ifExitsCateBC, $studentFeesIDs, $student, $class->levelid, $new_class_student_id, $class_student_details->id);
 
+        // get Kategori Berulang fees for current organization
+        $ifExitsCateRecurring = DB::table('fees_new')
+            ->where('category', 'Kategori Berulang')
+            ->where('organization_id', $co->organization_id)
+            ->where('status', 1)
+            ->get();
 
-            $ifExitsCateRecurring = DB::table('fees_new')
-                ->where('category', 'Kategori Berulang')
-                ->where('organization_id', $co->organization_id)
-                ->where('status', 1)
-                ->get();
+        // get the class_student after updating 
+        $cs_after_update = DB::table('class_student as cs')
+            ->where('cs.student_id', $student->studentId)
+            ->first();
 
-            $cs_after_update = DB::table('class_student as cs')
-                ->where('cs.student_id', $student->studentId)
-                ->first();
+        // loop to assign each appropriate recurring fee to student
+        foreach ($ifExitsCateRecurring as $kateRec) {
+            // if the recurring fee is still active when the student move class
+            if ($kateRec->end_date > $cs_after_update->start_date) {
+                $target = json_decode($kateRec->target);
 
-            if (!$ifExitsCateRecurring->isEmpty()) {
-                foreach ($ifExitsCateRecurring as $kateRec) {
+                if (isset($target->gender) && $target->gender != $student->gender) {
+                    continue;
+                }
 
-                    if ($kateRec->end_date > $cs_after_update->start_date) {
-                        $target = json_decode($kateRec->target);
+                if ($target->data == "All_Level" || $target->data == $class->levelid) {
+                    // if the target of the recurring fee is all level, update or assign the recurring fee to the student
+                    $this->updateOrAssignFeesRecurring($kateRec, $studentFeesIDs, $student, $cs_after_update, $new_class_student_id);
 
-                        if (isset($target->gender)) {
-                            if ($target->gender != $studentData->gender) {
-                                continue;
-                            }
-                        }
+                } else if (is_array($target->data)) {
+                    if (in_array($student->newClass, $target->data)) {
+                        // if the student's class is in the target of the recurring fee, update or assign the recurring fee to the student
+                        $this->updateOrAssignFeesRecurring($kateRec, $studentFeesIDs, $student, $cs_after_update, $new_class_student_id);
 
-                        if ($target->data == "All_Level" || $target->data == $class->levelid) {
-
-                            $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
-                            $dateend = Carbon::parse($kateRec->end_date);
-                            $totalDay = ($datestarted->diffInDays($dateend)) + 1;
-                            $cs_startdate = Carbon::parse($cs_after_update->start_date);
-                            $totalDayLeft = ($cs_startdate)->diffInDays($dateend);
-                            if ($totalDayLeft > $totalDay || $datestarted->day == $cs_startdate->day) {
-                                $totalDayLeft = $totalDay;
-                            }
-                            $finalAmount = $kateRec->totalAmount * ($totalDayLeft / $totalDay);
-                            if ($finalAmount > $kateRec->totalAmount) {
-                                $finalAmount = $kateRec->totalAmount;
-                            }
-
-                            if (in_array($kateRec->id, $studentFeesIDs)) {
-                                // continue;
-                                $ifStudentFeesNewExist = DB::table('student_fees_new as sfn')
-                                    ->where('sfn.fees_id', $kateRec->id)
-                                    ->where('sfn.class_student_id', $student->studentId)
-                                    ->first();
-
-                                DB::table('fees_recurring as fr')
-                                    ->where('fr.student_fees_new_id', $ifStudentFeesNewExist->id)
-                                    ->update([
-                                        'totalDayLeft' => $totalDayLeft,
-                                        'finalAmount' => $finalAmount,
-                                        'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
-                                        'created_at' => now(),
-                                    ]);
-                            } else {
-                                // DB::table('student_fees_new')->insert([
-                                //     'status'            => 'Debt',
-                                //     'fees_id'           =>  $kateRec->id,
-                                //     'class_student_id'  =>  $class_student_details->id
-                                // ]);
-
-                                $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                    'status' => 'Debt',
-                                    'fees_id' => $kateRec->id,
-                                    'class_student_id' => $new_class_student_id
-                                ]);
-
-                                DB::table('fees_recurring')->insert([
-                                    'student_fees_new_id' => $student_fees_new,
-                                    'totalDay' => $totalDay,
-                                    'totalDayLeft' => $totalDayLeft,
-                                    'finalAmount' => $finalAmount,
-                                    'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
-                                    'created_at' => now(),
-                                ]);
-                            }
-                        } else if (is_array($target->data)) {
-                            if (in_array($student->newClass, $target->data)) {
-
-                                $datestarted = Carbon::parse($kateRec->start_date); //back to original date without format (string to datetime)
-                                $dateend = Carbon::parse($kateRec->end_date);
-                                $totalDay = ($datestarted->diffInDays($dateend)) + 1;
-                                $cs_startdate = Carbon::parse($cs_after_update->start_date);
-                                $totalDayLeft = ($cs_startdate)->diffInDays($dateend);
-                                if ($totalDayLeft > $totalDay || $datestarted->day == $cs_startdate->day) {
-                                    $totalDayLeft = $totalDay;
-                                }
-                                $finalAmount = $kateRec->totalAmount * ($totalDayLeft / $totalDay);
-                                if ($finalAmount > $kateRec->totalAmount) {
-                                    $finalAmount = $kateRec->totalAmount;
-                                }
-
-                                if (in_array($kateRec->id, $studentFeesIDs)) {
-                                    // continue;
-                                    $ifStudentFeesNewExist = DB::table('student_fees_new as sfn')
-                                        ->where('sfn.fees_id', $kateRec->id)
-                                        ->where('sfn.class_student_id', $student->studentId)
-                                        ->first();
-
-                                    DB::table('fees_recurring as fr')
-                                        ->where('fr.student_fees_new_id', $ifStudentFeesNewExist->id)
-                                        ->update([
-                                            'totalDayLeft' => $totalDayLeft,
-                                            'finalAmount' => $finalAmount,
-                                            'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
-                                            'created_at' => now(),
-                                        ]);
-                                } else {
-                                    // DB::table('student_fees_new')->insert([
-                                    //     'status'            => 'Debt',
-                                    //     'fees_id'           =>  $kateRec->id,
-                                    //     'class_student_id'  =>  $class_student_details->id
-                                    // ]);
-
-                                    $student_fees_new = DB::table('student_fees_new')->insertGetId([
-                                        'status' => 'Debt',
-                                        'fees_id' => $kateRec->id,
-                                        'class_student_id' => $new_class_student_id
-                                    ]);
-
-                                    DB::table('fees_recurring')->insert([
-                                        'student_fees_new_id' => $student_fees_new,
-                                        'totalDay' => $totalDay,
-                                        'totalDayLeft' => $totalDayLeft,
-                                        'finalAmount' => $finalAmount,
-                                        'desc' => 'RM' . $kateRec->totalAmount . '*' . $totalDayLeft . '/' . $totalDay,
-                                        'created_at' => now(),
-                                    ]);
-                                }
-                            } else {
-                                // $delete=DB::table('student_fees_new as sfn')
-                                //         ->where('sfn.fees_id',$kateRec->id)
-                                //         ->where('sfn.class_student_id',$class_student_details->id)
-                                //         ->where('sfn.status',"Debt")
-                                //         ->delete();
-
-                                $delete = DB::table('student_fees_new as sfn')
-                                    ->where([
-                                        ['sfn.fees_id', $kateRec->id],
-                                        ['sfn.class_student_id', $class_student_details->id],
-                                        ['sfn.status', '=', 'Debt'],
-                                    ])
-                                    ->get()->pluck('id');
-                                DB::table('student_fees_new')->whereIn('id', $delete)->delete();
-                                //return response()->json(['data'=>$delete]);  
-                            }
-                        }
                     } else {
-                        // $delete=DB::table('student_fees_new as sfn')
-                        //         ->where('sfn.fees_id',$kateRec->id)
-                        //         ->where('sfn.class_student_id',$class_student_details>id)
-                        //         ->where('sfn.status',"Debt")
-                        //         ->delete();
-                        $delete = DB::table('student_fees_new as sfn')
-                            ->where([
-                                ['sfn.fees_id', $kateRec->id],
-                                ['sfn.class_student_id', $class_student_details->id],
-                                ['sfn.status', '=', 'Debt'],
-                            ])
-                            ->get()->pluck('id');
-                        DB::table('student_fees_new')->whereIn('id', $delete)->delete();
-                        //return response()->json(['data'=>$delete]);
+                        // after transfering class, if the student's class is not in the fees_recurring target list, remove the old student_fees_new for previous class
+                        $this->deleteRecurringFee($kateRec, $class_student_details);
                     }
                 }
+            } else {
+                // if the recurring fee is inactive, remove the student_fees_new of the old class_student
+                $this->deleteRecurringFee($kateRec, $class_student_details);
             }
         }
     }
