@@ -2402,19 +2402,30 @@ class StudentController extends Controller
         // old class_student before moving class
         $class_student = DB::table('class_organization as co')
             ->join('class_student as cs', 'cs.organclass_id', 'co.id')
-            ->where('cs.student_id', $student->id ?? $student->studentId)
+            ->join('students as s', 's.id', '=', 'cs.student_id')
+            ->where('s.nama', $student->studentName)
+            ->where('s.parent_tel', $student->parentTelno)
             ->where('cs.status', 1)
-            ->select('co.*', 'cs.*', 'cs.id as class_student_id')
-            ->where('co.class_id', $student->class_id ?? $student->oldClassId);
-
-        // getting the first in the list
-        $class_student_details = $class_student->first();
+            ->select('cs.id')
+            ->pluck('cs.id')
+            ->toArray();
 
         // make the old class_student inactive
-        $class_student->update([
-            'cs.end_date' => now(),
-            'cs.status' => 0,
-        ]);
+        DB::table('class_student')
+            ->whereIn('id', $class_student)
+            ->update([
+                'end_date' => now(),
+                'status' => 0
+            ]);
+
+        // getting the first in the list
+        $class_student_details = DB::table('class_organization as co')
+            ->join('class_student as cs', 'cs.organclass_id', 'co.id')
+            ->join('students as s', 's.id', '=', 'cs.student_id')
+            ->whereIn('cs.id', $class_student)
+            ->where('co.class_id', $student->oldClassId)
+            ->select('co.*', 'cs.*', 'cs.id as class_student_id')
+            ->first();
 
         // insert a new class_student for the new class
         $new_class_student_id = DB::table('class_student')->insertGetId([
@@ -2479,12 +2490,12 @@ class StudentController extends Controller
                         $this->updateOrAssignFeesRecurring($kateRec, $studentFeesIDs, $student, $cs_after_update, $new_class_student_id);
 
                     } else {
-                        // after transfering class, if the student's class is not in the fees_recurring target list, remove the old student_fees_new for previous class
+                        // TODO: after transfering class, if the student's class is not in the fees_recurring target list, set the student_fees_new status to be 0
                         $this->deleteRecurringFee($kateRec, $class_student_details);
                     }
                 }
             } else {
-                // if the recurring fee is inactive, remove the student_fees_new of the old class_student
+                // TODO: if the recurring fee is inactive, set student_fees_new status to be 0 
                 $this->deleteRecurringFee($kateRec, $class_student_details);
             }
         }
@@ -2514,11 +2525,14 @@ class StudentController extends Controller
 
         $class_student = DB::table('class_organization as co')
             ->join('class_student as cs', 'cs.organclass_id', 'co.id')
-            ->where('cs.student_id', $student->studentId)
+            ->join('students as s', 's.id', '=', 'cs.student_id')
+            ->where('s.nama', $student->studentName)
+            ->where('s.parent_tel', $student->parentTelno)
             ->where('cs.status', 1)
-            ->select('co.*', 'cs.*', 'cs.id as class_student_id')
-            ->where('co.class_id', $student->oldClassId);
-        // dd('pass');
+            ->select('cs.id')
+            ->pluck('cs.id')
+            ->toArray();
+
         $newparent = DB::table('users')
             ->where('telno', '=', $student->parentTelno)
             ->first();
@@ -2602,14 +2616,20 @@ class StudentController extends Controller
                 ]);
         }
 
+        DB::table('class_student')
+            ->whereIn('id', $class_student)
+            ->update([
+                'end_date' => now(),
+                'status' => 0
+            ]);
 
-        $class_student_details = $class_student->first();
-
-        $class_student->update([
-            //'cs.organclass_id'=>$co->id,
-            'cs.end_date' => now(),
-            'cs.status' => 0,
-        ]);
+        $class_student_details = DB::table('class_organization as co')
+            ->join('class_student as cs', 'cs.organclass_id', 'co.id')
+            ->join('students as s', 's.id', '=', 'cs.student_id')
+            ->whereIn('cs.id', $class_student)
+            ->where('co.class_id', $student->oldClassId)
+            ->select('co.*', 'cs.*', 'cs.id as class_student_id')
+            ->first();
 
         $new_class_student_id = DB::table('class_student')->insertGetId([
             'organclass_id' => $co->id,
