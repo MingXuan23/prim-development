@@ -128,7 +128,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
                     ->orWhere('u.icno', $phone);
             })
             ->where('cs.status', 1)
-            ->select('s.id as studentId', 's.nama as studentName', 's.gender as gender', 'u.name as parentName', 'u.id as parentId', 'u.telno as parentTelno', 'cs.status')
+            ->select('s.id as studentId', 's.nama as studentName', 's.gender as gender', 'u.name as parentName', 'u.id as parentId', 'u.telno as parentTelno', 'u.icno as parentIcno', 'cs.status')
             ->first();
 
         if ($findStudent != null) {
