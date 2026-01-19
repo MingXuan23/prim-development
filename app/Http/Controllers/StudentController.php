@@ -2404,7 +2404,10 @@ class StudentController extends Controller
             ->join('class_student as cs', 'cs.organclass_id', 'co.id')
             ->join('students as s', 's.id', '=', 'cs.student_id')
             ->where('s.nama', $student->studentName)
-            ->where('s.parent_tel', $student->parentTelno)
+            ->where(function ($query) use ($student) {
+                $query->where('s.parent_tel', '=', $student->parentTelno)
+                    ->orWhere('s.parent_tel', '=', $student->parentIcno);
+            })
             ->where('cs.status', 1)
             ->select('cs.id')
             ->pluck('cs.id')
@@ -2527,7 +2530,10 @@ class StudentController extends Controller
             ->join('class_student as cs', 'cs.organclass_id', 'co.id')
             ->join('students as s', 's.id', '=', 'cs.student_id')
             ->where('s.nama', $student->studentName)
-            ->where('s.parent_tel', $student->parentTelno)
+            ->where(function ($query) use ($student) {
+                $query->where('s.parent_tel', $student->parentTelno)
+                    ->orWhere('s.parent_tel', $student->parentIcno);
+            })
             ->where('cs.status', 1)
             ->select('cs.id')
             ->pluck('cs.id')
