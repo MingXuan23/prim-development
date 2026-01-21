@@ -1986,6 +1986,7 @@ class FeesController extends AppBaseController
                 ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org : $oid)
                 ->where('classes.levelid', '>', 0)
                 ->where('classes.status', "1")
+                ->where('class_student.status', 1)
                 ->where('students.gender', $gender)
                 ->get();
 
@@ -2001,6 +2002,7 @@ class FeesController extends AppBaseController
                     ->select('class_student.id as class_student_id', 'class_student.start_date as class_student_start_date')
                     ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org : $oid)
                     ->where('classes.status', "1")
+                    ->where('class_student.status', 1)
                     ->where('class_student.start_date', '<', $date_end)
                     ->get();
 
@@ -2014,6 +2016,7 @@ class FeesController extends AppBaseController
                     ->select('class_student.id as class_student_id')
                     ->where('class_organization.organization_id', $organization->parent_org != null ? $organization->parent_org : $oid)
                     ->where('classes.levelid', '>', 0)
+                    ->where('class_student.status', 1)
                     ->where('classes.status', "1")
                     ->get();
 
