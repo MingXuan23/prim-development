@@ -547,7 +547,7 @@ class StudentController extends Controller
             ->where('status', 1)
             ->get();
 
-        if (!$ifExitsCateA->isEmpty() && empty($ifExits)) {
+        if (!$ifExitsCateA->isEmpty() && !empty($ifExits)) {
             foreach ($ifExitsCateA as $kateA) {
                 DB::table('fees_new_organization_user')->insert([
                     'status' => 'Debt',
@@ -705,7 +705,7 @@ class StudentController extends Controller
                 ->where('status', 1)
                 ->get();
 
-            if (!$ifExitsCateA->isEmpty() && empty($ifExits)) {
+            if (!$ifExitsCateA->isEmpty() && !empty($ifExits)) {
                 foreach ($ifExitsCateA as $kateA) {
                     DB::table('fees_new_organization_user')->insert([
                         'status' => 'Debt',
