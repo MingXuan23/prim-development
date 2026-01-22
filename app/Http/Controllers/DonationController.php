@@ -324,7 +324,7 @@ class DonationController extends Controller
         if (request()->ajax()) {
             return datatables()->of($listhistory)
                 ->editColumn('datetime_created', function ($data) {
-                    $formatedDate = Carbon::parse($data->datetime_created)->format('Y-m-d H:i:s');
+                    $formatedDate = Carbon::parse($data->datetime_created)->format('d-m-Y H:i:s');
                     return $formatedDate;
                 })
                 ->editColumn('amount', function ($data) {
