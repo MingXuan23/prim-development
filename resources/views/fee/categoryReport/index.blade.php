@@ -213,7 +213,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Export Yuran</h5>
+                    <h5 class="modal-title">Export Semua Yuran</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -346,15 +346,14 @@
             $('#organExport').change(function () {
                 var organizationid = $("#organExport").val();
                 var _token = $('input[name="_token"]').val();
-                fetch_data_year(organizationid)
+                fetch_data_year(organizationid, '#fee_year_export');
                 fetchClass(organizationid, '#yuranExport', $('#fee_year_export').val());
             });
 
             $('#organExportAllYuran').change(function () {
                 var organizationid = $("#organExportAllYuran").val();
                 var _token = $('input[name="_token"]').val();
-                fetch_data_year(organizationid)
-                fetchClass(organizationid, '#yuranExport', $('#fee_year_export').val());
+                fetch_data_year(organizationid, '#feeYearExportAllYuran');
             });
 
             $('#fee_year_export').change(function () {
@@ -398,7 +397,7 @@
                 })
             }
 
-            function fetch_data_year(oid = '') {
+            function fetch_data_year(oid = '', feeYearSelectId = '') {
                 var _token = $('input[name="_token"]').val();
                 $.ajax({
                     url: "{{ route('fees.fetchClassForCateYuran') }}",
@@ -409,9 +408,9 @@
                     },
                     success: function (result) {
 
-                        $('#feeYearExportAllYuran').empty();
+                        $(feeYearSelectId).empty();
                         jQuery.each(result.years, function (key, value) {
-                            $('#feeYearExportAllYuran').append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
+                            $(feeYearSelectId).append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
                         });
                     }
                 })
