@@ -695,7 +695,7 @@ Route::post('send-message', 'MessageController@sendMessage')->name('send-message
 Route::post('/exportAllYuranStatus', 'FeesController@ExportAllYuranStatus')->name('exportAllYuranStatus');
 Route::post('/exportJumlahBayaranIbuBapa', 'FeesController@ExportJumlahBayaranIbuBapa')->name('exportJumlahBayaranIbuBapa');
 Route::post('/exportYuranOverview', 'FeesController@exportYuranOverview')->name('exportYuranOverview');
-
+Route::post('/exportAllYuran', 'FeesController@exportAllYuran')->name('exportAllYuran');
 
 
 Route::group(['prefix' => 'notification'], function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ExportAllYuran;
 use App\Exports\FormResponsesExport;
 use Carbon\Carbon;
 use App\Models\Fee;
@@ -2732,6 +2733,23 @@ class FeesController extends AppBaseController
         }
         return Excel::download(new ExportTransaction($organization, $list), $organization->nama . $date . '.xlsx');
     }
+
+    public function exportAllYuran(Request $request)
+    {
+        if (Auth::id() == null) {
+            return redirect('/login');
+        }
+
+        if (!Auth::user()->hasRole('Superadmin') && !Auth::user()->hasRole('Pentadbir') && !Auth::user()->hasRole('Guru') && !Auth::user()->hasRole('Koop Admin') && !Auth::user()->hasRole('Pentadbir Swasta') && !Auth::user()->hasRole('Guru Swasta')) {
+            return redirect('/home');
+        }
+
+        $oid = $request->get('organExportAllYuran');
+        $year = $request->get('feeYearExportAllYuran');
+
+        return Excel::download(new ExportAllYuran($oid, $year), "Yuran Tahun " . $year . ".xlsx");
+    }
+
     public function cetegoryReportIndex()
     {
 
