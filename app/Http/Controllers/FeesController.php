@@ -108,16 +108,14 @@ class FeesController extends AppBaseController
 
         $date_end = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
 
-        if (Carbon::parse($date_end)->gte(today())) {
-            DB::table("fees_new")
-                ->where("id", $id)
-                ->update([
-                    "name" => $request->get('name'),
-                    "desc" => $request->get("description"),
-                    "end_date" => $date_end,
-                    "status" => 1
-                ]);
-        }
+        DB::table("fees_new")
+            ->where("id", $id)
+            ->update([
+                "name" => $request->get('name'),
+                "desc" => $request->get("description"),
+                "end_date" => $date_end,
+                "status" => 1
+            ]);
 
         if ($feeCategory->category == "Kategori A") {
             return redirect()->route('fees.A');
