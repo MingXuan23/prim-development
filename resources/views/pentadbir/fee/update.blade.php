@@ -63,13 +63,14 @@
                         <div class="form-group col-md-12">
                             <label class="control-label required">Tempoh Aktif</label>
 
-                            <div class="input-daterange input-group" id="date">
+                            <div class="input-daterange input-group">
                                 <input type="text" class="form-control" name="date_started" placeholder="Tarikh Awal"
                                     autocomplete="off" data-parsley-required-message="Sila masukkan tarikh awal"
-                                    data-parsley-errors-container=".errorMessage"
+                                    data-parsley-errors-container=".errorMessage" disabled
                                     value="{{ \Carbon\Carbon::parse($fee->start_date)->format('d/m/Y') }}" required />
-                                <input type="text" class="form-control" name="date_end" placeholder="Tarikh Akhir"
-                                    autocomplete="off" data-parsley-required-message="Sila masukkan tarikh akhir"
+                                <input type="text" id="end_date" class="form-control" name="date_end"
+                                    placeholder="Tarikh Akhir" autocomplete="off"
+                                    data-parsley-required-message="Sila masukkan tarikh akhir"
                                     data-parsley-errors-container=".errorMessage"
                                     value="{{ \Carbon\Carbon::parse($fee->end_date)->format('d/m/Y') }}" required />
                             </div>
@@ -77,31 +78,6 @@
                             <div class="errorMessage"></div>
                         </div>
                     </div>
-
-                    <!-- @if ($fee->category != "Kategori A")
-                        <div class="form-group">
-                            <label>Tahap</label>
-                            <select name="level" id="level" class="form-control"
-                                data-parsley-required-message="Sila pilih tahap"
-                                data-parsley-required-message="Sila pilih tahap" required>
-                                <option value="" disabled selected>Pilih Tahap</option>
-                                <option value="All_Level">Semua Tahap</option>
-                                <option value="1">Tahap 1</option>
-                                <option value="2">Tahap 2</option>
-                            </select>
-                        </div>
-
-                        <div class="yearhide form-group">
-                            <label>Tahun</label>
-                            <select name="year" id="year" class="form-control">
-                                <option value="" disabled selected>Pilih Tahun</option>
-                            </select>
-                        </div>
-
-                        <div class="cbhide row px-4 py-3">
-
-                        </div>
-                    @endif -->
 
                     <div class="form-group">
                         <label>Penerangan</label>
@@ -144,7 +120,7 @@
 
             var today = new Date();
 
-            $('#date').datepicker({
+            $('#end_date').datepicker({
                 toggleActive: true,
                 startDate: today,
                 todayHighlight: true,

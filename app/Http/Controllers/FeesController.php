@@ -106,7 +106,6 @@ class FeesController extends AppBaseController
             ->select("category")
             ->first();
 
-        $date_started = Carbon::createFromFormat(config('app.date_format'), $request->get('date_started'))->format('Y-m-d');
         $date_end = Carbon::createFromFormat(config('app.date_format'), $request->get('date_end'))->format('Y-m-d');
 
         DB::table("fees_new")
@@ -114,8 +113,8 @@ class FeesController extends AppBaseController
             ->update([
                 "name" => $request->get('name'),
                 "desc" => $request->get("description"),
-                "start_date" => $date_started,
-                "end_date" => $date_end
+                "end_date" => $date_end,
+                "status" => 1
             ]);
 
         if ($feeCategory->category == "Kategori A") {
@@ -1228,8 +1227,8 @@ class FeesController extends AppBaseController
                     $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Ubah Butiran</a>';
                     $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-info m-1">Tutup yuran</button></div>';
                 } else {
-                    // $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Edit</a>';
-                    $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    // $btn = $btn . '<button id="' . $row->id . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button></div>';
+                    $btn = $btn . '<a href="' . route('fees.edit', $row->id) . '" class="btn btn-primary m-1">Ubah Butiran</a></div>';
                 }
                 return $btn;
             });
