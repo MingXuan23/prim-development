@@ -92,7 +92,7 @@
                 <div class="col-md-12">
                     <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
                         data-target="#modalJumlahBayaran"><i class="fas fa-plus"></i> Export Jumlah Bayaran Ibu/Bapa</a>
-                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-success" data-toggle="modal"
+                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
                         data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
                 </div>
 
