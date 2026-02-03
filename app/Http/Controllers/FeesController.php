@@ -2901,8 +2901,8 @@ class FeesController extends AppBaseController
                 });
             })
             ->where('fn.organization_id', $oid)
-            ->whereYear('fn.start_date', $year)
-            ->orWhereYear('fn.end_date', $year)
+            ->where('fn.start_date', '<=', $year . '-12-31')
+            ->where('fn.end_date', '>=', $year . '-01-01')
             ->groupBy('fn.id')
             ->select('fn.id', DB::raw("CONCAT(fn.category, ' - ', fn.name) AS name"))
             ->orderBy('fn.category')
@@ -2916,6 +2916,7 @@ class FeesController extends AppBaseController
     public function studentDebtDatatable(Request $request)
     {
         $fees = Fee_New::find($request->feeid);
+        $year = $request->feeYear;
 
         if (request()->ajax()) {
             if ($fees->category == "Kategori A") {
@@ -2925,6 +2926,19 @@ class FeesController extends AppBaseController
                     ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                     ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                     ->where('co.class_id', $request->classid)
+                    ->where(function ($query) use ($year) {
+                        if (!isset($year)) {
+                            return $query;
+                        }
+
+                        if ($year == now()->year) {
+                            $query->where('cs.start_date', '<=', $year . '-12-31')
+                                ->whereNull('cs.end_date');
+                        } else {
+                            $query->where('cs.start_date', '<=', $year . '-12-31')
+                                ->where('cs.end_date', '>=', $year . '-01-01');
+                        }
+                    })
                     ->select('ou.user_id', 's.*')
                     ->orderBy('s.nama')
                     ->get()
@@ -2932,16 +2946,22 @@ class FeesController extends AppBaseController
 
                 $feeA = DB::table('fees_new_organization_user as fou')
                     ->leftJoin('organization_user as ou', 'ou.id', 'fou.organization_user_id')
+                    ->leftJoin('transactions as t', 't.id', '=', 'fou.transaction_id')
                     ->where('ou.organization_id', $request->orgId)
                     ->where('fou.fees_new_id', $request->feeid)
-                    ->select('ou.user_id', 'fou.status')
+                    ->select('ou.user_id', 'fou.status', 't.datetime_created', 't.amount')
+                    ->orderBy('datetime_created', 'desc')
                     ->get()
+                    ->unique('user_id')
                     ->keyBy('user_id');
+
                 $data = $student_user->map(function ($student) use ($feeA) {
                     $user_id = $student->user_id;
                     if ($feeA->has($user_id)) {
                         $fee_data = $feeA->get($user_id);
                         $student->status = $fee_data->status; // Add the status from $feeA to $student_user
+                        $student->amount = $fee_data->amount; // Add transaction amount from $feeA to $student_user
+                        $student->datetime_created = $fee_data->datetime_created; // Add transaction datetime_created from $feeA to $student_user
                     }
                     return $student;
                 });
@@ -2951,24 +2971,58 @@ class FeesController extends AppBaseController
                         ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                         ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                         ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                        ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
+                        ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
-                        ->where('cs.status', 1)
+                        ->where(function ($query) use ($year) {
+                            if (!isset($year)) {
+                                return $query;
+                            }
+
+                            if ($year == now()->year) {
+                                $query->where('cs.start_date', '<=', $year . '-12-31')
+                                    ->whereNull('cs.end_date');
+                            } else {
+                                $query->where('cs.start_date', '<=', $year . '-12-31')
+                                    ->where('cs.end_date', '>=', $year . '-01-01');
+                            }
+                        })
                         ->where('co.class_id', $request->classid)
-                        ->select('s.*', 'sfn.status')
-                        ->orderBy('s.nama')
-                        ->get();
+                        ->select('s.*', 'sfn.status', 't.datetime_created', 't.amount')
+                        ->orderBy('datetime_created', 'desc')
+                        ->get()
+                        ->unique('id')
+                        ->sortBy('nama')
+                        ->values();
                 } else {
                     $data = DB::table('students as s')
                         ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
                         ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                         ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                         ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
+                        ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
+                        ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
                         ->where('co.class_id', $request->classid)
-                        ->where('cs.status', 1)
-                        ->select('s.*', 'sfn.status', 'cs.start_date as cs_startdate', 'fr.*')
-                        ->orderBy('s.nama')
-                        ->get();
+                        ->where(function ($query) use ($year) {
+                            if (!isset($year)) {
+                                return $query;
+                            }
+
+                            if ($year == now()->year) {
+                                $query->where('cs.start_date', '<=', $year . '-12-31')
+                                    ->whereNull('cs.end_date');
+                            } else {
+                                $query->where('cs.start_date', '<=', $year . '-12-31')
+                                    ->where('cs.end_date', '>=', $year . '-01-01');
+                            }
+                        })
+                        ->select('s.*', 'sfn.status', 'cs.start_date as cs_startdate', 'fr.*', 't.datetime_created', 't.amount')
+                        ->orderBy('datetime_created', 'desc')
+                        ->get()
+                        ->unique('id')
+                        ->sortBy('nama')
+                        ->values();
                 }
             }
 
@@ -2995,8 +3049,23 @@ class FeesController extends AppBaseController
                 }
             });
 
+            $table->addColumn('transaction_date', function ($row) {
+                if (!isset($row->datetime_created) || $row->status == 'Debt') {
+                    return "<p class='text-center'>-</p>";
+                }
 
-            $table->rawColumns(['status']);
+                return "<p class='text-center'>" . $row->datetime_created . "</p>";
+            });
+
+            $table->addColumn('amount', function ($row) {
+                if ($row->status == 'Debt') {
+                    return "<p class='text-center'>0</p>";
+                }
+
+                return "<p class='text-center'>" . $row->amount . "</p>";
+            });
+
+            $table->rawColumns(['status', 'transaction_date', 'amount']);
 
             return $table->make(true);
         }
