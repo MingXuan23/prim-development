@@ -79,9 +79,9 @@
                 <div class="col-md-12">
                     <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
                         data-target="#modalJumlahBayaran"><i class="fas fa-plus"></i> Export Jumlah Bayaran Ibu/Bapa</a>
-                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-success" data-toggle="modal"
+                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
                         data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
-                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-success" data-toggle="modal"
+                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
                         data-target="#modalExportSemuaYuran"><i class="fas fa-plus"></i> Export Semua Yuran</a>
                 </div>
 
@@ -96,6 +96,8 @@
                                         <th>Nama Murid</th>
                                         <th>Jantina</th>
                                         <th>Status Pembayaran</th>
+                                        <th>Tarikh Transaksi</th>
+                                        <th>Jumlah Bayaran (RM)</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -467,7 +469,8 @@
                             data: {
                                 feeid: $("#fees").val(),
                                 classid: $("#classes").val(),
-                                orgId: $("#organization").val()
+                                orgId: $("#organization").val(),
+                                feeYear: $('#fee_year').val()
                             }
                         },
                         'columnDefs': [{
@@ -494,10 +497,21 @@
                             data: "gender",
                             name: "gender",
                             "width": "10%"
-                        }, {
+                        },
+                        {
                             data: "status",
                             name: "status",
                             "width": "10%"
+                        },
+                        {
+                            data: "transaction_date",
+                            name: "transaction_date",
+                            width: "10%"
+                        },
+                        {
+                            data: "amount",
+                            name: "amount",
+                            width: "10%"
                         }]
                     });
                 }
