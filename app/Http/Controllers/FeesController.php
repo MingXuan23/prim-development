@@ -2927,6 +2927,10 @@ class FeesController extends AppBaseController
                     ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
                     ->where('co.class_id', $request->classid)
                     ->where(function ($query) use ($year) {
+                        if (!isset($year)) {
+                            return $query;
+                        }
+
                         if ($year == now()->year) {
                             $query->where('cs.start_date', '<=', $year . '-12-31')
                                 ->whereNull('cs.end_date');

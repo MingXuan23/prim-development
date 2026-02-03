@@ -328,7 +328,8 @@
                             data: {
                                 feeid: $("#fees").val(),
                                 classid: $("#classes").val(),
-                                orgId: $("#organization").val()
+                                orgId: $("#organization").val(),
+                                feeYear: null
                             }
                         },
                         'columnDefs': [{
