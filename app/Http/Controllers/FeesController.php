@@ -2975,6 +2975,10 @@ class FeesController extends AppBaseController
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
                         ->where(function ($query) use ($year) {
+                            if (!isset($year)) {
+                                return $query;
+                            }
+
                             if ($year == now()->year) {
                                 $query->where('cs.start_date', '<=', $year . '-12-31')
                                     ->whereNull('cs.end_date');
@@ -3001,6 +3005,10 @@ class FeesController extends AppBaseController
                         ->where('sfn.fees_id', $fees->id)
                         ->where('co.class_id', $request->classid)
                         ->where(function ($query) use ($year) {
+                            if (!isset($year)) {
+                                return $query;
+                            }
+
                             if ($year == now()->year) {
                                 $query->where('cs.start_date', '<=', $year . '-12-31')
                                     ->whereNull('cs.end_date');
