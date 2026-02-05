@@ -1637,6 +1637,10 @@ class DirectPayController extends Controller
             $fpx_sellerOrderNo = $transaction->nama;
             try {
                 $response_value = $this->getTransactionInfo($transaction->id);
+
+                echo $transaction_id . "<br>";
+                echo $response_value . "<br>";
+
                 if (!isset($response_value['fpx_DebitAuthCode'])) {
                     continue;
                 }
@@ -1654,6 +1658,10 @@ class DirectPayController extends Controller
                         ]
 
                     );
+
+                    $trans = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
+
+                    echo $trans . "<br>";
 
                     $this->updateTransaction($fpx_productDesc, $fpx_sellerOrderNo, false);
                 } else {
