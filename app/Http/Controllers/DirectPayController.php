@@ -73,7 +73,7 @@ class DirectPayController extends Controller
     public function directpayIndex(Request $request)
     {
 
-       $whitelistUsers = [17151];
+        $whitelistUsers = [17151];
 
         // Ensure user is authenticated
         if (Auth::check() && in_array(Auth::id(), $whitelistUsers, true)) {
@@ -1641,7 +1641,7 @@ class DirectPayController extends Controller
                     continue;
                 }
 
-                $fpx_productDesc =$transaction->nama;
+                $fpx_productDesc = $transaction->nama;
 
                 if ($response_value['fpx_DebitAuthCode'] == '00') {
 
@@ -1744,8 +1744,14 @@ class DirectPayController extends Controller
 
         $ch = curl_init($url);
 
+        $headers = [
+            "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,/;q=0.8,application/signed-exchange;v=b3;q=0.7",
+            "accept-language: en-US,en;q=0.9",
+            "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0"
+        ];
+
         // Set cURL options
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $headers);
 
         // Execute cURL session and get the response
         $response = curl_exec($ch);
@@ -1773,7 +1779,7 @@ class DirectPayController extends Controller
             return;
         }
 
-        $fpx_productDescCode = substr(ltrim($fpx_productDesc,"PRIM_") , 0, 1);
+        $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
         switch ($fpx_productDescCode) {
             case 'R':
                 $update = DB::table('code_requests')->where('transaction_id', $transaction->id)->update([
@@ -1827,7 +1833,7 @@ class DirectPayController extends Controller
         }
 
         $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
-        $fpx_productDescCode = substr(ltrim($fpx_productDesc,"PRIM_") , 0, 1);
+        $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
         switch ($fpx_productDescCode) {
             case 'S':
                 $list_student_fees_id_by_student = DB::table('student_fees_new')
