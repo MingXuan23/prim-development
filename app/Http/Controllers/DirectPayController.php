@@ -1639,7 +1639,7 @@ class DirectPayController extends Controller
                 $response_value = $this->getTransactionInfo($transaction->id);
 
                 echo $transaction_id . "<br>";
-                echo $response_value . "<br>";
+                echo $response_value['status'] . "<br>";
 
                 if (!isset($response_value['fpx_DebitAuthCode'])) {
                     continue;
