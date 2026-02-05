@@ -1759,7 +1759,8 @@ class DirectPayController extends Controller
         ];
 
         // Set cURL options
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
         // Execute cURL session and get the response
         $response = curl_exec($ch);
