@@ -44,14 +44,13 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
             ->join('classes as c', 'c.id', '=', 'co.class_id')
             ->where('co.organization_id', '=', $this->orgId)
             ->where(function ($query) {
-                $query->where(function ($innerQuery) {
-                    $innerQuery->where('cs.start_date', '<=', $this->year . '-12-31')
+                if ($this->year == now()->year) {
+                    $query->where('cs.start_date', '<=', $this->year . '-12-31')
+                        ->whereNull('cs.end_date');
+                } else {
+                    $query->where('cs.start_date', '<=', $this->year . '-12-31')
                         ->where('cs.end_date', '>=', $this->year . '-01-01');
-                })
-                    ->orWhere(function ($innerQuery) {
-                        $innerQuery->where('cs.start_date', '<=', $this->year . '-12-31')
-                            ->whereNull('cs.end_date');
-                    });
+                }
             })
             ->select('s.id as student_id', 's.nama as student_name', 'c.nama as nama_kelas', 'cs.id as class_student_id')
             ->orderBy('c.nama', 'asc')
