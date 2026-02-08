@@ -128,126 +128,132 @@
                 })
             }
 
+            function fetch_students(classid = '') {
+                studentsTable = $('#studentsTable');
+
+                studentsTable = studentsTable.DataTable({
+                    ordering: true,
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('fees.fetchOneStudentToManyFeesDatatable') }}",
+                        method: "GET",
+                        data: {
+                            oid: $('#organization').val(),
+                            classid: classid,
+                            routeName: "fees.assignFeesToStudentEdit"
+                        }
+                    },
+                    'columnDefs': [{
+                        "targets": [0, 1, 2, 3, 4, 5],
+                        "className": "text-center",
+                        "width": "2%"
+                    }],
+                    order: [
+                        [1, 'asc']
+                    ],
+                    columns: [
+                        {
+                            "data": null,
+                            searchable: false,
+                            "sortable": false,
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            },
+                            "width": "5%"
+                        },
+                        {
+                            data: "student_name",
+                            name: "student_name",
+                            "width": "20%"
+                        },
+                        {
+                            data: "gender",
+                            render: function (data, type, row) {
+                                if (data == 'L') {
+                                    return "<p>Lelaki</p>";
+                                } else if (data == 'P') {
+                                    return "<p>Perempuan</p>";
+                                }
+                            },
+                            "width": "5%"
+                        },
+                        {
+                            data: "student_status",
+                            render: function (data, type, row) {
+                                if (data == 1) {
+                                    return "<span class='badge badge-success'>Aktif</span>";
+                                } else {
+                                    return "<span class='badge badge-danger'>Tidak Aktif</span>";
+                                }
+                            },
+                            "width": "10%"
+                        },
+                        {
+                            data: "fees",
+                            render: function (data, type, row) {
+                                // if the first object in the data array has null values, return a dash (-)
+                                if (data[0]['fee_category'] == null) {
+                                    return "<span>-</span>";
+                                }
+
+                                // (to prevent the yuran name and status yuran from having line misarrangement)
+                                return data
+                                    .map(fee => {
+                                        if (fee.fee_category != null && fee.fee_name != null) {
+                                            return "<span class='text-truncate mb-1'>" + fee.fee_category + " - " + fee.fee_name + "</span>";
+                                        }
+                                    })
+                                    .join("<br>");
+                            },
+                            "width": "40%"
+                        },
+                        {
+                            data: "fees",
+                            render: function (data, type, row) {
+                                // if the first object in the data array has null values, return a dash (-)
+                                if (data[0]['fee_status'] == null) {
+                                    return "<span>-</span>";
+                                }
+
+                                return data
+                                    .map(fee => {
+                                        if (fee.fee_status == "Debt") {
+                                            return "<span class='badge badge-danger mb-1'>Belum Selesai</span>";
+                                        } else if (fee.fee_status == "Paid") {
+                                            return "<span class='badge badge-success mb-1'>Selesai</span>";
+                                        }
+                                    })
+                                    .join("<br>");
+                            },
+                            "width": "10%"
+                        },
+                        {
+                            data: "action",
+                            name: "action",
+                            "width": "15%"
+                        }
+                    ]
+                });
+            }
+
             $('#classes').change(function () {
                 if ($(this).val() != '') {
                     var classid = $("#classes option:selected").val();
-                    var studentsTable = $('#studentsTable');
 
                     // remove the initial data when the classes selection is being reselected
-                    studentsTable.DataTable().clear().destroy();
+                    $('#studentsTable').DataTable().clear().destroy();
 
-                    studentsTable = studentsTable.DataTable({
-                        ordering: true,
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: "{{ route('fees.fetchOneStudentToManyFeesDatatable') }}",
-                            method: "GET",
-                            data: {
-                                oid: $('#organization').val(),
-                                classid: classid,
-                                routeName: "fees.assignFeesToStudentEdit"
-                            }
-                        },
-                        'columnDefs': [{
-                            "targets": [0, 1, 2, 3, 4, 5],
-                            "className": "text-center",
-                            "width": "2%"
-                        }],
-                        order: [
-                            [1, 'asc']
-                        ],
-                        columns: [
-                            {
-                                "data": null,
-                                searchable: false,
-                                "sortable": false,
-                                render: function (data, type, row, meta) {
-                                    return meta.row + meta.settings._iDisplayStart + 1;
-                                },
-                                "width": "5%"
-                            },
-                            {
-                                data: "student_name",
-                                name: "student_name",
-                                "width": "20%"
-                            },
-                            {
-                                data: "gender",
-                                render: function (data, type, row) {
-                                    if (data == 'L') {
-                                        return "<p>Lelaki</p>";
-                                    } else if (data == 'P') {
-                                        return "<p>Perempuan</p>";
-                                    }
-                                },
-                                "width": "5%"
-                            },
-                            {
-                                data: "student_status",
-                                render: function (data, type, row) {
-                                    if (data == 1) {
-                                        return "<span class='badge badge-success'>Aktif</span>";
-                                    } else {
-                                        return "<span class='badge badge-danger'>Tidak Aktif</span>";
-                                    }
-                                },
-                                "width": "10%"
-                            },
-                            {
-                                data: "fees",
-                                render: function (data, type, row) {
-                                    // if the first object in the data array has null values, return a dash (-)
-                                    if (data[0]['fee_category'] == null) {
-                                        return "<span>-</span>";
-                                    }
-
-                                    // (to prevent the yuran name and status yuran from having line misarrangement)
-                                    return data
-                                        .map(fee => {
-                                            if (fee.fee_category != null && fee.fee_name != null) {
-                                                return "<span class='text-truncate mb-1'>" + fee.fee_category + " - " + fee.fee_name + "</span>";
-                                            }
-                                        })
-                                        .join("<br>");
-                                },
-                                "width": "40%"
-                            },
-                            {
-                                data: "fees",
-                                render: function (data, type, row) {
-                                    // if the first object in the data array has null values, return a dash (-)
-                                    if (data[0]['fee_status'] == null) {
-                                        return "<span>-</span>";
-                                    }
-
-                                    return data
-                                        .map(fee => {
-                                            if (fee.fee_status == "Debt") {
-                                                return "<span class='badge badge-danger mb-1'>Belum Selesai</span>";
-                                            } else if (fee.fee_status == "Paid") {
-                                                return "<span class='badge badge-success mb-1'>Selesai</span>";
-                                            }
-                                        })
-                                        .join("<br>");
-                                },
-                                "width": "10%"
-                            },
-                            {
-                                data: "action",
-                                name: "action",
-                                "width": "15%"
-                            }
-                        ]
-                    })
+                    fetch_students(classid);
                 }
             });
 
-            $('#organization').on('change', function () {
+            $('#organization').change(function () {
                 // remove the initial data when the organization selection is being reselected
                 $('#studentsTable').DataTable().clear().destroy();
 
                 if ($(this).val() != '') {
+                    fetch_students();
                     fetch_classes($("#organization").val(), "#classes");
                 }
             });

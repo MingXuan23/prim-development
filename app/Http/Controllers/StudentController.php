@@ -548,13 +548,26 @@ class StudentController extends Controller
             ->get();
 
         if (!$ifExitsCateA->isEmpty() && !empty($ifExits)) {
+            // get the organization_user and organization_user_student for this parent
+            $parentKategoriAFees = DB::table("organization_user as ou")
+                ->join('fees_new_organization_user as fou', 'fou.organization_user_id', '=', 'ou.id')
+                ->where('ou.user_id', '=', $parentId)
+                ->where('ou.organization_id', '=', $co->oid)
+                ->get();
+
             foreach ($ifExitsCateA as $kateA) {
-                DB::table('fees_new_organization_user')->insert([
-                    'status' => 'Debt',
-                    'fees_new_id' => $kateA->id,
-                    'organization_user_id' => $ou->id,
-                    'transaction_id' => NULL
-                ]);
+                // check if this parent already have the current fee
+                $parentFee = $parentKategoriAFees->where('fees_new_id', '=', $kateA->id)->first();
+
+                // if result is null (parent does not have this fee), assign kategori A fee for this parent
+                if (!isset($parentFee)) {
+                    DB::table('fees_new_organization_user')->insert([
+                        'status' => 'Debt',
+                        'fees_new_id' => $kateA->id,
+                        'organization_user_id' => $ou->id,
+                        'transaction_id' => NULL
+                    ]);
+                }
             }
         }
 
