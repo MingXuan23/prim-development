@@ -1799,7 +1799,10 @@ class FeesController extends AppBaseController
             ->join("class_student as cs", "s.id", "=", "cs.student_id")
             ->join("class_organization as co", "co.id", "=", "cs.organclass_id")
             ->leftJoin("student_fees_new as sfn", "cs.id", "=", "sfn.class_student_id")
-            ->leftJoin("fees_new as fn", "sfn.fees_id", "=", "fn.id")
+            ->leftJoin("fees_new as fn", function ($query) {
+                $query->on('sfn.fees_id', '=', 'fn.id')
+                    ->where('fn.status', '=', 1);
+            })
             ->select(
                 "s.id as student_id",
                 "s.nama as student_name",
@@ -1811,10 +1814,12 @@ class FeesController extends AppBaseController
                 "sfn.status as fee_status"
             )
             ->where("co.organization_id", "=", $oid)
-            ->where("co.class_id", "LIKE", isset($classId) ? $classId : "%")
-            ->where("s.id", "LIKE", isset($studentId) ? $studentId : "%")
-            ->where("cs.status", "!=", -1)
-            ->where("fn.status", 1)
+            ->when(isset($classId), function ($query) use ($classId) {
+                $query->where('co.class_id', '=', $classId);
+            })
+            ->when(isset($studentId), function ($query) use ($studentId) {
+                $query->where('s.id', '=', $studentId);
+            })
             ->orderBy("fee_category", "asc")
             ->orderBy("fee_name", "asc")
             ->get()
