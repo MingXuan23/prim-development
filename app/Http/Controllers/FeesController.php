@@ -2633,7 +2633,7 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.username as username', 't.transac_no as transac_no')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_of_success as date', 't.username as username', 't.transac_no as transac_no')
                     ->distinct('name');
             }
         } else {
@@ -2645,7 +2645,7 @@ class FeesController extends AppBaseController
                             ->orWhere('t.nama', 'like', 'School_Fees%');
                     })
                     ->where('t.status', 'success')
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.username as username', 't.transac_no as transac_no');
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_of_success as date', 't.username as username', 't.transac_no as transac_no');
             } else if (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta')) {
                 $listHisotry = DB::table('transactions as t')
                     ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
@@ -2659,7 +2659,7 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.username as username', 't.transac_no as transac_no')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_of_success as date', 't.username as username', 't.transac_no as transac_no')
                     ->distinct('name');
             } else if (Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru Swasta')) {
                 $listHisotry = DB::table('transactions as t')
@@ -2676,7 +2676,7 @@ class FeesController extends AppBaseController
                     ->where('t.status', 'success')
                     ->where('organization_user.user_id', Auth::id())
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.username as username', 't.transac_no as transac_no')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_of_success as date', 't.username as username', 't.transac_no as transac_no')
                     ->distinct('name');
             } else {
                 $listHisotry = DB::table('transactions as t')
@@ -2692,13 +2692,13 @@ class FeesController extends AppBaseController
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.username as username', 't.transac_no as transac_no')
+                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_of_success as date', 't.username as username', 't.transac_no as transac_no')
                     ->distinct('name');
             }
         }
 
         if ($request->start_date != null && $request->end_date != null) {
-            $listHisotry = $listHisotry->whereBetween('datetime_created', [$request->start_date, $request->end_date]);
+            $listHisotry = $listHisotry->whereBetween('datetime_of_success', [$request->start_date, $request->end_date]);
         }
         $listHisotry = $listHisotry->get();
 

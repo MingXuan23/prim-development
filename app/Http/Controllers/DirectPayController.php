@@ -1307,7 +1307,8 @@ class DirectPayController extends Controller
                         'status' => 'Success',
                         'buyerBankId' => $request->Fpx_BuyerBankBranch,
                         'amount' => $request->TransactionAmount,
-                        'description' => $request->Fpx_SellerExOrderNo
+                        'description' => $request->Fpx_SellerExOrderNo,
+                        'datetime_of_success' => now()
                     ]
                 );
 
@@ -1654,7 +1655,8 @@ class DirectPayController extends Controller
                             'status' => 'Success',
                             'amount' => $response_value['transactionAmount'],
                             'description' => $response_value['fpx_SellerExOrderNo'],
-                            'transac_no' => $response_value['fpx_FpxTxnId']
+                            'transac_no' => $response_value['fpx_FpxTxnId'],
+                            'datetime_of_success' => now()
                         ]
 
                     );
@@ -2366,7 +2368,8 @@ class DirectPayController extends Controller
                             'status' => 'Success',
                             'amount' => $response_value['transactionAmount'],
                             'description' => $response_value['fpx_SellerExOrderNo'],
-                            'transac_no' => $response_value['fpx_FpxTxnId']
+                            'transac_no' => $response_value['fpx_FpxTxnId'],
+                            'datetime_of_success' => now()
                         ]
 
                     );
