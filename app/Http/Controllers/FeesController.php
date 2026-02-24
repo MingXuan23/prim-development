@@ -2851,7 +2851,12 @@ class FeesController extends AppBaseController
 
     public function fetchYuran(Request $request)
     {
-        $class = ClassModel::find($request->classid);
+        $class = null;
+
+        if ($request->classid != null) {
+            $class = ClassModel::find($request->classid);
+        }
+
         $oid = $request->oid;
         $year = $request->fee_year;
         $lists = DB::table('fees_new')
@@ -2868,6 +2873,10 @@ class FeesController extends AppBaseController
         foreach ($lists as $key => $list) {
             $target = json_decode($list->target);
             // dd($target->data);
+
+            if ($class == null) {
+                continue;
+            }
 
             if ($target->data == "All_Level" || $target->data == "ALL" || $target->data == $class->levelid) {
                 continue;
@@ -2919,6 +2928,17 @@ class FeesController extends AppBaseController
         return response()->json(['success' => $yurans]);
     }
 
+    public function checkClassStudentYear($year, $query)
+    {
+        if ($year == now()->year) {
+            return $query->where('cs.start_date', '<=', $year . '-12-31')
+                ->whereNull('cs.end_date');
+        } else {
+            return $query->where('cs.start_date', '<=', $year . '-12-31')
+                ->where('cs.end_date', '>=', $year . '-01-01');
+        }
+    }
+
     public function studentDebtDatatable(Request $request)
     {
         $fees = Fee_New::find($request->feeid);
@@ -2927,33 +2947,25 @@ class FeesController extends AppBaseController
         if (request()->ajax()) {
             if ($fees->category == "Kategori A") {
                 $student_user = DB::table('students as s')
-                    ->leftJoin('organization_user_student as ous', 'ous.student_id', 's.id')
-                    ->leftJoin('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
-                    ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                    ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->where('co.class_id', $request->classid)
-                    ->where(function ($query) use ($year) {
-                        if (!isset($year)) {
-                            return $query;
-                        }
-
-                        if ($year == now()->year) {
-                            $query->where('cs.start_date', '<=', $year . '-12-31')
-                                ->whereNull('cs.end_date');
-                        } else {
-                            $query->where('cs.start_date', '<=', $year . '-12-31')
-                                ->where('cs.end_date', '>=', $year . '-01-01');
-                        }
+                    ->join('organization_user_student as ous', 'ous.student_id', 's.id')
+                    ->join('organization_user as ou', 'ou.id', 'ous.organization_user_id', 'ou.id')
+                    ->join('class_student as cs', 'cs.student_id', 's.id')
+                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->join('classes as c', 'c.id', '=', 'co.class_id')
+                    ->where('co.organization_id', '=', $request->orgId)
+                    ->when(isset($request->classid), function ($query) use ($request) {
+                        $query->where('co.class_id', '=', $request->classid);
                     })
-                    ->select('ou.user_id', 's.*')
-                    ->orderBy('s.nama')
-                    ->get()
-                    ->keyBy('user_id');
+                    ->when(isset($year), function ($query) use ($year) {
+                        return $this->checkClassStudentYear($year, $query);
+                    })
+                    ->select('ou.user_id', 's.*', 'c.nama as class_name')
+                    ->distinct()
+                    ->get();
 
                 $feeA = DB::table('fees_new_organization_user as fou')
-                    ->leftJoin('organization_user as ou', 'ou.id', 'fou.organization_user_id')
+                    ->join('organization_user as ou', 'ou.id', 'fou.organization_user_id')
                     ->leftJoin('transactions as t', 't.id', '=', 'fou.transaction_id')
-                    ->where('ou.organization_id', $request->orgId)
                     ->where('fou.fees_new_id', $request->feeid)
                     ->select('ou.user_id', 'fou.status', 't.datetime_created', 't.amount')
                     ->orderBy('datetime_created', 'desc')
@@ -2963,93 +2975,81 @@ class FeesController extends AppBaseController
 
                 $data = $student_user->map(function ($student) use ($feeA) {
                     $user_id = $student->user_id;
-                    if ($feeA->has($user_id)) {
-                        $fee_data = $feeA->get($user_id);
-                        $student->status = $fee_data->status; // Add the status from $feeA to $student_user
-                        $student->amount = $fee_data->amount; // Add transaction amount from $feeA to $student_user
-                        $student->datetime_created = $fee_data->datetime_created; // Add transaction datetime_created from $feeA to $student_user
-                    }
+                    $fee_data = $feeA->get($user_id);
+                    $student->status = $fee_data->status ?? null; // Add the status from $feeA to $student_user
+                    $student->amount = $fee_data->amount ?? 0; // Add transaction amount from $feeA to $student_user
+                    $student->datetime_created = $fee_data->datetime_created ?? null; // Add transaction datetime_created from $feeA to $student_user
                     return $student;
                 });
+
             } else {
                 if ($fees->category != "Kategori Berulang") {
                     $data = DB::table('students as s')
-                        ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                        ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
-                        ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                        ->join('class_student as cs', 'cs.student_id', 's.id')
+                        ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                        ->join('classes as c', 'c.id', '=', 'co.class_id')
+                        ->leftjoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                         ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
-                        ->where(function ($query) use ($year) {
-                            if (!isset($year)) {
-                                return $query;
-                            }
-
-                            if ($year == now()->year) {
-                                $query->where('cs.start_date', '<=', $year . '-12-31')
-                                    ->whereNull('cs.end_date');
-                            } else {
-                                $query->where('cs.start_date', '<=', $year . '-12-31')
-                                    ->where('cs.end_date', '>=', $year . '-01-01');
-                            }
+                        ->when(isset($year), function ($query) use ($year) {
+                            return $this->checkClassStudentYear($year, $query);
                         })
-                        ->where('co.class_id', $request->classid)
-                        ->select('s.*', 'sfn.status', 't.datetime_created', 't.amount')
+                        ->when(isset($request->classid), function ($query) use ($request) {
+                            $query->where('co.class_id', '=', $request->classid);
+                        })
+                        ->select('s.*', 'sfn.status', 't.datetime_created', 't.amount', 'c.nama as class_name')
                         ->orderBy('datetime_created', 'desc')
                         ->get()
                         ->unique('id')
-                        ->sortBy('nama')
                         ->values();
                 } else {
                     $data = DB::table('students as s')
-                        ->leftJoin('class_student as cs', 'cs.student_id', 's.id')
-                        ->leftJoin('class_organization as co', 'co.id', 'cs.organclass_id')
+                        ->join('class_student as cs', 'cs.student_id', 's.id')
+                        ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                        ->join('classes as c', 'c.id', '=', 'co.class_id')
                         ->leftJoin('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
                         ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
                         ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
-                        ->where('co.class_id', $request->classid)
-                        ->where(function ($query) use ($year) {
-                            if (!isset($year)) {
-                                return $query;
-                            }
-
-                            if ($year == now()->year) {
-                                $query->where('cs.start_date', '<=', $year . '-12-31')
-                                    ->whereNull('cs.end_date');
-                            } else {
-                                $query->where('cs.start_date', '<=', $year . '-12-31')
-                                    ->where('cs.end_date', '>=', $year . '-01-01');
-                            }
+                        ->when(isset($request->classid), function ($query) use ($request) {
+                            $query->where('co.class_id', '=', $request->classid);
                         })
-                        ->select('s.*', 'sfn.status', 'cs.start_date as cs_startdate', 'fr.*', 't.datetime_created', 't.amount')
+                        ->when(isset($year), function ($query) use ($year) {
+                            return $this->checkClassStudentYear($year, $query);
+                        })
+                        ->select('s.*', 'sfn.status', 'cs.start_date as cs_startdate', 'fr.*', 't.datetime_created', 't.amount', 'c.nama as class_name')
                         ->orderBy('datetime_created', 'desc')
                         ->get()
                         ->unique('id')
-                        ->sortBy('nama')
                         ->values();
                 }
             }
+
+            $data = $data->sortBy(function ($item) {
+                return [$item->class_name, $item->nama];
+            })
+                ->values();
 
             $table = Datatables::of($data);
 
             $table->addColumn('status', function ($row) {
                 if (property_exists($row, 'status')) {
-                    if ($row->status == 'Debt') {
+                    if ($row->status == 'Paid') {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+                        $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
 
                         return $btn;
                     } else {
                         $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . '<span class="badge badge-success"> Telah Bayar </span></div>';
+                        $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
 
                         return $btn;
                     }
                 } else {
                     $btn = '<div class="d-flex justify-content-center">';
-                    $btn = $btn . '<span class="badge badge-danger"> Masih Berhutang </span></div>';
+                    $btn = $btn . '<span class="badge badge-warning"> Tidak Berkaitan </span></div>';
 
                     return $btn;
                 }
