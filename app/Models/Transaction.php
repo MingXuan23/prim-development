@@ -11,7 +11,7 @@ class Transaction extends Model
 {
     public $timestamps = false;
 
-    protected $dates = ['datetime_created' ,'transaction_balance_id'];
+    protected $dates = ['datetime_created', 'transaction_balance_id', 'datetime_of_success'];
 
     public function donation()
     {
@@ -22,8 +22,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Booking::class);
     }
-    public function pgngOrder(){
-        return $this->belongsTo(PgngOrder::class ,'id' , 'transaction_id');
+    public function pgngOrder()
+    {
+        return $this->belongsTo(PgngOrder::class, 'id', 'transaction_id');
     }
     public static function getTransactionByOrganizationIdAndStatus($organizationId)
     {
@@ -226,7 +227,7 @@ class Transaction extends Model
             ->whereRaw('date(transactions.datetime_created) = curdate()')
             ->select(DB::raw('count(transactions.id) as donor'))
             ->first();
-        
+
         return response()->json($donors);
     }
 
@@ -238,7 +239,7 @@ class Transaction extends Model
             ->select(DB::raw('count(transactions.id) as donor'))
             ->first();
 
-            return response()->json($donors);
+        return response()->json($donors);
     }
 
     public static function getTotalDonorByMonth_CatA($organizationId)
@@ -249,7 +250,7 @@ class Transaction extends Model
             ->select(DB::raw('count(transactions.id) as donor'))
             ->first();
 
-            return response()->json($donors);
+        return response()->json($donors);
     }
 
     // ******************* Category B
