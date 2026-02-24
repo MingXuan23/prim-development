@@ -350,7 +350,6 @@
                 var organizationid = $("#organExport").val();
                 var _token = $('input[name="_token"]').val();
                 fetch_data_year(organizationid, '#fee_year_export');
-                fetchClass(organizationid, '#yuranExport', $('#fee_year_export').val());
             });
 
             $('#organExportAllYuran').change(function () {
@@ -414,6 +413,9 @@
                         jQuery.each(result.years, function (key, value) {
                             $(feeYearSelectId).append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
                         });
+
+                        fetchClass(oid, '#yuranExport', $('#fee_year_export').val());
+
                     }
                 })
             }
