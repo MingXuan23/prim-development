@@ -95,6 +95,7 @@
                                         <th>No</th>
                                         <th>Nama Murid</th>
                                         <th>Jantina</th>
+                                        <th>Kelas</th>
                                         <th>Status Pembayaran</th>
                                         <th>Tarikh Transaksi</th>
                                         <th>Jumlah Bayaran (RM)</th>
@@ -349,7 +350,6 @@
                 var organizationid = $("#organExport").val();
                 var _token = $('input[name="_token"]').val();
                 fetch_data_year(organizationid, '#fee_year_export');
-                fetchClass(organizationid, '#yuranExport', $('#fee_year_export').val());
             });
 
             $('#organExportAllYuran').change(function () {
@@ -370,10 +370,7 @@
                 fetch_data(organizationid, '#yuranExport1');
             });
 
-            if ($("#organization").val() == "") {
-                $("#organization").prop("selectedIndex", 1).trigger('change');
-                fetch_data($("#organization").val(), '#classes');
-            }
+            $("#organization").prop("selectedIndex", 0);
 
             function fetch_data(oid = '', classId = '') {
                 var _token = $('input[name="_token"]').val();
@@ -386,7 +383,7 @@
                     },
                     success: function (result) {
                         $(classId).empty();
-                        $(classId).append("<option value='0'> Semua Kelas</option>");
+                        $(classId).append("<option value=''> Semua Kelas</option>");
                         jQuery.each(result.success, function (key, value) {
                             $(classId).append("<option value='" + value.cid + "'>" + value.cname + "</option>");
                         });
@@ -395,6 +392,8 @@
                         jQuery.each(result.years, function (key, value) {
                             $('#fee_year').append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
                         });
+
+                        fetch_yuran_data();
                     }
                 })
             }
@@ -414,35 +413,40 @@
                         jQuery.each(result.years, function (key, value) {
                             $(feeYearSelectId).append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
                         });
+
+                        fetchClass(oid, '#yuranExport', $('#fee_year_export').val());
+
+                    }
+                })
+            }
+
+            function fetch_yuran_data(classId = '') {
+                var classid = $("#classes option:selected").val();
+                var _token = $('input[name="_token"]').val();
+                var fee_year = $("#fee_year").val();
+                //console.log(classid);
+                $.ajax({
+                    url: "{{ route('fees.fetchYuran') }}",
+                    method: "POST",
+                    data: {
+                        classid: classid,
+                        oid: $("#organization").val(),
+                        _token: _token,
+                        fee_year: fee_year
+                    },
+                    success: function (result) {
+                        $('#fees').empty();
+                        $("#fees").append("<option value='0'>Pilih Yuran</option>");
+
+                        jQuery.each(result.success, function (key, value) {
+                            $("#fees").append("<option value='" + value.id + "'>" + value.name + "</option>");
+                        });
                     }
                 })
             }
 
             $('#classes').change(function () {
-                if ($(this).val() != '') {
-                    var classid = $("#classes option:selected").val();
-                    var _token = $('input[name="_token"]').val();
-                    var fee_year = $("#fee_year").val();
-                    //console.log(classid);
-                    $.ajax({
-                        url: "{{ route('fees.fetchYuran') }}",
-                        method: "POST",
-                        data: {
-                            classid: classid,
-                            oid: $("#organization").val(),
-                            _token: _token,
-                            fee_year: fee_year
-                        },
-                        success: function (result) {
-                            $('#fees').empty();
-                            $("#fees").append("<option value='0'>Pilih Yuran</option>");
-
-                            jQuery.each(result.success, function (key, value) {
-                                $("#fees").append("<option value='" + value.id + "'>" + value.name + "</option>");
-                            });
-                        }
-                    })
-                }
+                fetch_yuran_data($(this).val());
             });
 
             $('#fee_year').change(function () {
@@ -478,9 +482,6 @@
                             "className": "text-center",
                             "width": "2%"
                         }],
-                        order: [
-                            [1, 'asc']
-                        ],
                         columns: [{
                             "data": null,
                             searchable: false,
@@ -496,6 +497,11 @@
                         {
                             data: "gender",
                             name: "gender",
+                            "width": "10%"
+                        },
+                        {
+                            data: "class_name",
+                            name: "class_name",
                             "width": "10%"
                         },
                         {
