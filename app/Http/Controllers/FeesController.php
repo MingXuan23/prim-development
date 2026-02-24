@@ -1233,7 +1233,7 @@ class FeesController extends AppBaseController
                 return $btn;
             });
 
-            $table->rawColumns(['status', 'action']);
+            $table->rawColumns(['target', 'status', 'action']);
             // $table->rawColumns(['target', 'status']);
             return $table->make(true);
         }
