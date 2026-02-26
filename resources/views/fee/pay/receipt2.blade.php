@@ -68,6 +68,11 @@
                                     <tr>
                                         <td>Tarikh</td>
                                         <td>:</td>
+                                        <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dikemaskini</td>
+                                        <td>:</td>
                                         <td>{{ isset($get_transaction->datetime_of_success) ? $get_transaction->datetime_of_success->format('j M Y H:i:s A') : "" }}</td>
                                     </tr>
                                 </table>
