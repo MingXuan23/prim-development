@@ -43,6 +43,7 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->join('classes as c', 'c.id', 'co.class_id')
                 ->join('fees_new_organization_user as fou', 'fou.organization_user_id', '=', 'ou.id')
+                ->leftJoin('transactions as t', 't.id', 'fou.transaction_id')
                 ->where('ou.organization_id', $orgId)
                 ->where('fou.fees_new_id', $yuran->id)
                 ->where(function ($query) {
@@ -55,9 +56,9 @@ class ExportYuranStatus implements WithMultipleSheets
                                 ->whereNull('cs.end_date');
                         });
                 })
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'fou.status')
-                ->orderBy('c.nama')
-                ->orderBy('s.nama')
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'fou.status', 't.amount')
+                ->orderByDesc('cs.id')
+                ->orderByDesc('t.status')
                 ->get();
 
         } else {
@@ -66,6 +67,8 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->join('classes as c', 'c.id', 'co.class_id')
                 ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', 'sfn.id')
+                ->leftJoin('transactions as t', 'ftn.transactions_id', 't.id')
                 ->where('sfn.fees_id', $yuran->id)
                 ->where(function ($query) {
                     $query->where(function ($query) {
@@ -77,21 +80,21 @@ class ExportYuranStatus implements WithMultipleSheets
                                 ->whereNull('cs.end_date');
                         });
                 })
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status')
-                ->orderBy('c.nama')
-                ->orderBy('s.nama')
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status', 't.amount')
+                ->orderByDesc('cs.id')
+                ->orderByDesc('t.status')
                 ->get();
         }
 
         // sort based on class, student name
-        $data = $data->sortBy(function ($d) {
-            return [
-                $d->nama_kelas,
-                $d->nama,
-                $d->status == 'Paid' ? 0 : 1,
-            ];
-        })
+        $data = $data
             ->unique('nama')
+            ->sortBy(function ($d) {
+                return [
+                    $d->nama_kelas,
+                    $d->nama,
+                ];
+            })
             ->values();
 
         foreach ($data as $student) {
@@ -126,6 +129,7 @@ class ExportYuranStatus implements WithMultipleSheets
             'Kelas',
             'Jantina',
             'Status',
+            'Jumlah Bayaran'
         ];
 
         // foreach ($this->yuran as $yuranItem) {
