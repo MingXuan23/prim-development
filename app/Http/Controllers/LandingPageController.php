@@ -629,11 +629,14 @@ class LandingPageController extends AppBaseController
     {
         if ($request->ajax()) {
             $posters = '';
-
+            $searchQuery = $request->searchQuery;
 
             $donations = DB::table('donations')
                 ->where('donations.donation_type', $request->type)
                 ->where('donations.status', 1)
+                ->when(isset($searchQuery), function ($query) use ($searchQuery) {
+                    $query->where('nama', 'LIKE', "%$searchQuery%");
+                })
                 ->inRandomOrder()
                 ->get();
 
