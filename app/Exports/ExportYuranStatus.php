@@ -13,10 +13,15 @@ use Maatwebsite\Excel\Concerns\Exportable;
 
 class ExportYuranStatus implements WithMultipleSheets
 {
-    public function __construct($yuran, $feeYear)
+    private $yuran;
+    private $feeYear;
+    private $includeMasihBerhutang;
+
+    public function __construct($yuran, $feeYear, $includeMasihBerhutang = true)
     {
         $this->yuran = $yuran;
         $this->feeYear = $feeYear;
+        $this->includeMasihBerhutang = $includeMasihBerhutang;
     }
 
     /**
@@ -43,6 +48,7 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->join('classes as c', 'c.id', 'co.class_id')
                 ->join('fees_new_organization_user as fou', 'fou.organization_user_id', '=', 'ou.id')
+                ->join('fees_new as fn', 'fn.id', 'fou.fees_new_id')
                 ->leftJoin('transactions as t', 't.id', 'fou.transaction_id')
                 ->where('ou.organization_id', $orgId)
                 ->where('fou.fees_new_id', $yuran->id)
@@ -56,7 +62,10 @@ class ExportYuranStatus implements WithMultipleSheets
                                 ->whereNull('cs.end_date');
                         });
                 })
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'fou.status', 't.amount')
+                ->when(!$this->includeMasihBerhutang, function ($query) {
+                    $query->where('fou.status', 'Paid');
+                })
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'fou.status', 'fn.totalAmount')
                 ->orderByDesc('cs.id')
                 ->orderByDesc('t.status')
                 ->get();
@@ -67,6 +76,7 @@ class ExportYuranStatus implements WithMultipleSheets
                 ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                 ->join('classes as c', 'c.id', 'co.class_id')
                 ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                 ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', 'sfn.id')
                 ->leftJoin('transactions as t', 'ftn.transactions_id', 't.id')
                 ->where('sfn.fees_id', $yuran->id)
@@ -80,7 +90,10 @@ class ExportYuranStatus implements WithMultipleSheets
                                 ->whereNull('cs.end_date');
                         });
                 })
-                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status', 't.amount')
+                ->when(!$this->includeMasihBerhutang, function ($query) {
+                    $query->where('sfn.status', 'Paid');
+                })
+                ->select('s.nama', 'c.nama as nama_kelas', 's.gender', 'sfn.status', 'fn.totalAmount')
                 ->orderByDesc('cs.id')
                 ->orderByDesc('t.status')
                 ->get();
@@ -96,6 +109,16 @@ class ExportYuranStatus implements WithMultipleSheets
                 ];
             })
             ->values();
+
+        if ($this->includeMasihBerhutang) {
+            $data = $data->map(function ($item) {
+                if ($item->status == 'Debt') {
+                    $item->totalAmount = null;
+                }
+
+                return $item;
+            });
+        }
 
         foreach ($data as $student) {
             $student->status = $student->status == "Debt" ? "Masih Berhutang" : "Telah Bayar";

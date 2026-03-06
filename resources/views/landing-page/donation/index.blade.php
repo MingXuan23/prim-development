@@ -12,12 +12,13 @@
     @include('landing-page.head')
     <style>
         /*whatsapp contact button*/
-        #btn-whatsapp{
+        #btn-whatsapp {
             position: fixed;
             right: 12px;
             bottom: 12px;
             z-index: 999
         }
+
         .Btn {
             display: flex;
             align-items: center;
@@ -49,6 +50,7 @@
         .sign svg path {
             fill: white;
         }
+
         .text {
             position: absolute;
             right: 0%;
@@ -78,6 +80,7 @@
             transition-duration: 0.3s;
             padding-right: 10px;
         }
+
         .Btn:active {
             transform: translate(2px, 2px);
         }
@@ -106,12 +109,14 @@
         #headerhover:hover {
             transform: scale(1.2);
         }
-        .single-feature-list{
-            background-image: -webkit-linear-gradient(50deg,#5e2ced 0,#9749f8 100%)!important;
-            color: white!important;
+
+        .single-feature-list {
+            background-image: -webkit-linear-gradient(50deg, #5e2ced 0, #9749f8 100%) !important;
+            color: white !important;
         }
-        .form-control{
-            border-color:#5e5e5e!important;
+
+        .form-control {
+            border-color: #5e5e5e !important;
             transition: all 0.2s ease;
         }
 
@@ -122,20 +127,23 @@
         .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
             transform: scale(1.1);
         } */
-        .why-choose-area.why-choose-us-bg{
-            background-image: none!important;
+        .why-choose-area.why-choose-us-bg {
+            background-image: none !important;
         }
-        .why-choose-area{
-            .container{
+
+        .why-choose-area {
+            .container {
                 position: relative;
-                .shape-1{
+
+                .shape-1 {
                     position: absolute;
                     left: 5%;
                     top: 20%;
                     -webkit-animation: upndown 10s linear 2s infinite;
                     animation: upndown 10s linear 2s infinite;
                 }
-                .shape-2{
+
+                .shape-2 {
                     position: absolute;
                     left: -2%;
                     top: 20%;
@@ -143,14 +151,16 @@
                     animation: upndown 8s linear 2s infinite;
                     opacity: .5;
                 }
-                .shape-3{
+
+                .shape-3 {
                     position: absolute;
                     right: 5%;
                     bottom: 20%;
                     -webkit-animation: upndown 10s linear 2s infinite;
                     animation: upndown 10s linear 2s infinite;
                 }
-                .shape-4{
+
+                .shape-4 {
                     position: absolute;
                     right: -2%;
                     bottom: 20%;
@@ -161,41 +171,50 @@
             }
 
         }
-        section[aria-label="Donors In The Past Week"] , section[aria-label="Top Ketua Ahli"]{
+
+        section[aria-label="Donors In The Past Week"],
+        section[aria-label="Top Ketua Ahli"] {
             /*background-color: #500ade;*/
             padding-top: 80px;
             padding-bottom: 80px;
             /*background-image: url('assets/landing-page/img/bg/why-us-dark-bg.png');*/
             background-size: contain;
         }
-        .container.container-donation{
+
+        .container.container-donation {
             overflow: hidden;
         }
-        .donors-container{
+
+        .donors-container {
             display: flex;
             align-content: center;
             padding: 30px 0;
             animation: slide 70s linear infinite;
         }
-        .donors-container-2{
+
+        .donors-container-2 {
             animation: slide 45s linear infinite 0.5s;
         }
+
         .donors-container:hover {
             animation-play-state: paused;
         }
-        @keyframes slide{
-            from{
+
+        @keyframes slide {
+            from {
                 transform: translateX(0%);
             }
-            to{
+
+            to {
                 transform: translateX(-2400px);
             }
         }
-        .donor-container{
-            flex-shrink:0;
-            background-image: linear-gradient(#5e2ced 0%,#9749f8 100%);
-            color: rgb(255, 255, 255) ;
-            margin:15px 15px 15px 0;
+
+        .donor-container {
+            flex-shrink: 0;
+            background-image: linear-gradient(#5e2ced 0%, #9749f8 100%);
+            color: rgb(255, 255, 255);
+            margin: 15px 15px 15px 0;
             padding: 12px;
             text-align: center;
             border-radius: 0.25rem;
@@ -204,15 +223,17 @@
             width: 225px;
 
         }
-        .donor-name{
+
+        .donor-name {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             text-transform: uppercase;
         }
-        .donation-amount{
+
+        .donation-amount {
             text-align: center;
-            background-image: linear-gradient(180deg ,#5e2ced 0%,#9749f8 100% );
+            background-image: linear-gradient(180deg, #5e2ced 0%, #9749f8 100%);
             color: white;
             padding: 12px 0;
         }
@@ -224,7 +245,7 @@
             padding: 20px;
             text-align: center;
 
-            .shape-1{
+            .shape-1 {
                 position: absolute;
                 left: 5%;
                 bottom: 0;
@@ -232,7 +253,8 @@
                 animation: upndown 10s linear 2s infinite;
                 z-index: -1;
             }
-            .shape-2{
+
+            .shape-2 {
                 position: absolute;
                 left: -2%;
                 bottom: 0;
@@ -242,7 +264,8 @@
                 z-index: -1;
 
             }
-            .shape-3{
+
+            .shape-3 {
                 position: absolute;
                 right: 5%;
                 top: 0;
@@ -251,7 +274,8 @@
                 z-index: -1;
 
             }
-            .shape-4{
+
+            .shape-4 {
                 position: absolute;
                 right: -2%;
                 top: 0;
@@ -272,7 +296,8 @@
         .leader-group {
             margin: 15px;
             max-width: 400px;
-            flex: 1 1 calc(33.33% - 30px); /* Ensure three groups per row on large screens */
+            flex: 1 1 calc(33.33% - 30px);
+            /* Ensure three groups per row on large screens */
         }
 
         .leader-list {
@@ -284,10 +309,10 @@
             width: 100%;
             padding: 15px;
             justify-content: space-between;
-            display:flex;
+            display: flex;
             border-bottom: 1px solid rgb(151, 151, 151);
             transition: all 0.3s ease;
-            background-image: -webkit-linear-gradient(50deg, #6104cc 0,#5e2ced 100%)!important;
+            background-image: -webkit-linear-gradient(50deg, #6104cc 0, #5e2ced 100%) !important;
         }
 
 
@@ -313,55 +338,72 @@
             justify-content: center;
             margin-top: 30px;
         }
-        .single-why-us-item{
+
+        .single-why-us-item {
             background-color: rgb(118, 70, 233);
             text-align: center;
             border: 2px solid rgb(118, 70, 233);
-            .icon{
+
+            .icon {
                 margin: 0 auto;
             }
         }
-        .single-why-us-item:hover{
+
+        .single-why-us-item:hover {
             background-color: inherit;
         }
-        .single-why-us-item .icon.gdbg-1{
+
+        .single-why-us-item .icon.gdbg-1 {
             background-image: -webkit-linear-gradient(50deg, #b59bff 0, #9749f8 100%) !important;
         }
+
+        #donation-search-bar {
+            border-radius: 30px;
+            border: 3px solid #9749f8 !important;
+            transition: all 0.2s ease;
+            padding: 10px 20px;
+        }
+
+        #donation-search-bar:focus {
+            border: 3px solid #5e2ced !important;
+        }
+
         /* Display rules for different screen sizes */
         @media (max-width: 799px) {
             .leader-groups {
-            flex-direction: column;
+                flex-direction: column;
             }
 
             .leader-group {
-            flex: 1 1 100%;
-            max-width: 100%;
+                flex: 1 1 100%;
+                max-width: 100%;
             }
 
-            #group2, #group3 {
-            display: none;
+            #group2,
+            #group3 {
+                display: none;
             }
         }
 
         @media (min-width: 800px) and (max-width: 1199px) {
             .leader-group {
-            flex: 1 1 calc(50% - 30px);
-            max-width: calc(50% - 30px);
+                flex: 1 1 calc(50% - 30px);
+                max-width: calc(50% - 30px);
             }
 
             #group3 {
-            display: none;
+                display: none;
             }
         }
 
         @media (min-width: 1200px) {
             .leader-group {
-            flex: 1 1 calc(33.33% - 30px);
-            max-width: calc(33.33% - 30px);
+                flex: 1 1 calc(33.33% - 30px);
+                max-width: calc(33.33% - 30px);
             }
         }
 
-        @media only screen and (max-width: 991px){
+        @media only screen and (max-width: 991px) {
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
                 transform: scale(1.0);
             }
@@ -379,28 +421,32 @@
             }
         }
 
-        @media screen and (max-width: 770px){
-            .nav-tabs{
-                display:flex!important;
+        @media screen and (max-width: 770px) {
+            .nav-tabs {
+                display: flex !important;
                 flex-wrap: nowrap;
                 overflow-x: auto;
                 scroll-snap-type: x mandatory;
             }
-            ::-webkit-scrollbar{
+
+            ::-webkit-scrollbar {
                 width: 20px;
                 height: 12px;
             }
-            ::-webkit-scrollbar-thumb{
+
+            ::-webkit-scrollbar-thumb {
                 border-radius: 0.5rem;
                 background: #500ade;
             }
-            .nav-tabs >li{
+
+            .nav-tabs>li {
                 white-space: nowrap;
                 scroll-snap-align: center;
             }
-            .nav-tabs a{
+
+            .nav-tabs a {
                 min-width: 225px;
-                margin-bottom: 0!important;
+                margin-bottom: 0 !important;
             }
         }
     </style>
@@ -457,7 +503,8 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="breadcrumb-area breadcrumb-bg style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
+    <header class="breadcrumb-area breadcrumb-bg style-two" id="home"
+        style="padding-top: 170px; padding-bottom: 170px;">
         <!-- <div class="header-right-image wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
@@ -466,22 +513,29 @@
         <div class="container">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
-                    <img src="{{ URL::asset('assets/landing-page/img/header-derma.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-derma.png') }}" alt="header right image"
+                        style="max-width: 110%;" id="headerhover">
                 </div>
                 <div class="col-lg-6 justify-content-center">
                     <div class="header-inner">
                         {{-- <h1 class="title wow fadeInDown white">Derma</h1>
-                        <p class="white">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu subuh. Allah menjanjikan
-                            banyak kelebihan dan ganjarannya. Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
-                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
+                        <p class="white">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu subuh. Allah
+                            menjanjikan
+                            banyak kelebihan dan ganjarannya. Kami sediakan Kemudahan bersepadu supaya kita boleh
+                            bersedekah atau menderma TANPA NAMA serendah RM2
+                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web
+                            prim.my/derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div> --}}
                         <h1 class="title wow fadeInDown white">Derma</h1>
-                        <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari terutamanya di waktu Subuh. Allah menjanjikan
+                        <p class="white" style="font-size: 20px;">Kita digalakkan untuk bersedekah setiap hari
+                            terutamanya di waktu Subuh. Allah menjanjikan
                             banyak kelebihan dan ganjarannya.
-                            Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA serendah RM2
-                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web prim.my/derma.</p>
+                            Kami sediakan Kemudahan bersepadu supaya kita boleh bersedekah atau menderma TANPA NAMA
+                            serendah RM2
+                            untuk pelbagai masjid serta organisasi yang telah berdaftar di dalam laman web
+                            prim.my/derma.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         </div>
@@ -490,8 +544,9 @@
 
                 {{-- <div class="col-lg-7">
                     <h1 class="title wow fadeInDown white ">PRiM</h1>
-                    <p class=" white" style="font-size: 20px">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
-                    berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                    <p class=" white" style="font-size: 20px">Sebuah sistem yang menyediakan perkhidmatan pembayaran
+                        dalam talian untuk pelbagai organisasi
+                        berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
                     <div class="btn-wrapper wow fadeInUp ">
                         <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                         <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
@@ -504,28 +559,31 @@
                     <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
                 </div>
                 <div class="col-lg-7 align-items-center d-none d-lg-block" style="text-align: center">
-                    <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="max-width: 100%;">
+                    <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image"
+                        style="max-width: 100%;">
                 </div>
             </div>
             <div class="row justify-content-center" style="padding-top: 150px">
                 <h1 class="title wow fadeInDown">PRiM</h1>
-                <p class="text-center">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
-                berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
+                <p class="text-center">Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk
+                    pelbagai organisasi
+                    berdaftar. Antara perkhidmatan yang telah kami sediakan ialah derma.</p>
                 <div class="btn-wrapper wow fadeInUp">
                     <a href="#organization" class="boxed-btn btn-rounded">Jom Derma</a>
                 </div>
             </div> --}}
-{{--        </div>--}}
+            {{--
+        </div>--}}
     </header>
     <!-- header area end  -->
     <section aria-label="Click to reach out to us at WhatsApp" id="btn-whatsapp">
-        <a href="https://wa.me/139017388" target="_blank" class="social-link" >
+        <a href="https://wa.me/139017388" target="_blank" class="social-link">
             <div class="Btn">
                 <div class="sign">
                     <svg class="socialSvg whatsappSvg" viewBox="0 0 16 16">
                         <path
-                            d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
-                        ></path>
+                            d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z">
+                        </path>
                     </svg>
                 </div>
                 <div class="text">Hubungi Kami</div>
@@ -538,17 +596,18 @@
             <div class="mb-3 text-center">Paparan penderma-penderma yang terkini</div>
             <div class="donors-container donors-container-1">
                 @foreach ($donors as $index => $donor)
-{{--                    @if ($index % 10 == 0 && $index > 0)--}}
-{{--                        <!-- Close the previous row and open a new one -->--}}
-{{--                        </div><div class="donors-container donors-container-2">--}}
-{{--                    @endif--}}
-                    <div class="donor-container">
-                        <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
-                        <div class="donor-amount">RM{{ $donor->amount }}</div>
-                        <small>{{date('d/m/Y h:i A',strtotime($donor->datetime_created))}}</small>
-                    </div>
+                        {{-- @if ($index % 10 == 0 && $index > 0)--}}
+                        {{-- <!-- Close the previous row and open a new one -->--}}
+                        {{-- </div>
+                    <div class="donors-container donors-container-2">--}}
+                        {{-- @endif--}}
+                        <div class="donor-container">
+                            <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
+                            <div class="donor-amount">RM{{ $donor->amount }}</div>
+                            <small>{{date('d/m/Y h:i A', strtotime($donor->datetime_created))}}</small>
+                        </div>
                 @endforeach
-        </div>
+            </div>
 
         </div>
 
@@ -566,29 +625,29 @@
             <div class="leader-groups">
                 <!-- Leader item -->
                 @foreach ($leaders as $index => $leader)
-                    <?php
-                        $groupNumber = floor($index / 5) + 1;
-                    ?>
-                    <!-- Create the group divs dynamically based on the group number -->
-                    @if($index % 5 == 0)
-                        <div class="leader-group" id="group{{ $groupNumber }}">
-                            <ul class="leader-list">
-                    @endif
+                                <?php
+                    $groupNumber = floor($index / 5) + 1;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
+                                <!-- Create the group divs dynamically based on the group number -->
+                                @if($index % 5 == 0)
+                                    <div class="leader-group" id="group{{ $groupNumber }}">
+                                        <ul class="leader-list">
+                                @endif
 
-                    <!-- Leader item -->
-                    <li class="leader-item" style="animation-delay: {{ $index * 0.1 }}s;">
-                        <span class="leader-name">{{ $index + 1 }}. {{ $leader->name }}</span>
-                        <span class="follower-count">{{ $leader->member_count }} Ahli</span>
-                    </li>
+                                        <!-- Leader item -->
+                                        <li class="leader-item" style="animation-delay: {{ $index * 0.1 }}s;">
+                                            <span class="leader-name">{{ $index + 1 }}. {{ $leader->name }}</span>
+                                            <span class="follower-count">{{ $leader->member_count }} Ahli</span>
+                                        </li>
 
-                    <!-- Close the group divs when the last leader of the group is reached -->
-                    @if($index % 5 == 4 || $index == count($leaders) - 1)
-                            </ul>
-                        </div>
-                    @endif
+                                        <!-- Close the group divs when the last leader of the group is reached -->
+                                        @if($index % 5 == 4 || $index == count($leaders) - 1)
+                                                </ul>
+                                            </div>
+                                        @endif
                 @endforeach
             </div>
-<!--
+            <!--
             <div class="leader-buttons">
                 <button class="btn btn-info" onclick="showInfo()">Maklumat Lanjut</button>
                 <button class="btn btn-register" onclick="register()">Daftar</button>
@@ -616,7 +675,7 @@
     </section> -->
     <section class="team-member-area" id="team">
         <div class="bg-shape-1">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width: 90%";>
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width: 90%" ;>
         </div>
         <div class="container">
 
@@ -641,7 +700,8 @@
                         <div class="col-lg-6">
                             <div class="section-title left-aligned">
                                 <h3 class="title extra" style="margin-top: 24px;font-size: 40px;">Terkini</h3>
-                                <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
+                                <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme">
+                                </div>
                             </div>
                         </div>
                         {{-- <div class="col-lg-6">
@@ -656,7 +716,8 @@
                             </div><!-- //. section title -->
                         </div> --}}
                         <div class="col-lg-6">
-                            <h3 class="title extra" style="margin-bottom: 24px; margin-top: 24px;font-size: 40px;">Syarat-syarat</h3>
+                            <h3 class="title extra" style="margin-bottom: 24px; margin-top: 24px;font-size: 40px;">
+                                Syarat-syarat</h3>
                             <div class="feature-area">
 
                                 <div class="hover-inner">
@@ -691,7 +752,9 @@
                                                 Islam.
                                                 <br> <i> <a
                                                         href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
-                                                        download class="text-white"> (klik untuk muat turun borang)</a> </i> </p>
+                                                        download class="text-white"> (klik untuk muat turun borang)</a>
+                                                </i>
+                                            </p>
                                             <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
                                                     style="margin-right: 10px"></i> Mendaftar sebagai organisasi di
                                                 sistem PRiM.
@@ -871,6 +934,9 @@
                         <h3 class="title">Organisasi</h3>
                         <p>Antara organisasi derma yang berdaftar bersama PRiM.</p>
                     </div><!-- //. section title -->
+                    <div class="section-search mb-3">
+                        <input type="text" class="form-control" id="donation-search-bar" placeholder="🔍 Cari derma">
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -879,22 +945,26 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
+                                    role="tab" aria-controls="lain" aria-selected="false"><i
+                                        class="fas fa-building"></i>
                                     Derma Khas </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-university"></i>
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
+                                        class="fas fa-university"></i>
                                     IPTA / Universiti</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-hammer"></i>
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
+                                        class="fas fa-hammer"></i>
                                     Masjid/Surau Baru </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i class="fas fa-school"></i>
+                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
+                                        class="fas fa-school"></i>
                                     PIBG Sekolah </a>
                             </li>
                             <li class="nav-item">
@@ -909,7 +979,8 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-solid fa-hammer"></i>
+                                    role="tab" aria-controls="ngo" aria-selected="false"><i
+                                        class="fas fa-solid fa-hammer"></i>
                                     Wakaf MAIM</a>
                             </li>
                             <li class="nav-item">
@@ -941,53 +1012,56 @@
             {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}}
         </div>
         <div class="container">
-{{--            <div class="container">--}}
-{{--                <div class="row justify-content-center">--}}
-{{--                    <div class="col-lg-10">--}}
-{{--                        <div class="section-title">--}}
-{{--                            <!-- section title -->--}}
-{{--                            --}}{{-- <span class="subtitle">Screenshots</span> --}}
-{{--                            <h3 class="title extra">Pasukan Kami</h3>--}}
-{{--                        </div><!-- //. section title -->--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--            <div class="row text-center">--}}
-{{--                <div class="col-lg-12 mb-200">--}}
-{{--                    <div class="row justify-content-center">--}}
-{{--                        <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
-{{--                            <div class="p-3">--}}
-{{--                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
-{{--                            </div>--}}
-{{--                            <div class="pt-3">--}}
-{{--                                <h4>Yahya Bin Ibrahim</h4>--}}
-{{--                                <p>Chief Executive Officer</p>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
+            {{-- <div class="container">--}}
+                {{-- <div class="row justify-content-center">--}}
+                    {{-- <div class="col-lg-10">--}}
+                        {{-- <div class="section-title">--}}
+                            {{-- <!-- section title -->--}}
+                            {{-- --}}{{-- <span class="subtitle">Screenshots</span> --}}
+                            {{-- <h3 class="title extra">Pasukan Kami</h3>--}}
+                            {{-- </div><!-- //. section title -->--}}
+                        {{-- </div>--}}
+                    {{-- </div>--}}
+                {{-- </div>--}}
+            {{-- <div class="row text-center">--}}
+                {{-- <div class="col-lg-12 mb-200">--}}
+                    {{-- <div class="row justify-content-center">--}}
+                        {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
+                            {{-- <div class="p-3">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt=""
+                                    style="max-width:70%; width: 250px">--}}
+                                {{-- </div>--}}
+                            {{-- <div class="pt-3">--}}
+                                {{-- <h4>Yahya Bin Ibrahim</h4>--}}
+                                {{-- <p>Chief Executive Officer</p>--}}
+                                {{-- </div>--}}
+                            {{-- </div>--}}
 
-{{--                        <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
-{{--                            <div class="p-3">--}}
-{{--                                <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
-{{--                            </div>--}}
-{{--                            <div class="pt-3">--}}
-{{--                                <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>--}}
-{{--                                <p>Chief Operating Officer</p>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
+                        {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
+                            {{-- <div class="p-3">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt=""
+                                    style="max-width:70%; width: 250px">--}}
+                                {{-- </div>--}}
+                            {{-- <div class="pt-3">--}}
+                                {{-- <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>--}}
+                                {{-- <p>Chief Operating Officer</p>--}}
+                                {{-- </div>--}}
+                            {{-- </div>--}}
 
-{{--                        <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
-{{--                            <div class="p-3">--}}
-{{--                                <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
-{{--                            </div>--}}
-{{--                            <div class="pt-3">--}}
-{{--                                <h4>Chuan Chuan You</h4>--}}
-{{--                                <p>Chief Technology Officer</p>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
+                        {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
+                            {{-- <div class="p-3">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt=""
+                                    style="max-width:70%; width: 250px">--}}
+                                {{-- </div>--}}
+                            {{-- <div class="pt-3">--}}
+                                {{-- <h4>Chuan Chuan You</h4>--}}
+                                {{-- <p>Chief Technology Officer</p>--}}
+                                {{-- </div>--}}
+                            {{-- </div>--}}
 
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
+                        {{-- </div>--}}
+                    {{-- </div>--}}
+                {{-- </div>--}}
 
             <div class="container" style="margin-bottom: 10rem">
                 <div class="row justify-content-center">
@@ -1025,64 +1099,65 @@
                 </div>
             </div>
 
-{{--            <div class="row">--}}
-{{--                <div class="col-lg-6">--}}
-{{--                    <div class="contact-area-wrapper" id="contact">--}}
-{{--                        <!-- contact area wrapper -->--}}
-{{--                        --}}{{-- <span class="subtitle">Contact us</span> --}}
-{{--                        <h3 class="title">Hubungi Kami</h3>--}}
-{{--                        <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>--}}
-{{--                        <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"--}}
-{{--                            enctype="multipart/form-data">--}}
+            {{-- <div class="row">--}}
+                {{-- <div class="col-lg-6">--}}
+                    {{-- <div class="contact-area-wrapper" id="contact">--}}
+                        {{-- <!-- contact area wrapper -->--}}
+                        {{-- --}}{{-- <span class="subtitle">Contact us</span> --}}
+                        {{-- <h3 class="title">Hubungi Kami</h3>--}}
+                        {{-- <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>--}}
+                        {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
+                            --}} {{-- enctype="multipart/form-data">--}}
 
-{{--                            @csrf--}}
-{{--                            <div class="row">--}}
-{{--                                <div class="col-lg-12">--}}
-{{--                                    <div class="form-group">--}}
-{{--                                        <input type="text" class="form-control" id="uname" name="uname"--}}
-{{--                                            placeholder="Nama Penuh" required>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
-{{--                                <div class="col-lg-6">--}}
-{{--                                    <div class="form-group">--}}
-{{--                                        <input type="email" class="form-control" id="email" name="email"--}}
-{{--                                            placeholder="Email" required>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
+                            {{-- @csrf--}}
+                            {{-- <div class="row">--}}
+                                {{-- <div class="col-lg-12">--}}
+                                    {{-- <div class="form-group">--}}
+                                        {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{--
+                                            placeholder="Nama Penuh" required>--}}
+                                        {{-- </div>--}}
+                                    {{-- </div>--}}
+                                {{-- <div class="col-lg-6">--}}
+                                    {{-- <div class="form-group">--}}
+                                        {{-- <input type="email" class="form-control" id="email" name="email" --}} {{--
+                                            placeholder="Email" required>--}}
+                                        {{-- </div>--}}
+                                    {{-- </div>--}}
 
-{{--                                <div class="col-lg-6">--}}
-{{--                                    <div class="form-group">--}}
-{{--                                        <input type="text" class="form-control phone_no" id="telno" name="telno"--}}
-{{--                                            placeholder="Nombor Telefon" required>--}}
-{{--                                    </div>--}}
-{{--                                </div>--}}
+                                {{-- <div class="col-lg-6">--}}
+                                    {{-- <div class="form-group">--}}
+                                        {{-- <input type="text" class="form-control phone_no" id="telno" name="telno"
+                                            --}} {{-- placeholder="Nombor Telefon" required>--}}
+                                        {{-- </div>--}}
+                                    {{-- </div>--}}
 
-{{--                                <div class="col-lg-12">--}}
-{{--                                    <div class="form-group textarea">--}}
-{{--                                        <textarea name="message" id="message" class="form-control" cols="30" rows="10"--}}
-{{--                                            placeholder="Mesej" required></textarea>--}}
-{{--                                    </div>--}}
-{{--                                    <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-{{--                        </form>--}}
-{{--                    </div><!-- //. contact area wrapper -->--}}
-{{--                </div>--}}
-{{--                <div class="col-lg-6">--}}
-{{--                    <div class="contact-area-wrapper" id="contact">--}}
-{{--                        <div class="map-responsive">--}}
-{{--                            <iframe--}}
-{{--                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"--}}
-{{--                                width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""--}}
-{{--                                aria-hidden="false" tabindex="0">--}}
-{{--                            </iframe>--}}
+                                {{-- <div class="col-lg-12">--}}
+                                    {{-- <div class="form-group textarea">--}}
+                                        {{-- <textarea name="message" id="message" class="form-control" cols="30"
+                                            rows="10" --}} {{-- placeholder="Mesej" required></textarea>--}}
+                                        {{-- </div>--}}
+                                    {{-- <button class="submit-btn  btn-rounded gd-bg-1"
+                                        type="submit">Hantar</button>--}}
+                                    {{-- </div>--}}
+                                {{-- </div>--}}
+                            {{-- </form>--}}
+                        {{-- </div><!-- //. contact area wrapper -->--}}
+                    {{-- </div>--}}
+                {{-- <div class="col-lg-6">--}}
+                    {{-- <div class="contact-area-wrapper" id="contact">--}}
+                        {{-- <div class="map-responsive">--}}
+                            {{-- <iframe--}} {{--
+                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                                --}} {{-- width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
+                                --}} {{-- aria-hidden="false" tabindex="0">--}}
+                                {{-- </iframe>--}}
 
-{{--                            <br>--}}
+                                {{-- <br>--}}
 
-{{--                        </div>--}}
-{{--                    </div><!-- //. contact area wrapper -->--}}
-{{--                </div>--}}
-{{--            </div>--}}
+                                {{-- </div>--}}
+                        {{-- </div><!-- //. contact area wrapper -->--}}
+                    {{-- </div>--}}
+                {{-- </div>--}}
         </div>
     </section>
     <!-- team member area end -->
@@ -1186,9 +1261,9 @@
     <!-- preloader area end -->
 
     <!-- back to top area start -->
-{{--    <div class="back-to-top">--}}
-{{--        <i class="fas fa-angle-up"></i>--}}
-{{--    </div>--}}
+    {{-- <div class="back-to-top">--}}
+        {{-- <i class="fas fa-angle-up"></i>--}}
+        {{-- </div>--}}
     <!-- back to top area end -->
     @include('landing-page.footer-script')
 
@@ -1196,151 +1271,168 @@
         var msg = '{{Session::get('alert')}}';
         var exist = '{{Session::has('alert')}}';
 
-    if (exist) {
-        Swal.fire({
-            title: 'Terima Kasih',
-            text: 'Kerana anda telah menghubungi kami!',
-            type: 'success',
-            confirmButtonColor: '#556ee6',
-            cancelButtonColor: "#f46a6a"
-        });
-    }
+        if (exist) {
+            Swal.fire({
+                title: 'Terima Kasih',
+                text: 'Kerana anda telah menghubungi kami!',
+                type: 'success',
+                confirmButtonColor: '#556ee6',
+                cancelButtonColor: "#f46a6a"
+            });
+        }
 
-    $(document).ready(function() {
-        window.onload = function() {
-            document.getElementById("8").click();
-        };
+        $(document).ready(function () {
+            window.onload = function () {
+                document.getElementById("8").click();
+            };
 
-        $.ajax({
-            url: "{{ route('landingpage.donation.header') }}",
-            type: 'GET',
-            success: function( result ){
-
-                $('#headerPoster').html( result );
-                $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-                $('#headerPoster').find('.owl-stage-outer').children().unwrap();
-                $('#headerPoster').owlCarousel({
-                    loop:true,
-                    autoplay:true,
-                    autoplayTimeout:5000,
-                    responsiveClass:true,
-                    responsive:{
-                        0:{
-                            items:1,
-                            nav:false
-                        },
-                        600:{
-                            items:1,
-                            nav:false
-                        },
-                        1000:{
-                            items:1,
-                            nav:false,
-                        }
-                    },
-                });
-            }
-        });
-
-        $('#feedback').owlCarousel({
-            loop: true,
-            autoplay: true, //true if you want enable autoplay
-            autoPlayTimeout: 1000,
-            margin: 30,
-            dots: false,
-            nav: true,
-            smartSpeed:3000,
-            animateIn:'fadeIn',
-            animateOut:"fadeOut",
-            navText:['',''],
-            responsive: {
-                0: {
-                    items: 1,
-                    nav: false
-                },
-                414: {
-                    items: 1,
-                    nav: false
-                },
-                520: {
-                    items: 2,
-                    nav: false
-                },
-                767: {
-                    items: 2,
-                    nav: false
-                },
-                768: {
-                    items: 2,
-                    nav: false
-                },
-                960: {
-                    items: 3,
-                    nav:false
-                },
-                1200: {
-                    items: 4
-                },
-                1920: {
-                    items: 4
-                }
-            }
-        });
-
-        $('.phone_no').mask('00000000000');
-
-        var typedonation;
-        $(document).on('click', '.btn-organization', function() {
-            var type = $(this).attr("id");
-            typedonation = type;
             $.ajax({
-                url: "{{ route('landingpage.donation.bytabbing') }}",
+                url: "{{ route('landingpage.donation.header') }}",
                 type: 'GET',
-                data: {
-                    type: type,
-                },
-                success: function( result ){
+                success: function (result) {
 
-                    var posterExist = true;
-                    if (result === '') {
-                        result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
-                        posterExist = false;
-                    }
-
-                    $('#donationPoster').html( result );
-                    $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-                    $('#donationPoster').find('.owl-stage-outer').children().unwrap();
-                    $('#donationPoster').owlCarousel({
-                        // loop:true,
-                        dots: posterExist,
-                        // paginationNumbers: false,
-                        responsiveClass:true,
-                        responsive:{
-                            0:{
-                                items:1,
-                                nav:false
+                    $('#headerPoster').html(result);
+                    $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                    $('#headerPoster').find('.owl-stage-outer').children().unwrap();
+                    $('#headerPoster').owlCarousel({
+                        loop: true,
+                        autoplay: true,
+                        autoplayTimeout: 5000,
+                        responsiveClass: true,
+                        responsive: {
+                            0: {
+                                items: 1,
+                                nav: false
                             },
-                            600:{
-                                items:2,
-                                nav:false
+                            600: {
+                                items: 1,
+                                nav: false
                             },
-                            1000:{
-                                items:3,
-                                nav:false,
-                                loop:false
+                            1000: {
+                                items: 1,
+                                nav: false,
                             }
                         },
                     });
                 }
             });
-        });
 
-        // duplicate the donors to make the loop effect works
-        var duplicate1 = document.querySelector('.donors-container-1').cloneNode(true);
-        $('.donors-container-1').append($(duplicate1).children());
-        var duplicate2 = document.querySelector('.donors-container-2').cloneNode(true);
-        $('.donors-container-2').append($(duplicate2).children());
-    });
+            $('#feedback').owlCarousel({
+                loop: true,
+                autoplay: true, //true if you want enable autoplay
+                autoPlayTimeout: 1000,
+                margin: 30,
+                dots: false,
+                nav: true,
+                smartSpeed: 3000,
+                animateIn: 'fadeIn',
+                animateOut: "fadeOut",
+                navText: ['', ''],
+                responsive: {
+                    0: {
+                        items: 1,
+                        nav: false
+                    },
+                    414: {
+                        items: 1,
+                        nav: false
+                    },
+                    520: {
+                        items: 2,
+                        nav: false
+                    },
+                    767: {
+                        items: 2,
+                        nav: false
+                    },
+                    768: {
+                        items: 2,
+                        nav: false
+                    },
+                    960: {
+                        items: 3,
+                        nav: false
+                    },
+                    1200: {
+                        items: 4
+                    },
+                    1920: {
+                        items: 4
+                    }
+                }
+            });
+
+            $('.phone_no').mask('00000000000');
+
+            function loadDonationCarousel(type, searchQuery = '') {
+                $.ajax({
+                    url: "{{ route('landingpage.donation.bytabbing') }}",
+                    type: 'GET',
+                    data: {
+                        type: type,
+                        searchQuery: searchQuery
+                    },
+                    success: function (result) {
+
+                        var posterExist = true;
+                        if (result === '') {
+                            result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
+                            posterExist = false;
+                        }
+
+                        $('#donationPoster').html(result);
+                        $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                        $('#donationPoster').find('.owl-stage-outer').children().unwrap();
+                        $('#donationPoster').owlCarousel({
+                            // loop:true,
+                            dots: posterExist,
+                            // paginationNumbers: false,
+                            responsiveClass: true,
+                            responsive: {
+                                0: {
+                                    items: 1,
+                                    nav: false
+                                },
+                                600: {
+                                    items: 2,
+                                    nav: false
+                                },
+                                1000: {
+                                    items: 3,
+                                    nav: false,
+                                    loop: false
+                                }
+                            },
+                        });
+                    }
+                });
+            }
+
+            var typedonation;
+            var searchQuery = '';
+            var searchDelay;
+            $(document).on('click', '.btn-organization', function () {
+                var type = $(this).attr("id");
+                typedonation = type;
+                loadDonationCarousel(typedonation, searchQuery);
+            });
+
+            $('#donation-search-bar').on('input', function () {
+                searchQuery = $(this).val().trim().toLowerCase();
+                clearTimeout(searchDelay);
+
+                searchDelay = setTimeout(function () {
+                    loadDonationCarousel(typedonation, searchQuery);
+                }, 300);
+            });
+
+            // duplicate the donors to make the loop effect works
+            var duplicate1 = document.querySelector('.donors-container-1').cloneNode(true);
+            $('.donors-container-1').append($(duplicate1).children());
+            var duplicate2 = document.querySelector('.donors-container-2').cloneNode(true);
+            $('.donors-container-2').append($(duplicate2).children());
+        });
     </script>
 </body>
+
 </html>
