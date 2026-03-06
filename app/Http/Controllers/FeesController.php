@@ -2952,6 +2952,7 @@ class FeesController extends AppBaseController
     {
         $fees = Fee_New::find($request->feeid);
         $year = $request->feeYear;
+        $includeMasihBerhutang = $request->includeMasihBerhutang;
 
         if (request()->ajax()) {
             if ($fees->category == "Kategori A") {
@@ -2969,7 +2970,6 @@ class FeesController extends AppBaseController
                         return $this->checkClassStudentYear($year, $query);
                     })
                     ->select('ou.user_id', 's.*', 'c.nama as class_name')
-                    // ->distinct()
                     ->orderByDesc('cs.id')
                     ->get()
                     ->unique('nama')
@@ -2977,15 +2977,16 @@ class FeesController extends AppBaseController
 
                 $feeA = DB::table('fees_new_organization_user as fou')
                     ->join('organization_user as ou', 'ou.id', 'fou.organization_user_id')
+                    ->join('fees_new as fn', 'fn.id', '=', 'fou.fees_new_id')
                     ->leftJoin('transactions as t', 't.id', '=', 'fou.transaction_id')
                     ->where('fou.fees_new_id', $request->feeid)
-                    ->select('ou.user_id', 'fou.status', 't.datetime_created', 't.amount')
+                    ->select('ou.user_id', 'fou.status', 't.datetime_created', 'fn.totalAmount as amount')
                     ->orderBy('datetime_created', 'desc')
                     ->get()
                     ->unique('user_id')
                     ->keyBy('user_id');
 
-                $data = $student_user->map(function ($student) use ($feeA) {
+                $data = $student_user->map(function ($student) use ($feeA, $includeMasihBerhutang) {
                     $user_id = $student->user_id;
                     $fee_data = $feeA->get($user_id);
                     $student->status = $fee_data->status ?? null; // Add the status from $feeA to $student_user
@@ -2994,6 +2995,12 @@ class FeesController extends AppBaseController
                     return $student;
                 });
 
+                if (!$includeMasihBerhutang) {
+                    $data = $data->filter(function ($student) {
+                        return $student->status == 'Paid';
+                    });
+                }
+
             } else {
                 if ($fees->category != "Kategori Berulang") {
                     $data = DB::table('students as s')
@@ -3001,6 +3008,7 @@ class FeesController extends AppBaseController
                         ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                         ->join('classes as c', 'c.id', '=', 'co.class_id')
                         ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                        ->join('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
                         ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
@@ -3010,8 +3018,11 @@ class FeesController extends AppBaseController
                         ->when(isset($year), function ($query) use ($year) {
                             return $this->checkClassStudentYear($year, $query);
                         })
-                        ->select('s.*', 'sfn.status', 't.datetime_created', 'cs.id as class_student_id', 't.amount', 'c.nama as class_name')
-                        ->orderBy('class_student_id', 'desc')
+                        ->when(!$includeMasihBerhutang, function ($query) {
+                            $query->where('sfn.status', '=', 'Paid');
+                        })
+                        ->select('s.*', 'sfn.status', 't.datetime_created', 'cs.id as class_student_id', 'fn.totalAmount as amount', 'c.nama as class_name')
+                        ->orderByDesc('class_student_id')
                         ->orderByDesc('t.status')
                         ->get()
                         ->unique('nama')
@@ -3022,6 +3033,7 @@ class FeesController extends AppBaseController
                         ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                         ->join('classes as c', 'c.id', '=', 'co.class_id')
                         ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                        ->join('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
                         ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
                         ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
@@ -3032,7 +3044,10 @@ class FeesController extends AppBaseController
                         ->when(isset($year), function ($query) use ($year) {
                             return $this->checkClassStudentYear($year, $query);
                         })
-                        ->select('s.*', 'sfn.status', 'cs.id as class_student_id', 'fr.*', 't.datetime_created', 't.amount', 'c.nama as class_name')
+                        ->when(!$includeMasihBerhutang, function ($query) {
+                            $query->where('sfn.status', '=', 'Paid');
+                        })
+                        ->select('s.*', 'sfn.status', 'cs.id as class_student_id', 'fr.*', 't.datetime_created', 'fn.totalAmount as amount', 'c.nama as class_name')
                         ->orderByDesc('class_student_id')
                         ->orderByDesc('t.status')
                         ->get()
@@ -3094,6 +3109,7 @@ class FeesController extends AppBaseController
     public function ExportAllYuranStatus(Request $request)
     {
         $feeYear = $request->get('fee_year');
+        $includeMasihBerhutang = $request->get('includeMasihBerhutang');
 
         if ($request->yuranExport == 0) {
             $filename = "LaporanSemuaYuran";
@@ -3127,7 +3143,7 @@ class FeesController extends AppBaseController
 
 
         if (!$orgtypeSwasta || count($orgtypeSwasta) == 0) {
-            return Excel::download(new ExportYuranStatus($yuran, $feeYear), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran, $feeYear, $includeMasihBerhutang), $filename . '.xlsx');
         } else {
             return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }

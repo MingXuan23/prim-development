@@ -83,6 +83,10 @@
                         data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
                     <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
                         data-target="#modalExportSemuaYuran"><i class="fas fa-plus"></i> Export Semua Yuran</a>
+                    <div style="float: left; margin-left: 15px;">
+                        <input type="checkbox" name="includeMasihBerhutang" id="includeMasihBerhutangCheckbox" checked>
+                        <label for="includeMasihBerhutang">Termasuk Pelajar Masih Berhutang</label>
+                    </div>
                 </div>
 
                 <div class="col-md-12">
@@ -143,6 +147,10 @@
                             <select name="yuranExport" id="yuranExport" class="form-control">
 
                             </select>
+                        </div>
+                        <div class="form-group mx-2">
+                            <input type="checkbox" name="includeMasihBerhutang" checked>
+                            <label for="includeMasihBerhutang">Termasuk Pelajar Masih Berhutang</label>
                         </div>
                         <div class="modal-footer">
                             <button id="buttonExport" type="submit" class="btn btn-primary">Export</button>
@@ -301,9 +309,6 @@
 
             });
 
-
-
-
             function fetchClass(organizationid = '', yuranId = '', year = '') {
                 var _token = $('input[name="_token"]').val();
                 var fee_year = year ?? $('#fee_year').val();
@@ -445,6 +450,69 @@
                 })
             }
 
+            function loadDatatable() {
+                $('#yuranTable').DataTable().destroy();
+
+                var yuranTable = $('#yuranTable').DataTable({
+                    ordering: true,
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('fees.debtDatatable') }}",
+                        type: 'GET',
+                        data: {
+                            feeid: $("#fees").val(),
+                            classid: $("#classes").val(),
+                            orgId: $("#organization").val(),
+                            feeYear: $('#fee_year').val(),
+                            includeMasihBerhutang: $('#includeMasihBerhutangCheckbox').is(':checked') ? 1 : 0
+                        }
+                    },
+                    'columnDefs': [{
+                        "targets": [0, 1, 2, 3], // your case first column
+                        "className": "text-center",
+                        "width": "2%"
+                    }],
+                    columns: [{
+                        "data": null,
+                        searchable: false,
+                        "sortable": false,
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    }, {
+                        data: "nama",
+                        name: "nama",
+                        "width": "20%"
+                    },
+                    {
+                        data: "gender",
+                        name: "gender",
+                        "width": "10%"
+                    },
+                    {
+                        data: "class_name",
+                        name: "class_name",
+                        "width": "10%"
+                    },
+                    {
+                        data: "status",
+                        name: "status",
+                        "width": "10%"
+                    },
+                    {
+                        data: "transaction_date",
+                        name: "transaction_date",
+                        width: "10%"
+                    },
+                    {
+                        data: "amount",
+                        name: "amount",
+                        width: "10%"
+                    }]
+                });
+            }
+
             $('#classes').change(function () {
                 fetch_yuran_data($(this).val());
             });
@@ -461,66 +529,12 @@
 
             $('#fees').change(function () {
                 if ($(this).val() != 0) {
-                    $('#yuranTable').DataTable().destroy();
-
-                    var yuranTable = $('#yuranTable').DataTable({
-                        ordering: true,
-                        processing: true,
-                        serverSide: true,
-                        ajax: {
-                            url: "{{ route('fees.debtDatatable') }}",
-                            type: 'GET',
-                            data: {
-                                feeid: $("#fees").val(),
-                                classid: $("#classes").val(),
-                                orgId: $("#organization").val(),
-                                feeYear: $('#fee_year').val()
-                            }
-                        },
-                        'columnDefs': [{
-                            "targets": [0, 1, 2, 3], // your case first column
-                            "className": "text-center",
-                            "width": "2%"
-                        }],
-                        columns: [{
-                            "data": null,
-                            searchable: false,
-                            "sortable": false,
-                            render: function (data, type, row, meta) {
-                                return meta.row + meta.settings._iDisplayStart + 1;
-                            }
-                        }, {
-                            data: "nama",
-                            name: "nama",
-                            "width": "20%"
-                        },
-                        {
-                            data: "gender",
-                            name: "gender",
-                            "width": "10%"
-                        },
-                        {
-                            data: "class_name",
-                            name: "class_name",
-                            "width": "10%"
-                        },
-                        {
-                            data: "status",
-                            name: "status",
-                            "width": "10%"
-                        },
-                        {
-                            data: "transaction_date",
-                            name: "transaction_date",
-                            width: "10%"
-                        },
-                        {
-                            data: "amount",
-                            name: "amount",
-                            width: "10%"
-                        }]
-                    });
+                    loadDatatable();
                 }
+            });
+
+            $('#includeMasihBerhutangCheckbox').on('change', function () {
+                loadDatatable();
             });
 
             // csrf token for ajax
