@@ -2756,10 +2756,12 @@ class FeesController extends AppBaseController
             return redirect('/home');
         }
 
+        $includeMasihBerhutang = $request->get('includeMasihBerhutang');
+
         $oid = $request->get('organExportAllYuran');
         $year = $request->get('feeYearExportAllYuran');
 
-        return Excel::download(new ExportAllYuran($oid, $year), "Yuran Tahun " . $year . ".xlsx");
+        return Excel::download(new ExportAllYuran($oid, $year, $includeMasihBerhutang), "Yuran Tahun " . $year . ".xlsx");
     }
 
     public function cetegoryReportIndex()

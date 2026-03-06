@@ -248,6 +248,10 @@
                                 <option value="0" disabled selected>Pilih Tahun</option>
                             </select>
                         </div>
+                        <div class="form-group mx-2">
+                            <input type="checkbox" name="includeMasihBerhutang" checked>
+                            <label for="includeMasihBerhutang">Termasuk Pelajar Masih Berhutang</label>
+                        </div>
                         <div class="modal-footer">
                             <button id="buttonExportSemua" type="submit" class="btn btn-primary">Export</button>
                         </div>
