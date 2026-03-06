@@ -534,7 +534,9 @@
             });
 
             $('#includeMasihBerhutangCheckbox').on('change', function () {
-                loadDatatable();
+                if ($("#fees").val() != 0 && $("#organization").val() != '') {
+                    loadDatatable();
+                }
             });
 
             // csrf token for ajax
