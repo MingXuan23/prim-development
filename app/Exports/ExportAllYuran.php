@@ -15,11 +15,13 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
     private $orgId;
     private $feesByOrg;
     private $year;
+    private $includeMasihBerhutang;
 
-    public function __construct($orgId, $year)
+    public function __construct($orgId, $year, $includeMasihBerhutang = true)
     {
         $this->orgId = $orgId;
         $this->year = $year;
+        $this->includeMasihBerhutang = $includeMasihBerhutang;
 
         // get all fees by organization
         $this->feesByOrg = DB::table("fees_new")
@@ -29,7 +31,7 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
             ->orderBy('category', 'asc')
             ->orderByDesc('status')
             ->orderBy('name', 'asc')
-            ->select('id', 'name', 'status', 'category')
+            ->select('id', 'name', 'status', 'category', 'totalAmount')
             ->get();
     }
 
@@ -44,24 +46,28 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
             ->join('classes as c', 'c.id', '=', 'co.class_id')
             ->where('co.organization_id', '=', $this->orgId)
             ->where(function ($query) {
-                if ($this->year == now()->year) {
-                    $query->where('cs.start_date', '<=', $this->year . '-12-31')
-                        ->whereNull('cs.end_date');
-                } else {
+                $query->where(function ($query) {
                     $query->where('cs.start_date', '<=', $this->year . '-12-31')
                         ->where('cs.end_date', '>=', $this->year . '-01-01');
-                }
+                })->orWhere(function ($query) {
+                    $query->where('cs.start_date', '<=', $this->year . '-12-31')
+                        ->whereNull('cs.end_date');
+                });
             })
             ->select('s.id as student_id', 's.nama as student_name', 'c.nama as nama_kelas', 'cs.id as class_student_id')
-            ->orderBy('c.nama', 'asc')
-            ->orderBy('s.nama', 'asc')
-            ->get();
+            ->orderByDesc('cs.id')
+            ->get()
+            ->unique('student_name')
+            ->values();
 
         // get all fees_new_organization_user (for Kategori A)
         $feesNewOrganizationUsers = DB::table("fees_new_organization_user as fou")
             ->join('organization_user as ou', 'ou.id', '=', 'fou.organization_user_id')
             ->join('organization_user_student as ous', 'ou.id', '=', 'ous.organization_user_id')
             ->whereIn('ous.student_id', $studentsByOrg->pluck('student_id'))
+            ->when(!$this->includeMasihBerhutang, function ($query) {
+                $query->where('fou.status', '=', 'Paid');
+            })
             ->select('ou.id as organization_user_id', 'ous.student_id as student_id', 'fou.fees_new_id as fees_id', 'fou.status')
             ->get()
             ->groupBy(function ($row) {
@@ -72,6 +78,9 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
         // get all student_fees_new with transactions (for Kategori B and Kategori C)
         $studentFeesNew = DB::table("student_fees_new")
             ->whereIn('class_student_id', $studentsByOrg->pluck('class_student_id'))
+            ->when(!$this->includeMasihBerhutang, function ($query) {
+                $query->where('status', '=', 'Paid');
+            })
             ->get()
             ->groupBy(function ($row) {
                 // using indexing
@@ -93,6 +102,7 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
             ];
 
             foreach ($this->feesByOrg as $fee) {
+
                 if ($fee->category == "Kategori A") {
                     // key is the index in feesNewOrganizationUsers
                     $key = $studentId . '_' . $fee->id;
@@ -108,11 +118,11 @@ class ExportAllYuran implements FromCollection, WithHeadings, ShouldAutoSize
                 }
 
                 if ($feeStatus == null) {
-                    $row->{$fee->name} = '-';
+                    $row->{$fee->id} = '-';
                 } else if ($feeStatus == 'Debt') {
-                    $row->{$fee->name} = 'Masih Berhutang';
+                    $row->{$fee->id} = 'Masih Berhutang';
                 } else {
-                    $row->{$fee->name} = 'Telah Bayar';
+                    $row->{$fee->id} = "Telah Bayar ($fee->totalAmount)";
                 }
             }
 
