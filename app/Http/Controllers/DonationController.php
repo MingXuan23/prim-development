@@ -454,6 +454,13 @@ class DonationController extends Controller
 
     public function store(DonationRequest $request)
     {
+        $nameExists = Donation::where('nama', '=', $request->nama)->exists();
+
+        // ensure that donation name is unique so that the url link will be unique
+        if ($nameExists) {
+            return redirect()->back()->withErrors('Nama derma telah digunakan. Sila guna nama lain.');
+        }
+
         $link = explode(" ", $request->nama);
         $str = implode("-", $link);
 
