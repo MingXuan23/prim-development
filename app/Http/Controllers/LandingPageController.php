@@ -233,7 +233,7 @@ class LandingPageController extends AppBaseController
             ->get();
 
         //get the total number of students
-        $studentCount = $organizationStudentCounts->sum("student_count") + $lmmStudentCounts->sum("student_count") - $organizationStudentCounts->where('id', 137)->first()->student_count;//minus MAAHAD TAHFIZ SAINS DARUL AMAN because included in lmmStudentCounts
+        $studentCount = $organizationStudentCounts->sum("student_count") + $lmmStudentCounts->sum("student_count");
 
         //get the total number of fees
 //        $totalFee =  DB::table("fees_new as fn")
