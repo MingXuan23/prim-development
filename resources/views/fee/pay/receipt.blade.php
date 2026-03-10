@@ -63,6 +63,11 @@
                                     <tr>
                                         <td>Tarikh</td>
                                         <td>:</td>
+                                        <td>{{ $get_transaction->datetime_created->format('j M Y H:i:s A') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Dikemaskini</td>
+                                        <td>:</td>
                                         <td>{{ isset($get_transaction->datetime_of_success) ? $get_transaction->datetime_of_success->format('j M Y H:i:s A') : "" }}</td>
                                     </tr>
                                 </table>
@@ -80,7 +85,13 @@
                                         <td class="py-2">No. Kad Pengenalan
                                         </td>
                                         <td class="py-2">:</td>
-                                        <td class="py-2">{{ $getparent->icno }}</td>
+                                        <td class="py-2">
+                                            @if($getparent->icno)
+                                                {{ $getparent->icno }}
+                                            @else
+                                                {{ $getparent->telno }}
+                                            @endif    
+                                        </td>
                                     </tr>
                                     <tr style="background-color:#e9ecef">
                                         <th colspan="9" class="text-center">Maklumat Yuran</th>
