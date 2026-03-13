@@ -19,7 +19,7 @@ class ClassController extends Controller
 
     public function index()
     {
-        $organization = $this->getOrganizationByUserId(); 
+        $organization = $this->getOrganizationByUserId();
         return view('class.index', compact('organization'));
     }
 
@@ -37,13 +37,20 @@ class ClassController extends Controller
 
     public function classimport(Request $request)
     {
-        $file       = $request->file('file');
-        $namaFile   = $file->getClientOriginalName();
+        $file = $request->file('file');
+
+        // check if file is empty or only have headers
+        $reader = Excel::toArray([], $file);
+        if (empty($reader) || count($reader[0]) <= 1) {
+            return redirect('/class')->withErrors(['error' => 'Fail tersebut adalah kosong atau hanya mempunyai tajuk.']);
+        }
+
+        $namaFile = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
 
         $etx = $file->getClientOriginalExtension();
         $formats = ['xls', 'xlsx', 'ods', 'csv'];
-        if (! in_array($etx, $formats)) {
+        if (!in_array($etx, $formats)) {
 
             return redirect('/class')->withErrors(['format' => 'Only supports upload .xlsx, .xls files']);
         }
@@ -66,30 +73,30 @@ class ClassController extends Controller
         $organization = $this->getOrganizationByUserId();
         return view('private-school.class.add', compact('organization'));
     }
-    
+
     public function store(Request $request)
     {
         //
         $this->validate($request, [
-            'name'          =>  'required',
-            'level'         =>  'required',
-            'organization'  =>  'required',
-            'classTeacher'  =>  'required'
+            'name' => 'required',
+            'level' => 'required',
+            'organization' => 'required',
+            'classTeacher' => 'required'
         ]);
 
         $class = new ClassModel([
-            'nama'          =>  $request->get('name'),
-            'levelid'       =>  $request->get('level'),
-            'status'       =>  "1",
+            'nama' => $request->get('name'),
+            'levelid' => $request->get('level'),
+            'status' => "1",
         ]);
         $class->save();
 
         DB::table('class_organization')->insert([
             'organization_id' => $request->get('organization'),
-            'class_id'        => $class->id,
-            'organ_user_id'  =>  $request->get('classTeacher'),
-            'start_date'      => now(),
-            'updated_at'       =>   now()
+            'class_id' => $class->id,
+            'organ_user_id' => $request->get('classTeacher'),
+            'start_date' => now(),
+            'updated_at' => now()
         ]);
 
         return redirect('/class')->with('success', 'New class has been added successfully');
@@ -99,69 +106,71 @@ class ClassController extends Controller
     {
         //
         $this->validate($request, [
-            'name'          =>  'required',
-            'level'         =>  'required',
-            'organization'  =>  'required',
-            'classTeacher'  =>  'required'
+            'name' => 'required',
+            'level' => 'required',
+            'organization' => 'required',
+            'classTeacher' => 'required'
         ]);
 
         $class = new ClassModel([
-            'nama'          =>  $request->get('name'),
-            'levelid'       =>  $request->get('level'),
-            'status'       =>  "1",
+            'nama' => $request->get('name'),
+            'levelid' => $request->get('level'),
+            'status' => "1",
         ]);
         $class->save();
 
         DB::table('class_organization')->insert([
             'organization_id' => $request->get('organization'),
-            'class_id'        => $class->id,
-            'organ_user_id'  =>  $request->get('classTeacher'),
-            'start_date'      => now(),
+            'class_id' => $class->id,
+            'organ_user_id' => $request->get('classTeacher'),
+            'start_date' => now(),
         ]);
 
         return redirect('/private-school/class')->with('success', 'New class has been added successfully');
     }
 
-    public function storeDummyClass($id){
-        
+    public function storeDummyClass($id)
+    {
+
         $class = new ClassModel([
-            'nama'          =>  "Graduated Class",
-            'levelid'       => 0,
-            'status'       =>  "1",
+            'nama' => "Graduated Class",
+            'levelid' => 0,
+            'status' => "1",
         ]);
         $class->save();
 
         DB::table('class_organization')->insert([
             'organization_id' => $id,
-            'class_id'        => $class->id,
-            'start_date'      => now(),
+            'class_id' => $class->id,
+            'start_date' => now(),
         ]);
 
         $class = new ClassModel([
-            'nama'          =>  "Inactive Class",
-            'levelid'       => 0,
-            'status'       =>  "1",
+            'nama' => "Inactive Class",
+            'levelid' => 0,
+            'status' => "1",
         ]);
         $class->save();
 
         DB::table('class_organization')->insert([
             'organization_id' => $id,
-            'class_id'        => $class->id,
-            'start_date'      => now(),
+            'class_id' => $class->id,
+            'start_date' => now(),
         ]);
 
         return redirect()->back();
     }
 
-    public function getDummyClassStatus(Request $request){
-       
-        
+    public function getDummyClassStatus(Request $request)
+    {
+
+
         $dummy = DB::table('classes as c')
-                ->join('class_organization as co','co.class_id','c.id')
-                ->where('co.organization_id',$request->oid)
-                ->where('c.levelid',0)
-                ->count();
-        return response()->json(['data' =>$dummy]);
+            ->join('class_organization as co', 'co.class_id', 'c.id')
+            ->where('co.organization_id', $request->oid)
+            ->where('c.levelid', 0)
+            ->count();
+        return response()->json(['data' => $dummy]);
     }
     public function show($id)
     {
@@ -172,19 +181,19 @@ class ClassController extends Controller
     {
         //
         $organization = $this->getOrganizationByUserId();
-        $class       = DB::table('classes')
+        $class = DB::table('classes')
             ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
             ->where('classes.id', $id)
             ->first();
 
         $teacher = DB::table('users as u')
-                    ->join('organization_user as ou','ou.user_id','u.id')
-                    ->where('ou.id',$class->organ_user_id??0)
-                    ->select('u.name')
-                    ->first();
-        $teacher = $teacher->name ??'Tiada Guru';
-       
-        return view('class.update', compact('class', 'organization', 'id','teacher'));
+            ->join('organization_user as ou', 'ou.user_id', 'u.id')
+            ->where('ou.id', $class->organ_user_id ?? 0)
+            ->select('u.name')
+            ->first();
+        $teacher = $teacher->name ?? 'Tiada Guru';
+
+        return view('class.update', compact('class', 'organization', 'id', 'teacher'));
     }
 
     public function update(Request $request, $id)
@@ -192,41 +201,41 @@ class ClassController extends Controller
         //
         // dd($id);
         $this->validate($request, [
-            'name'          =>  'required',
-            'level'         =>  'required',
-            'organization'  =>  'required',
-            
+            'name' => 'required',
+            'level' => 'required',
+            'organization' => 'required',
+
         ]);
 
         DB::table('classes')
             ->where('id', $id)
             ->update(
                 [
-                    'nama'      => $request->get('name'),
-                    
+                    'nama' => $request->get('name'),
+
                 ]
             );
         DB::table('classes')
-            ->where('id',$id)
-            ->where('levelid','>',0)
+            ->where('id', $id)
+            ->where('levelid', '>', 0)
             ->update([
-                'levelid'   => $request->get('level')
+                'levelid' => $request->get('level')
             ]);
-            
+
         $update = DB::table('class_organization')->where('class_id', $id);
-        $update ->update([
+        $update->update([
             'organization_id' => $request->get('organization'),
-           
+
         ]);
 
-        if($request->get('classTeacher') !=""){
-            $update ->update([
-                'organ_user_id'    =>  $request->get('classTeacher'),
-                'updated_at'       =>   now()
-               
+        if ($request->get('classTeacher') != "") {
+            $update->update([
+                'organ_user_id' => $request->get('classTeacher'),
+                'updated_at' => now()
+
             ]);
         }
-       
+
 
         return redirect('/class')->with('success', 'The data has been updated!');
     }
@@ -266,7 +275,7 @@ class ClassController extends Controller
                     ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                     ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                     ->leftJoin('users', 'organization_user.user_id', 'users.id')
-                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru','class_organization.updated_at')
+                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru', 'class_organization.updated_at')
                     ->where([
                         ['class_organization.organization_id', $oid],
                         ['classes.status', "1"]
@@ -314,7 +323,7 @@ class ClassController extends Controller
                 $btn = '<div class="d-flex justify-content-center">';
                 $btn = $btn . '<a href="' . route('class.edit', $row->cid) . '" class="btn btn-primary m-1">Edit</a>';
                 //$btn = $btn . '<button id="' . $row->cid . '" data-token="' . $token . '" class="btn btn-danger m-1">Buang</button>';
-                $btn=$btn.'</div>';
+                $btn = $btn . '</div>';
                 return $btn;
             });
 
@@ -345,14 +354,14 @@ class ClassController extends Controller
     public function fetchTeacher(Request $request)
     {
         $listTeacher = DB::table('users as u')
-        ->leftJoin('organization_user as ou', 'ou.user_id', 'u.id')
-        ->select('ou.id as id', 'u.name')
-        ->where('ou.organization_id', $request->oid)
-        ->where('ou.role_id', 5)
-        ->Orwhere('ou.role_id', 21)
-        ->orderBy('u.name')
-        ->get();
-        
+            ->leftJoin('organization_user as ou', 'ou.user_id', 'u.id')
+            ->select('ou.id as id', 'u.name')
+            ->where('ou.organization_id', $request->oid)
+            ->where('ou.role_id', 5)
+            ->Orwhere('ou.role_id', 21)
+            ->orderBy('u.name')
+            ->get();
+
         return response()->json(['success' => $listTeacher]);
     }
 }
