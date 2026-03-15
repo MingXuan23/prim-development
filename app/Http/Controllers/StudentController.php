@@ -30,6 +30,7 @@ use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use function PHPUnit\Framework\returnValue;
 
 class StudentController extends Controller
 {
@@ -162,6 +163,12 @@ class StudentController extends Controller
         //dd($ifSwasta);
 
         $file = $request->file('file');
+        $reader = Excel::toArray([], $file);
+
+        if (empty($reader) || count($reader[0]) <= 1) {
+            return redirect('/student')->withErrors(['error' => 'Fail tersebut adalah kosong atau hanya ada tajuk sahaja.']);
+        }
+
         $namaFile = $file->getClientOriginalName();
         $file->move('uploads/excel/', $namaFile);
         $public_path = $_SERVER['DOCUMENT_ROOT'];
