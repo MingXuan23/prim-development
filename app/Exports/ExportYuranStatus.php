@@ -14,12 +14,14 @@ use Maatwebsite\Excel\Concerns\Exportable;
 class ExportYuranStatus implements WithMultipleSheets
 {
     private $yuran;
+    private $classId;
     private $feeYear;
     private $includeMasihBerhutang;
 
-    public function __construct($yuran, $feeYear, $includeMasihBerhutang = true)
+    public function __construct($yuran, $classId = null, $feeYear, $includeMasihBerhutang = true)
     {
         $this->yuran = $yuran;
+        $this->classId = $classId;
         $this->feeYear = $feeYear;
         $this->includeMasihBerhutang = $includeMasihBerhutang;
     }
@@ -62,6 +64,9 @@ class ExportYuranStatus implements WithMultipleSheets
                                 ->whereNull('cs.end_date');
                         });
                 })
+                ->when(isset($this->classId), function ($query) {
+                    $query->where('co.class_id', '=', $this->classId);
+                })
                 ->when(!$this->includeMasihBerhutang, function ($query) {
                     $query->where('fou.status', 'Paid');
                 })
@@ -89,6 +94,9 @@ class ExportYuranStatus implements WithMultipleSheets
                             $query->where('cs.start_date', '<=', $this->feeYear . '-12-31')
                                 ->whereNull('cs.end_date');
                         });
+                })
+                ->when(isset($this->classId), function ($query) {
+                    $query->where('co.class_id', '=', $this->classId);
                 })
                 ->when(!$this->includeMasihBerhutang, function ($query) {
                     $query->where('sfn.status', 'Paid');

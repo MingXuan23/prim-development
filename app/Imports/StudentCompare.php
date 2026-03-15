@@ -60,6 +60,12 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
         set_time_limit(300);
         if (!isset($row['nama']) || !isset($row['nama_penjaga']) || !isset($row['jantina']) || !isset($row['no_ic_penjaga'])) {
 
+            $required_headers = ['nama', 'jantina', 'nama_penjaga', 'no_ic_penjaga'];
+
+            if (count(array_diff($required_headers, $row)) > 0) {
+                throw ValidationException::withMessages(["error" => "Invalid header names. Required headers: nama, jantina, nama_penjaga, no_ic_penjaga"]);
+            }
+
             if ($row['nama'] == null && $row['nama_penjaga'] == null && $row['jantina'] == null && $row['no_ic_penjaga'] == null) {
                 return null;
             } else {
