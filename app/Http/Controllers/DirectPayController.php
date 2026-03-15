@@ -1133,19 +1133,20 @@ class DirectPayController extends Controller
     {
         // 1. Construct the Payload Object
         // Mapping $data to the API's expected keys
+       //dd($data);
         $payloadObj = [
             'SellerOrderNo' => $data['fpx_sellerOrderNo'],
             'Amount' => number_format((float) $data['fpx_txnAmount'], 2, '.', ''),
             'BuyerEmail' => $data['fpx_buyerEmail'],
             'BuyerName' => $data['fpx_buyerName'],
             // Use provided merchant ID or fallback to config/TEST001
-            'MerchantId' => $data['merchant_id'] ?? 'TEST001',
+            'MerchantId' => $data['private_key'] ?? 'TEST001',
             //'CallBackUrl'   => '{default}', // Update this
             'TimeStamp' => Carbon::now()->toIso8601String(),
             'RequestId' => Str::random(12),
         ];
 
-        $payloadObj['MerchantId'] = 'TEST001';
+        //$payloadObj['MerchantId'] = 'TEST001';
         //$payloadObj['BuyerEmail'] = 'test@email.com';
 
         // 2. Convert to JSON String (Raw data to be signed)
@@ -1154,7 +1155,8 @@ class DirectPayController extends Controller
         // 3. Generate RSA Signature
         // Ensure the private key is formatted correctly
         $privateKey = env('PRIM_PRIVATE_KEY');
-        // dd(env('PRIM_PRIVATE_KEY'));
+
+         //dd(env('PRIM_PRIVATE_KEY'));
         // if (!str_contains($privateKey, 'BEGIN RSA PRIVATE KEY')) {
         //     $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" . 
         //                 wordwrap($privateKey, 64, "\n", true) . 
@@ -1174,6 +1176,7 @@ class DirectPayController extends Controller
 
         // dd($requestBody, $base64Payload);
         // 5. Send Request
+        //dd($payloadObj);
         $response = Http::withHeaders([
             'X-MerchantId' => $payloadObj['MerchantId'],
             'X-Signature' => $signatureBase64,
@@ -1184,7 +1187,7 @@ class DirectPayController extends Controller
         // ->post('https://sit.directpay.my/api/v1/Pay/GetPaymentUrl');
 
         $res = $response->json();
-
+        //dd($res,env('DIRECTPAY_GETPAYMENT_URL'));
         // 5. Handle Response or Throw Exception
         if (isset($res['status']) && $res['status'] === true) {
             return $res['payload']['paymentUrl'];
