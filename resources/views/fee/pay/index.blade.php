@@ -469,7 +469,7 @@
         // Bind event handler to the hidden.bs.collapse event of the collapse element
         $('.student-collapse').on('hidden.bs.collapse', function () {
             // Find all children checkboxes with the name "billcheck" and set their checked property to false
-            $(this).children().find("input[name='billcheck']").prop('checked', false).change();
+            $(this).children().find("input[name='billcheck']:checked").prop('checked', false).change();
         });
 
         $('.student-collapse').on('shown.bs.collapse', function () {

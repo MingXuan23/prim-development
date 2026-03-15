@@ -2868,20 +2868,34 @@ class FeesController extends AppBaseController
 
         $oid = $request->oid;
         $year = $request->fee_year;
-        $lists = DB::table('fees_new')
-            ->select('fees_new.*', DB::raw("CONCAT(fees_new.category, ' - ', fees_new.name) AS name"))
-            ->where('organization_id', $oid)
-            ->where('start_date', '<=', $year . '-12-31')
-            ->where('end_date', '>=', $year . '-01-01')
-            ->orderBy('category')
+
+        $lists = DB::table('fees_new as fn')
+            ->leftJoin('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
+            ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', '=', 'fn.id')
+            ->where(function ($query) {
+                $query->whereExists(function ($subQuery) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('student_fees_new')
+                        ->whereColumn('student_fees_new.fees_id', 'fn.id')
+                        ->where('student_fees_new.status', 'paid');
+                })->orWhereExists(function ($subQuery) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('fees_new_organization_user')
+                        ->whereColumn('fees_new_organization_user.fees_new_id', 'fn.id')
+                        ->where('fees_new_organization_user.status', 'paid');
+                })->orWhere('fn.status', '=', 1);
+            })
+            ->where('fn.organization_id', $oid)
+            ->where('fn.start_date', '<=', $year . '-12-31')
+            ->where('fn.end_date', '>=', $year . '-01-01')
+            ->groupBy('fn.id')
+            ->select('fn.*', DB::raw("CONCAT(fn.category, ' - ', fn.name) AS name"))
+            ->orderBy('fn.category')
             ->orderBy('name')
             ->get();
 
-        //dd($lists,$year);
-
         foreach ($lists as $key => $list) {
             $target = json_decode($list->target);
-            // dd($target->data);
 
             if ($class == null) {
                 continue;
@@ -2901,40 +2915,6 @@ class FeesController extends AppBaseController
         }
 
         return response()->json(['success' => $lists]);
-    }
-
-    public function fecthYuranByOrganizationId(Request $request)
-    {
-        $oid = $request->oid;
-        $year = $request->fee_year;
-        //dd($year);
-        $yurans = DB::table('fees_new as fn')
-            ->leftJoin('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
-            ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', '=', 'fn.id')
-            ->where(function ($query) {
-                $query->whereExists(function ($subQuery) {
-                    $subQuery->select(DB::raw(1))
-                        ->from('student_fees_new')
-                        ->whereColumn('student_fees_new.fees_id', 'fn.id')
-                        ->where('student_fees_new.status', 'paid');
-                })->orWhereExists(function ($subQuery) {
-                    $subQuery->select(DB::raw(1))
-                        ->from('fees_new_organization_user')
-                        ->whereColumn('fees_new_organization_user.fees_new_id', 'fn.id')
-                        ->where('fees_new_organization_user.status', 'paid');
-                });
-            })
-            ->where('fn.organization_id', $oid)
-            ->where('fn.start_date', '<=', $year . '-12-31')
-            ->where('fn.end_date', '>=', $year . '-01-01')
-            ->groupBy('fn.id')
-            ->select('fn.id', DB::raw("CONCAT(fn.category, ' - ', fn.name) AS name"))
-            ->orderBy('fn.category')
-            ->orderBy('name')
-            ->get();
-
-        //dd($yurans);
-        return response()->json(['success' => $yurans]);
     }
 
     public function checkClassStudentYear($year, $query)
@@ -3112,6 +3092,7 @@ class FeesController extends AppBaseController
     {
         $feeYear = $request->get('fee_year');
         $includeMasihBerhutang = $request->get('includeMasihBerhutang');
+        $classId = $request->get('class_export');
 
         if ($request->yuranExport == 0) {
             $filename = "LaporanSemuaYuran";
@@ -3145,7 +3126,7 @@ class FeesController extends AppBaseController
 
 
         if (!$orgtypeSwasta || count($orgtypeSwasta) == 0) {
-            return Excel::download(new ExportYuranStatus($yuran, $feeYear, $includeMasihBerhutang), $filename . '.xlsx');
+            return Excel::download(new ExportYuranStatus($yuran, $classId, $feeYear, $includeMasihBerhutang), $filename . '.xlsx');
         } else {
             return Excel::download(new ExportYuranStatusSwasta($yuran), $filename . '.xlsx');
         }

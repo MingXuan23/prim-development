@@ -335,8 +335,6 @@ Route::group(['prefix' => 'fees'], function () {
     Route::get('/category/report-swasta', 'FeesController@cetegoryReportIndexSwasta')->name('fees.category.report_swasta');
     Route::post('/list-fetchYuran', 'FeesController@fetchYuran')->name('fees.fetchYuran');
 
-    Route::post('/list-fetchYuranbyOrganId', 'FeesController@fecthYuranByOrganizationId')->name('fees.fetchYuranByOrganId');
-
     Route::post('/closeFee/{id}', 'FeesController@closeFee');
 });
 

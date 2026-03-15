@@ -136,6 +136,12 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="form-group">
+                            <label> Tahun </label>
+                            <select name="class_export" id="class_export" class="form-control">
+                                <option value="0" disabled selected>Pilih Kelas</option>
+                            </select>
+                        </div>
                         <div id="yuran" class="form-group">
                             <label> Tahun </label>
                             <select name="fee_year" id="fee_year_export" class="form-control">
@@ -294,7 +300,6 @@
                 }
             }
 
-
             $('#modalJumlahBayaran').on('shown.bs.modal', function () {
 
                 $('#date .form-control').datepicker({
@@ -309,79 +314,44 @@
                     // Call validateDateRange function when either datepicker changes
                     validateDateRange();
                 });
-
-
             });
-
-            function fetchClass(organizationid = '', yuranId = '', year = '') {
-                var _token = $('input[name="_token"]').val();
-                var fee_year = year ?? $('#fee_year').val();
-                $.ajax({
-                    url: "{{ route('fees.fetchYuranByOrganId') }}",
-                    method: "POST",
-                    data: {
-                        oid: organizationid,
-                        _token: _token,
-                        fee_year: fee_year
-                    },
-                    success: function (result) {
-                        $(yuranId).empty();
-                        $(yuranId).append("<option value='0' selected>Semua Yuran</option>");
-                        jQuery.each(result.success, function (key, value) {
-                            $(yuranId).append("<option value='" + value.id + "'>" + value.name + "</option>");
-                        });
-                    }
-                })
-            }
-
-            function fetchYear(organizationid = '') {
-                var _token = $('input[name="_token"]').val();
-                var fee_year = $('#fee_year').val();
-                $.ajax({
-                    url: "{{ route('fees.fetchYuranByOrganId') }}",
-                    method: "POST",
-                    data: {
-                        oid: organizationid,
-                        _token: _token,
-                        fee_year: fee_year
-                    },
-                    success: function (result) {
-                        $(yuranId).empty();
-                        $(yuranId).append("<option value='0' selected>Semua Yuran</option>");
-                        jQuery.each(result.success, function (key, value) {
-                            $(yuranId).append("<option value='" + value.id + "'>" + value.name + "</option>");
-                        });
-                    }
-                })
-            }
 
             $('#organExport').change(function () {
-                var organizationid = $("#organExport").val();
-                var _token = $('input[name="_token"]').val();
-                fetch_data_year(organizationid, '#fee_year_export');
+                if ($(this).val() != 0) {
+                    var organizationid = $("#organExport").val();
+                    var classid = $('#class_export').val();
+                    var _token = $('input[name="_token"]').val();
+                    fetch_class_data(organizationid, '#class_export', '#fee_year_export', '#yuranExport');
+                }
             });
+
+            $('#class_export').change(function () {
+                var organizationid = $("#organExport").val();
+                var classid = $('#class_export').val();
+                var _token = $('input[name="_token"]').val();
+
+                fetch_yuran_data(organizationid, classid, '#fee_year_export', '#yuranExport');
+            });
+
+            $('#fee_year_export').change(function () {
+                $('#class_export').trigger('change');
+            })
 
             $('#organExportAllYuran').change(function () {
                 var organizationid = $("#organExportAllYuran").val();
                 var _token = $('input[name="_token"]').val();
-                fetch_data_year(organizationid, '#feeYearExportAllYuran');
+                fetch_class_data(organizationid, '', '#feeYearExportAllYuran', '');
             });
-
-            $('#fee_year_export').change(function () {
-                var organizationid = $("#organExport").val();
-                fetchClass(organizationid, '#yuranExport', $('#fee_year_export').val());
-
-            })
 
             $('#organExport1').change(function () {
                 var organizationid = $("#organExport1").val();
                 var _token = $('input[name="_token"]').val();
-                fetch_data(organizationid, '#yuranExport1');
+                fetch_class_data(organizationid, '#yuranExport1', "", "");
             });
 
             $("#organization").prop("selectedIndex", 0);
 
-            function fetch_data(oid = '', classId = '') {
+            function fetch_class_data(oid = '', classHtmlId = '', feeYearHtmlId, feeHtmlId) {
                 var _token = $('input[name="_token"]').val();
                 $.ajax({
                     url: "{{ route('fees.fetchClassForCateYuran') }}",
@@ -391,64 +361,42 @@
                         _token: _token
                     },
                     success: function (result) {
-                        $(classId).empty();
-                        $(classId).append("<option value=''> Semua Kelas</option>");
+                        $(classHtmlId).empty();
+                        $(classHtmlId).append("<option value=''> Semua Kelas</option>");
                         jQuery.each(result.success, function (key, value) {
-                            $(classId).append("<option value='" + value.cid + "'>" + value.cname + "</option>");
+                            $(classHtmlId).append("<option value='" + value.cid + "'>" + value.cname + "</option>");
                         });
 
-                        $('#fee_year').empty();
+                        $(feeYearHtmlId).empty();
                         jQuery.each(result.years, function (key, value) {
-                            $('#fee_year').append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
+                            $(feeYearHtmlId).append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
                         });
 
-                        fetch_yuran_data();
+                        fetch_yuran_data(oid, classHtmlId, feeYearHtmlId, feeHtmlId);
                     }
                 })
             }
 
-            function fetch_data_year(oid = '', feeYearSelectId = '') {
+            function fetch_yuran_data(oid, classid, feeYearHtmlId, feeHtmlId) {
                 var _token = $('input[name="_token"]').val();
-                $.ajax({
-                    url: "{{ route('fees.fetchClassForCateYuran') }}",
-                    method: "POST",
-                    data: {
-                        oid: oid,
-                        _token: _token
-                    },
-                    success: function (result) {
+                var fee_year = $(feeYearHtmlId).val();
+                var feeSelect = $(feeHtmlId);
 
-                        $(feeYearSelectId).empty();
-                        jQuery.each(result.years, function (key, value) {
-                            $(feeYearSelectId).append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
-                        });
-
-                        fetchClass(oid, '#yuranExport', $('#fee_year_export').val());
-
-                    }
-                })
-            }
-
-            function fetch_yuran_data(classId = '') {
-                var classid = $("#classes option:selected").val();
-                var _token = $('input[name="_token"]').val();
-                var fee_year = $("#fee_year").val();
-                //console.log(classid);
                 $.ajax({
                     url: "{{ route('fees.fetchYuran') }}",
                     method: "POST",
                     data: {
                         classid: classid,
-                        oid: $("#organization").val(),
+                        oid: oid,
                         _token: _token,
                         fee_year: fee_year
                     },
                     success: function (result) {
-                        $('#fees').empty();
-                        $("#fees").append("<option value='0'>Pilih Yuran</option>");
+                        feeSelect.empty();
+                        feeSelect.append("<option value='0'>Pilih Yuran</option>");
 
                         jQuery.each(result.success, function (key, value) {
-                            $("#fees").append("<option value='" + value.id + "'>" + value.name + "</option>");
+                            feeSelect.append("<option value='" + value.id + "'>" + value.name + "</option>");
                         });
                     }
                 })
@@ -517,18 +465,19 @@
                 });
             }
 
+            $('#organization').change(function () {
+                if ($(this).val() != '') {
+                    fetch_class_data($(this).val(), '#classes', '#fee_year', '#fees');
+                }
+            });
+
             $('#classes').change(function () {
-                fetch_yuran_data($(this).val());
+                var organizationid = $('#organization').val();
+                fetch_yuran_data(organizationid, '#classes', '#fee_year', '#fees');
             });
 
             $('#fee_year').change(function () {
                 $('#classes').trigger('change');
-            });
-
-            $('#organization').change(function () {
-                if ($(this).val() != '') {
-                    fetch_data($("#organization").val(), "#classes");
-                }
             });
 
             $('#fees').change(function () {
