@@ -62,7 +62,7 @@ class StudentCompare implements ToModel, WithValidation, WithHeadingRow
 
             $required_headers = ['nama', 'jantina', 'nama_penjaga', 'no_ic_penjaga'];
 
-            if (count(array_diff($required_headers, $row)) > 0) {
+            if (count(array_diff($required_headers, array_keys($row))) > 0) {
                 throw ValidationException::withMessages(["error" => "Invalid header names. Required headers: nama, jantina, nama_penjaga, no_ic_penjaga"]);
             }
 
