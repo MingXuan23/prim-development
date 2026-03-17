@@ -2433,6 +2433,7 @@ class StudentController extends Controller
         // make the old class_student inactive
         DB::table('class_student')
             ->whereIn('id', $class_student)
+            ->where('status', 1)
             ->update([
                 'end_date' => now(),
                 'status' => 0
