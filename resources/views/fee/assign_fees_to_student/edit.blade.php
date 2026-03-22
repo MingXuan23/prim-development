@@ -68,18 +68,21 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Senarai Yuran</label>
-                            <select name="all_fees[]" id="all-fees" multiple class="form-control">
+                            <select name="all_fees[]" id="all-fees" multiple class="form-control"
+                                style="min-height: 200px;">
 
                             </select>
                         </div>
 
                         <div class="form-group col-md-6">
                             <label for="students_selected">Yuran Dipilih Untuk Pelajar</label>
-                            <select name="fees_selected[]" id="fees-selected" multiple class="form-control">
+                            <select name="fees_selected[]" id="fees-selected" multiple class="form-control"
+                                style="min-height: 200px;">
                                 @if (isset($currentStudentFeesData["fees"][0]["fee_id"]))
                                     @foreach ($currentStudentFeesData["fees"] as $fee)
                                         {{-- only able to change for debt fees --}}
-                                        <option value="{{ $fee["fee_id"] }}" {{ $fee["fee_status"] === 'Paid' ? 'disabled' : '' }}>
+                                        <option value="{{ $fee["fee_id"] }}" {{ $fee["fee_status"] === 'Paid' ? 'disabled' : '' }}
+                                            class="{{ $fee["fee_status"] === 'Paid' ? 'text-danger' : '' }}">
                                             {{ $fee["fee_category"] . " - " . $fee["fee_name"] }}
                                         </option>
                                     @endforeach
