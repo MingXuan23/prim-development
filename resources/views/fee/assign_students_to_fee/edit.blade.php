@@ -64,14 +64,16 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Senarai Pelajar</label>
-                            <select name="students[]" id="students" multiple class="form-control">
+                            <select name="students[]" id="students" multiple class="form-control h-5"
+                                style="min-height: 200px;">
 
                             </select>
                         </div>
 
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-6 h-5">
                             <label for="students_selected">Pelajar Dipilih Untuk Bayar Yuran</label>
-                            <select name="students_selected[]" id="students-selected" multiple class="form-control">
+                            <select name="students_selected[]" id="students-selected" multiple class="form-control"
+                                style="min-height: 200px;">
 
                             </select>
                         </div>
@@ -182,7 +184,7 @@
                     if (selectedStudentsData[0].length > 0 && selectedStudentsData[0][0].students[0].student_id != null) {
                         selectedStudentsData[0][0].students.forEach(function (student) {
                             if (student.student_fee_status === "Paid") {
-                                selectedStudentsList.append("<option disabled selected value='" + student.student_id + "'>" + student.student_name + "</option>");
+                                selectedStudentsList.append("<option disabled class='text-danger' selected value='" + student.student_id + "'>" + student.student_name + "</option>");
                             } else {
                                 selectedStudentsList.append("<option value='" + student.student_id + "'>" + student.student_name + "</option>")
                             }
