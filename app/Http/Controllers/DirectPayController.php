@@ -904,7 +904,7 @@ class DirectPayController extends Controller
                 // ******* save bridge transaction *********
                 // type = S for school fees and D for donation
 
-                if (substr($fpx_sellerExOrderNo, 0, 1) == 'S') {
+                if (substr($fpx_sellerExOrderNo, 5, 1) == 'S') {
 
                     // ********* student fee id
 
@@ -929,7 +929,7 @@ class DirectPayController extends Controller
                                 ]);
                         }
                     }
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'F') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'F') {
                     $result = DB::table('orders')
                         ->where('id', $request->order_id)
                         ->update([
@@ -955,7 +955,7 @@ class DirectPayController extends Controller
                     //         $this->insertPointHistory($referral_code->id,$transaction->id,1,1,'Transaksi Get & Go RM'.$transaction->amount);
                     //     }
 
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'K') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'K') {
                     $daySelect = (int) $request->week_status;
                     if ($daySelect == -1) {
                         $pickUp = Carbon::create(1, 1, 1)->toDateString(); //mindate
@@ -970,7 +970,7 @@ class DirectPayController extends Controller
                             'note' => $request->note,
                             'transaction_id' => $transaction->id
                         ]);
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'H') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'H') {
                     if ($paymentType == 'deposit' || $paymentType == 'full') {
                         $result = DB::table('bookings')
                             ->where('bookingid', $bookingId)
@@ -1001,7 +1001,7 @@ class DirectPayController extends Controller
                         // dd($entity,$entity_json);
                         $this->insertPointHistory($referral_code->id, $transaction->id, 1, 1, 'Transaksi Book & Stay RM' . $transaction->amount, $entity_json);
                     }
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'O') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'O') {
                     if ($request->mobile != 'true') {
                         $result = DB::table('orders')
                             ->where('id', $orderId)
@@ -1015,19 +1015,19 @@ class DirectPayController extends Controller
                                 'transactions_id' => $transaction->id
                             ]);
                     }
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'G') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'G') {
                     $result = DB::table('grab_bookings')
                         ->where('id', $bookingId)
                         ->update([
                             'transactionid' => $transaction->id
                         ]);
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'B') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'B') {
                     $result = DB::table('bus_bookings')
                         ->where('id', $bookingId)
                         ->update([
                             'transactionid' => $transaction->id
                         ]);
-                } else if (substr($fpx_sellerExOrderNo, 0, 1) == 'R') {
+                } else if (substr($fpx_sellerExOrderNo, 5, 1) == 'R') {
                     DB::table('code_requests')->where('status', 'Draft')->where('id', $request->request_id)->update([
                         'transaction_id' => $transaction->id,
                         'status' => 'Pending Payment'
@@ -1133,7 +1133,7 @@ class DirectPayController extends Controller
     {
         // 1. Construct the Payload Object
         // Mapping $data to the API's expected keys
-       //dd($data);
+        //dd($data);
         $payloadObj = [
             'SellerOrderNo' => $data['fpx_sellerOrderNo'],
             'Amount' => number_format((float) $data['fpx_txnAmount'], 2, '.', ''),
@@ -1156,7 +1156,7 @@ class DirectPayController extends Controller
         // Ensure the private key is formatted correctly
         $privateKey = env('PRIM_PRIVATE_KEY');
 
-         //dd(env('PRIM_PRIVATE_KEY'));
+        //dd(env('PRIM_PRIVATE_KEY'));
         // if (!str_contains($privateKey, 'BEGIN RSA PRIVATE KEY')) {
         //     $privateKey = "-----BEGIN RSA PRIVATE KEY-----\n" . 
         //                 wordwrap($privateKey, 64, "\n", true) . 
