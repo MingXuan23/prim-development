@@ -2616,7 +2616,7 @@ class FeesController extends AppBaseController
                 $listHisotry = DB::table('transactions as t')
                     ->where(function ($query) {
                         $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', 'School_Fees%');
+                            ->orWhere('t.nama', 'like', '%Scho%');
                     })
                     ->where('t.status', 'success')
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no');
@@ -2629,7 +2629,7 @@ class FeesController extends AppBaseController
                     ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where(function ($query) {
                         $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', 'School_Fees%');
+                            ->orWhere('t.nama', 'like', '%Scho%');
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
@@ -2642,7 +2642,7 @@ class FeesController extends AppBaseController
                     ->where('t.user_id', Auth::id())
                     ->where(function ($query) {
                         $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', 'School_Fees%');
+                            ->orWhere('t.nama', 'like', '%Scho%');
                     })
                     ->where('t.status', 'success')
                     ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no');
@@ -2655,7 +2655,7 @@ class FeesController extends AppBaseController
                     ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where(function ($query) {
                         $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', 'School_Fees%');
+                            ->orWhere('t.nama', 'like', '%Scho%');
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
@@ -2671,7 +2671,7 @@ class FeesController extends AppBaseController
                     ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
                     ->where(function ($query) {
                         $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', 'School_Fees%');
+                            ->orWhere('t.nama', 'like', '%Scho%');
                     })
                     ->where('t.status', 'success')
                     ->where('organization_user.user_id', Auth::id())
@@ -2688,7 +2688,7 @@ class FeesController extends AppBaseController
                     ->where('t.user_id', Auth::id())
                     ->where(function ($query) {
                         $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', 'School_Fees%');
+                            ->orWhere('t.nama', 'like', '%Scho%');
                     })
                     ->where('t.status', 'success')
                     ->where('fn.organization_id', $request->oid)
