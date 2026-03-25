@@ -639,6 +639,8 @@ class DirectPayController extends Controller
                 if ($request->has('source') && $request->source == 'mobile') {
                     //$fpx_sellerExOrderNo = $request->desc . "_M_" . date('YmdHis');
                     $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_M_" . date('YmdHis');
+                    //for mobile, using Auth::id() will cause null,so need to direct use user
+                    $fpx_buyerName = $user->name;
                 } else {
                     $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
                 }
@@ -2321,9 +2323,7 @@ class DirectPayController extends Controller
             return view('errors.500');
     }
 
-    public function updateDonationStreak()
-    {
-    }
+    public function updateDonationStreak() {}
 
     public function handle()
     {
