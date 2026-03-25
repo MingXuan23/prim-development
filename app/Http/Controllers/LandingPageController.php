@@ -444,7 +444,7 @@ class LandingPageController extends AppBaseController
         $organization = Organization::all()->count();
         $curYear = date("Y") . "-01-01";
 
-        $transactions = Transaction::where('nama', 'LIKE', 'Donation%')
+        $transactions = Transaction::where('nama', 'LIKE', '%dona%')
             ->where('status', 'Success')
             ->where('datetime_created', '>', $curYear)
             ->get()->count();
@@ -452,20 +452,20 @@ class LandingPageController extends AppBaseController
         // retrieve daily transactions
         $dailyTransactions = DB::table('transactions')
             ->where('status', 'success')
-            ->where('nama', 'LIKE', 'donation%')
+            ->where('nama', 'LIKE', '%dona%')
             ->where('datetime_created', '>', date('Y-m-d'))
             ->get()->count();
 
         $totalAmount = DB::table('transactions')
             ->where('status', 'success')
-            ->where('nama', 'LIKE', 'donation%')
+            ->where('nama', 'LIKE', '%dona%')
             ->where('datetime_created', '>', $curYear)
             ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
             ->first();
 
         $dailyGain = DB::table('transactions')
             ->where('status', 'success')
-            ->where('nama', 'LIKE', 'donation%')
+            ->where('nama', 'LIKE', '%dona%')
             ->where('datetime_created', '>', date('Y-m-d'))
             ->select(DB::table('transactions')->raw('sum(amount) as total_amount'))
             ->first();
@@ -491,7 +491,7 @@ class LandingPageController extends AppBaseController
 
         $oneWeekBeforeToday = date_create(date('Y-m-d'));
         date_sub($oneWeekBeforeToday, date_interval_create_from_date_string('7 days'));
-        $donors = Transaction::where('nama', 'LIKE', 'Donation%')
+        $donors = Transaction::where('nama', 'LIKE', '%dona%')
             ->where('status', 'Success')
             ->where(function ($query) use ($oneWeekBeforeToday) {
                 $query->whereDate('datetime_created', '<=', date('Y-m-d'));
