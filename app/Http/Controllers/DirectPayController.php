@@ -1755,7 +1755,7 @@ class DirectPayController extends Controller
         $bytes = mb_convert_encoding($signaturePlainText, 'UTF-8');
         $signatureHash = hash_hmac('sha256', $bytes, $privateKey);
 
-        $url = "https://api.directpay.my/api/v1/pay/MerchantInquiry";
+        $url = "https://api.directpay.my/api/v1/Pay/MerchantInquiry";
 
         $params = [
             'fpx_sellerOrderNo' => $fpx_sellerOrderNo,
@@ -1791,7 +1791,7 @@ class DirectPayController extends Controller
         curl_close($ch);
         $resultArray = json_decode($response, true);
 
-        if (!isset($resultArray['payload']['fpx_SellerOrderNo'])) {
+        if (!isset($resultArray['payload']['Fpx_SellerOrderNo'])) {
             return "Error: " . $url . "Message: " . $resultArray['errorMessage'];
         }
 
