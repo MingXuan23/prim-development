@@ -1750,7 +1750,7 @@ class DirectPayController extends Controller
 
         $privateKey = $organ->private_key;
         $buyerName = $transaction->username;
-        $requestTimestamp = now()->format('yyyyMMddHHmmss');
+        $requestTimestamp = now()->format('YmdHis');
         $signaturePlainText = "$fpx_sellerOrderNo|$privateKey|$buyerName|$requestTimestamp";
         $bytes = mb_convert_encoding($signaturePlainText, 'UTF-8');
         $signatureHash = hash_hmac('sha256', $bytes, $privateKey);
