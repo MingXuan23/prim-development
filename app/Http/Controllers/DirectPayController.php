@@ -1695,9 +1695,9 @@ class DirectPayController extends Controller
         $transaction = Transaction::find($transaction_id);
         $fpx_sellerOrderNo = $transaction->nama;
 
-        $fpx_productDesc = explode("_", $transaction->nama)[0];
+        $fpx_productDesc = explode("_", $transaction->nama)[1];
 
-        if ($fpx_productDesc == "Donation") {
+        if ($fpx_productDesc == "Dona") {
             $organ = DB::table("transactions as t")
                 ->leftJoin('donation_transaction as dt', 't.id', 'dt.transaction_id')
                 ->leftJoin('donations as d', 'd.id', 'dt.donation_id')
@@ -1706,7 +1706,7 @@ class DirectPayController extends Controller
                 ->select('o.private_key')
                 ->where('t.id', $transaction->id)
                 ->first();
-        } else if ($fpx_productDesc == "School") {
+        } else if ($fpx_productDesc == "Scho") {
             $organ = DB::table('organizations as o')
                 ->leftJoin('fees_new as fn', 'o.id', 'fn.organization_id')
                 ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', 'fn.id')
@@ -1724,7 +1724,7 @@ class DirectPayController extends Controller
                     ->first();
                 //dd($organ);
             }
-        } else if ($fpx_productDesc == "Merchant" || $fpx_productDesc == "Koperasi") {
+        } else if ($fpx_productDesc == "Merchant" || $fpx_productDesc == "Kope") {
             $order = PgngOrder::where('transaction_id', $transaction->id)->first();
 
             $organ = Organization::find($order->organization_id);
@@ -1747,14 +1747,20 @@ class DirectPayController extends Controller
         if ($organ == null) {
             return null;
         }
-        $privateKey = $organ->private_key;
 
-        $url = "https://directpay.my/api/fpx/GetTransactionInfo";
+        $privateKey = $organ->private_key;
+        $buyerName = $transaction->username;
+        $requestTimestamp = now()->format('yyyyMMddHHmmss');
+        $signaturePlainText = "$fpx_sellerOrderNo|$privateKey|$buyerName|$requestTimestamp";
+        $bytes = mb_convert_encoding($signaturePlainText, 'UTF-8');
+        $signatureHash = hash_hmac('sha256', $bytes, $privateKey);
+
+        $url = "https://api.directpay.my/api/v1/pay/MerchantInquiry";
 
         $params = [
-            'PrivateKey' => $privateKey,
-
-            'Fpx_SellerOrderNo' => $fpx_sellerOrderNo,
+            'fpx_sellerOrderNo' => $fpx_sellerOrderNo,
+            'signature' => $signatureHash,
+            'request_timestamp' => $requestTimestamp
         ];
 
         $url .= '?' . http_build_query($params);
@@ -1785,8 +1791,8 @@ class DirectPayController extends Controller
         curl_close($ch);
         $resultArray = json_decode($response, true);
 
-        if (!isset($resultArray['fpx_SellerOrderNo'])) {
-            return "Error: " . $url;
+        if (!isset($resultArray['payload']['fpx_SellerOrderNo'])) {
+            return "Error: " . $url . "Message: " . $resultArray['errorMessage'];
         }
 
         return $resultArray;
@@ -2323,7 +2329,9 @@ class DirectPayController extends Controller
             return view('errors.500');
     }
 
-    public function updateDonationStreak() {}
+    public function updateDonationStreak()
+    {
+    }
 
     public function handle()
     {
@@ -2353,6 +2361,7 @@ class DirectPayController extends Controller
             $fpx_sellerOrderNo = $transaction->nama;
             try {
                 $response_value = $this->getTransactionInfo($transaction->id);
+
                 //if invalid params -> no record in direct pay
                 if (is_string($response_value)) {
                     if (strpos($response_value, 'Error') === 0) {
@@ -2362,21 +2371,25 @@ class DirectPayController extends Controller
                     }
                 }
 
-                if (!isset($response_value['fpx_DebitAuthCode']) || $response_value['status'] == "Pending") {
+                $payload = $response_value['payload'];
+
+                if (!isset($response_value['statusCode']) || $payload['Status'] == "Pending") {
                     echo 'transaction skip <br>';
                     continue;
                 }
 
-                if ($response_value['fpx_DebitAuthCode'] == '00') {
+                if ($response_value['statusCode'] == '00') {
                     $fpx_productDesc = $transaction->nama;
+
 
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
                         [
                             'status' => 'Success',
-                            'amount' => $response_value['transactionAmount'],
-                            'description' => $response_value['fpx_SellerExOrderNo'],
-                            'transac_no' => $response_value['fpx_FpxTxnId'],
-                            'datetime_of_success' => now()
+                            'amount' => $payload['TransactionAmount'],
+                            'description' => $payload['Fpx_SellerExOrderNo'],
+                            'transac_no' => $payload['Fpx_FpxTxnId'],
+                            'datetime_of_success' => $payload['DateTime'],
+                            'buyerBankId' => $payload['Fpx_BuyerBankBranch']
                         ]
 
                     );
