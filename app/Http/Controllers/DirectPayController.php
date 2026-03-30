@@ -2375,6 +2375,7 @@ class DirectPayController extends Controller
 
                 if (!isset($payload['Fpx_DebitAuthCode']) || $payload['Status'] == "Pending") {
                     echo 'transaction skip <br>';
+                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
                     continue;
                 }
 
