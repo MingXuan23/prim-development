@@ -2340,13 +2340,13 @@ class DirectPayController extends Controller
         set_time_limit(1500);
 
         $transactions = DB::table('transactions')
-            ->whereIn('status', ['Pending', 'Failed'])
+            ->whereIn('status', ['Success', 'Pending', 'Failed'])
             ->whereBetween('datetime_created', [now()->subDays(2), now()])
             ->get();
 
         if ($type == 'all') {
             $transactions = DB::table('transactions')
-                ->whereIn('status', ['Pending', 'Failed'])
+                ->whereIn('status', ['Success', 'Pending', 'Failed'])
                 ->orderByDesc('id')
                 ->get();
         }
@@ -2375,7 +2375,6 @@ class DirectPayController extends Controller
 
                 if (!isset($payload['Fpx_DebitAuthCode']) || $payload['Status'] == "Pending") {
                     echo 'transaction skip <br>';
-                    Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(['status' => 'Failed']);
                     continue;
                 }
 
