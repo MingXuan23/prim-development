@@ -2373,14 +2373,13 @@ class DirectPayController extends Controller
 
                 $payload = $response_value['payload'];
 
-                if (!isset($response_value['statusCode']) || $payload['Status'] == "Pending") {
+                if (!isset($payload['Fpx_DebitAuthCode']) || $payload['Status'] == "Pending") {
                     echo 'transaction skip <br>';
                     continue;
                 }
 
-                if ($response_value['statusCode'] == '00') {
+                if ($payload['Fpx_DebitAuthCode'] == '00') {
                     $fpx_productDesc = $transaction->nama;
-
 
                     Transaction::where('nama', '=', $fpx_sellerOrderNo)->update(
                         [
@@ -2391,7 +2390,6 @@ class DirectPayController extends Controller
                             'datetime_of_success' => $payload['DateTime'],
                             'buyerBankId' => $payload['Fpx_BuyerBankBranch']
                         ]
-
                     );
 
                     $this->updateTransaction($fpx_productDesc, $fpx_sellerOrderNo, false);
