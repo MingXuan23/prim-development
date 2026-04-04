@@ -2340,13 +2340,13 @@ class DirectPayController extends Controller
         set_time_limit(1500);
 
         $transactions = DB::table('transactions')
-            ->whereIn('status', ['Success', 'Pending', 'Failed'])
-            ->whereBetween('datetime_created', [now()->subDays(2), now()])
+            ->whereIn('status', ['Pending', 'Failed'])
+            ->whereBetween('datetime_created', [now()->subDays(5), now()])
             ->get();
 
         if ($type == 'all') {
             $transactions = DB::table('transactions')
-                ->whereIn('status', ['Success', 'Pending', 'Failed'])
+                ->whereIn('status', ['Success'])  // TODO: change back to 'Pending' and 'Failed'
                 ->orderByDesc('id')
                 ->get();
         }
