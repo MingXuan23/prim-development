@@ -1696,8 +1696,9 @@ class DirectPayController extends Controller
         $fpx_sellerOrderNo = $transaction->nama;
 
         $fpx_productDesc = explode("_", $transaction->nama)[1];
+        $old_fpx_productDesc = explode("_", $transaction->nama)[0];
 
-        if ($fpx_productDesc == "Dona") {
+        if ($fpx_productDesc == "Dona" || $old_fpx_productDesc == "Donation") {
             $organ = DB::table("transactions as t")
                 ->leftJoin('donation_transaction as dt', 't.id', 'dt.transaction_id')
                 ->leftJoin('donations as d', 'd.id', 'dt.donation_id')
@@ -1706,7 +1707,7 @@ class DirectPayController extends Controller
                 ->select('o.private_key')
                 ->where('t.id', $transaction->id)
                 ->first();
-        } else if ($fpx_productDesc == "Scho") {
+        } else if ($fpx_productDesc == "Scho" || $old_fpx_productDesc == "School") {
             $organ = DB::table('organizations as o')
                 ->leftJoin('fees_new as fn', 'o.id', 'fn.organization_id')
                 ->leftJoin('fees_new_organization_user as fou', 'fou.fees_new_id', 'fn.id')
