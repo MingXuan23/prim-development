@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use IlluminateAgnostic\Collection\Support\Str;
 
 class AuthHandoffController extends Controller
@@ -12,15 +13,24 @@ class AuthHandoffController extends Controller
     public function getHandoffToken(Request $request)
     {
         $request->validate([
-            "redirect_url" => "required"
+            "redirect_url" => "required",
+            "user_token" => "required"
         ]);
+
+        $user = DB::table("user_token")
+            ->where('remember_token', '=', $request->get('user_token'))
+            ->first();
+
+        if ($user == null) {
+            abort(404, "User not found with token.");
+        }
 
         $token = Str::random(64);
 
         $cacheKey = 'handoff_token:' . $token;
 
         $payload = [
-            "user_id" => $request->user()->id,
+            "user_id" => $user->id,
             "redirect_url" => $request->get('redirect_url')
         ];
 
