@@ -155,6 +155,9 @@ Route::group(['prefix' => 'OrderS'], function () {
     Route::post('getReport', 'OrderSController@getReport');
 });
 
+// handoff token route for sedekah subuh mobile
+Route::post('auth-handoff/getHandoffToken', 'AuthHandoffController@getHandoffToken')->name('getHandoffToken');
+
 Route::group(['prefix' => 'derma', 'namespace' => 'MobileAPI'], function () {
     Route::post('login', 'DermaController@login');
     Route::post('validateToken', 'DermaController@validateToken');

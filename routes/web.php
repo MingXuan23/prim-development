@@ -20,6 +20,9 @@ Route::get('/mobile/pay', [App\Http\Controllers\MobileAPI\NewYuranController::cl
 Route::get('/mobile/receipt/{transaction_id}', [App\Http\Controllers\MobileAPI\NewYuranController::class, 'receipt'])->name('mobile.receipt');
 Route::get('/mobile/receipt/download/{transaction_id}', [App\Http\Controllers\MobileAPI\NewYuranController::class, 'downloadReceipt'])->name('mobile.receipt.download');
 
+// handoff token route for sedekah subuh mobile
+Route::get('/auth-handoff/redirect', 'AuthHandoffController@useHandOffToken')->name('useHandoffToken');
+
 Auth::routes();
 
 // Route::get('/register/{organizationId}', 'Auth\RegisterController@showRegistrationForm')->name('register.bayar_yuran');
@@ -998,24 +1001,24 @@ Route::group(['prefix' => 'polimas'], function () {
 });
 
 //offer & ride
-Route::group(['prefix' => 'offernride'], function () {
-    // Home page
-    Route::get('/home', 'OfferNRideController@index')->name('offernride.index');
-    // Manage Driver page
-    Route::get('/driver', 'OfferNRideController@driver_index')->name('offernride.driver-index');
-    Route::get('/driver/getDriverDatatable', 'OfferNRideController@getDriverDatatable')->name('offernride.getDriverDatatable');
-    Route::get('/driver/add', 'OfferNRideController@driver_add')->name('offernride.driver-add');
-    Route::post('/driver/add/store', 'OfferNRideController@driver_store')->name('offernride.driver-store');
-    Route::get('/driver/{oid}{id}', 'OfferNRideController@driver_edit')->name('offernride.driver-edit');
-    Route::post('/driver/fetchDrivers', 'OfferNRideController@fetchDrivers')->name('offernride.fetchDrivers');
-    // Manage Vehicle page
-    Route::get('/vehicle', 'OfferNRideController@vehicle_index')->name('offernride.vehicle-index');
-    Route::get('/vehicle/getVehicleDatatable', 'OfferNRideController@getVehicleDatatable')->name('offernride.getVehicleDatatable');
-    Route::get('/vehicle/add', 'OfferNRideController@vehicle_add')->name('offernride.vehicle-add');
-    Route::post('/vehicle/add/store', 'OfferNRideController@Vehicle_store')->name('offernride.vehicle-store');
-    Route::get('/vehicle/{oid}{id}', 'OfferNRideController@vehicle_edit')->name('offernride.vehicle-edit');
-    // Manage Trip page
-    Route::get('/trip', 'OfferNRideController@trip_index')->name('offernride.trip-index');
-    Route::get('/trip/getTripDatatable', 'OfferNRideController@getTripDatatable')->name('offernride.getTripDatatable');
-    Route::get('/trip/add', 'OfferNRideController@trip_add')->name('offernride.trip-add');
-});
+// Route::group(['prefix' => 'offernride'], function () {
+//     // Home page
+//     Route::get('/home', 'OfferNRideController@index')->name('offernride.index');
+//     // Manage Driver page
+//     Route::get('/driver', 'OfferNRideController@driver_index')->name('offernride.driver-index');
+//     Route::get('/driver/getDriverDatatable', 'OfferNRideController@getDriverDatatable')->name('offernride.getDriverDatatable');
+//     Route::get('/driver/add', 'OfferNRideController@driver_add')->name('offernride.driver-add');
+//     Route::post('/driver/add/store', 'OfferNRideController@driver_store')->name('offernride.driver-store');
+//     Route::get('/driver/{oid}{id}', 'OfferNRideController@driver_edit')->name('offernride.driver-edit');
+//     Route::post('/driver/fetchDrivers', 'OfferNRideController@fetchDrivers')->name('offernride.fetchDrivers');
+//     // Manage Vehicle page
+//     Route::get('/vehicle', 'OfferNRideController@vehicle_index')->name('offernride.vehicle-index');
+//     Route::get('/vehicle/getVehicleDatatable', 'OfferNRideController@getVehicleDatatable')->name('offernride.getVehicleDatatable');
+//     Route::get('/vehicle/add', 'OfferNRideController@vehicle_add')->name('offernride.vehicle-add');
+//     Route::post('/vehicle/add/store', 'OfferNRideController@Vehicle_store')->name('offernride.vehicle-store');
+//     Route::get('/vehicle/{oid}{id}', 'OfferNRideController@vehicle_edit')->name('offernride.vehicle-edit');
+//     // Manage Trip page
+//     Route::get('/trip', 'OfferNRideController@trip_index')->name('offernride.trip-index');
+//     Route::get('/trip/getTripDatatable', 'OfferNRideController@getTripDatatable')->name('offernride.getTripDatatable');
+//     Route::get('/trip/add', 'OfferNRideController@trip_add')->name('offernride.trip-add');
+// });
