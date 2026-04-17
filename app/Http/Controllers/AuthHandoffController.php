@@ -14,11 +14,10 @@ class AuthHandoffController extends Controller
     {
         $request->validate([
             "redirect_url" => "required",
-            "user_token" => "required"
         ]);
 
         $user = DB::table("user_token")
-            ->where('remember_token', '=', $request->get('user_token'))
+            ->where('remember_token', '=', $request->header('user_token'))
             ->first();
 
         if ($user == null) {
