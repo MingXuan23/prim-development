@@ -26,9 +26,9 @@ class AuthHandoffController extends Controller
             abort(404, "User not found with token.");
         }
 
-        $token = Str::random(64);
+        $randomStr = Str::random(64);
 
-        $cacheKey = 'handoff_token:' . $token;
+        $token = 'handoff_token_' . $randomStr . $user->id;
 
         $payload = [
             "user_id" => $user->id,
@@ -36,15 +36,14 @@ class AuthHandoffController extends Controller
             "desc" => $request->get("desc")
         ];
 
-        Cache::put($cacheKey, $payload, 60);
+        Cache::put($token, $payload, 60);
 
         return response()->json(['status' => 'success', 'token' => $token]);
     }
 
     public function useHandoffToken(Request $request)
     {
-        $cacheKey = 'handoff_token:' . $request->query('token');
-        $payload = Cache::pull($cacheKey);
+        $payload = Cache::pull($request->query('token'));
 
         if ($payload == null) {
             abort(403, "The token is invalid or expired.");
