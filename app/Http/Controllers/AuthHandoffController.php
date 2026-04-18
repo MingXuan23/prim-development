@@ -18,20 +18,20 @@ class AuthHandoffController extends Controller
             "desc" => "required"
         ]);
 
-        $user = DB::table("user_token")
+        $userToken = DB::table("user_token")
             ->where('remember_token', '=', $request->get('user_token'))
             ->first();
 
-        if ($user == null) {
+        if ($userToken == null) {
             abort(404, "User not found with token.");
         }
 
         $randomStr = Str::random(64);
 
-        $token = 'handoff_token_' . $randomStr . $user->id;
+        $token = 'handoff_token_' . $randomStr . $userToken->user_id;
 
         $payload = [
-            "user_id" => $user->id,
+            "user_id" => $userToken->user_id,
             "donation_id" => $request->get('donation_id'),
             "desc" => $request->get("desc")
         ];
