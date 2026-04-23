@@ -463,8 +463,7 @@
                     </a>
                     {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
                 </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
-                    aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
@@ -503,8 +502,7 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="breadcrumb-area breadcrumb-bg style-two" id="home"
-        style="padding-top: 170px; padding-bottom: 170px;">
+    <header class="breadcrumb-area breadcrumb-bg style-two" id="home" style="padding-top: 170px; padding-bottom: 170px;">
         <!-- <div class="header-right-image wow zoomIn" style="text-align: right">
             <img src="{{ URL::asset('assets/landing-page/img/pic-front.png') }}" alt="header right image" style="padding-bottom: 482px;
             max-width: 70%;">
@@ -513,8 +511,7 @@
         <div class="container">
             <div class="row d-flex align-items-center">
                 <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: center">
-                    <img src="{{ URL::asset('assets/landing-page/img/header-derma.png') }}" alt="header right image"
-                        style="max-width: 110%;" id="headerhover">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-derma.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
                 </div>
                 <div class="col-lg-6 justify-content-center">
                     <div class="header-inner">
@@ -559,8 +556,7 @@
                     <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div>
                 </div>
                 <div class="col-lg-7 align-items-center d-none d-lg-block" style="text-align: center">
-                    <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image"
-                        style="max-width: 100%;">
+                    <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="max-width: 100%;">
                 </div>
             </div>
             <div class="row justify-content-center" style="padding-top: 150px">
@@ -627,7 +623,7 @@
                 @foreach ($leaders as $index => $leader)
                                 <?php
                     $groupNumber = floor($index / 5) + 1;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
                                 <!-- Create the group divs dynamically based on the group number -->
                                 @if($index % 5 == 0)
                                     <div class="leader-group" id="group{{ $groupNumber }}">
@@ -727,11 +723,9 @@
                                         </div>
                                         <div class="content">
                                             <h4 class="title text-white" style="text-align: left;">Penderma</h4>
-                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
-                                                    style="margin-right: 10px"></i> Mempunyai akaun dalam bank
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked" style="margin-right: 10px"></i> Mempunyai akaun dalam bank
                                                 talian <i>(online banking)</i> dengan mana-mana bank di Malaysia.</p>
-                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
-                                                    style="margin-right: 10px"></i> Penderma akan menerima email
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked" style="margin-right: 10px"></i> Penderma akan menerima email
                                                 daripada pihak FPX dan sistem PRiM sebagai bukti pembayaran.</p>
 
                                         </div>
@@ -745,22 +739,16 @@
                                         </div>
                                         <div class="content">
                                             <h4 class="title text-white" style="text-align: left;">Penerima Derma</h4>
-                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
-                                                    style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
-                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
-                                                    style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked" style="margin-right: 10px"></i> Mempunyai akaun Bank Islam.</p>
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked" style="margin-right: 10px"></i> Mendaftar dengan Paynet melalui Bank
                                                 Islam.
-                                                <br> <i> <a
-                                                        href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}"
-                                                        download class="text-white"> (klik untuk muat turun borang)</a>
+                                                <br> <i> <a href="{{ URL::asset('fpx-pdf/Merchant Registration Form V2.1.pdf') }}" download class="text-white"> (klik untuk muat turun borang)</a>
                                                 </i>
                                             </p>
-                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
-                                                    style="margin-right: 10px"></i> Mendaftar sebagai organisasi di
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked" style="margin-right: 10px"></i> Mendaftar sebagai organisasi di
                                                 sistem PRiM.
                                             </p>
-                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked"
-                                                    style="margin-right: 10px"></i> Organisasi akan menerima email
+                                            <p style="text-align: left;" class="text-white"> <i class="flaticon-checked" style="margin-right: 10px"></i> Organisasi akan menerima email
                                                 daripada pihak FPX dan sistem PRiM sebagai bukti menerima bayaran.
                                             </p>
                                         </div>
@@ -944,49 +932,39 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="lain" aria-selected="false"><i
-                                        class="fas fa-building"></i>
+                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi" role="tab" aria-controls="lain" aria-selected="false"><i class="fas fa-building"></i>
                                     Derma Khas </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
+                                <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi" role="tab" aria-controls="tabung-covid" aria-selected="false"><i
                                         class="fas fa-university"></i>
                                     IPTA / Universiti</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
+                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi" role="tab" aria-controls="tabung-covid" aria-selected="false"><i
                                         class="fas fa-hammer"></i>
                                     Masjid/Surau Baru </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
+                                <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi" role="tab" aria-controls="tabung-covid" aria-selected="false"><i
                                         class="fas fa-school"></i>
                                     PIBG Sekolah </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i>
+                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi" role="tab" aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i>
                                     Pusat Tahfiz </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
+                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi" role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
                                     Imarah Masjid </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false">
-                                    <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}"
-                                        alt="Sedekah Subuh Logo" class="d-inline" width="45">
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi" role="tab" aria-controls="ngo" aria-selected="false">
+                                    <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}" alt="Sedekah Subuh Logo" class="d-inline" width="45">
                                     Sedekah Subuh</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi" role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
                                     NGO </a>
                             </li>
                         </ul>
@@ -1029,8 +1007,7 @@
                     {{-- <div class="row justify-content-center">--}}
                         {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
                             {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt=""
-                                    style="max-width:70%; width: 250px">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
                                 {{-- </div>--}}
                             {{-- <div class="pt-3">--}}
                                 {{-- <h4>Yahya Bin Ibrahim</h4>--}}
@@ -1040,8 +1017,7 @@
 
                         {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
                             {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt=""
-                                    style="max-width:70%; width: 250px">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
                                 {{-- </div>--}}
                             {{-- <div class="pt-3">--}}
                                 {{-- <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>--}}
@@ -1051,8 +1027,7 @@
 
                         {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
                             {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt=""
-                                    style="max-width:70%; width: 250px">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
                                 {{-- </div>--}}
                             {{-- <div class="pt-3">--}}
                                 {{-- <h4>Chuan Chuan You</h4>--}}
@@ -1079,19 +1054,16 @@
                     <div class="col-lg-12">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt=""
-                                    style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt="" style="max-width:70%">
                             </div>
 
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
-                                    style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt="" style="max-width:70%">
 
                             </div>
 
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
-                                    style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt="" style="max-width:70%">
 
                             </div>
 
@@ -1107,38 +1079,32 @@
                         {{-- --}}{{-- <span class="subtitle">Contact us</span> --}}
                         {{-- <h3 class="title">Hubungi Kami</h3>--}}
                         {{-- <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>--}}
-                        {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
-                            --}} {{-- enctype="multipart/form-data">--}}
+                        {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin" --}} {{-- enctype="multipart/form-data">--}}
 
                             {{-- @csrf--}}
                             {{-- <div class="row">--}}
                                 {{-- <div class="col-lg-12">--}}
                                     {{-- <div class="form-group">--}}
-                                        {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{--
-                                            placeholder="Nama Penuh" required>--}}
+                                        {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{-- placeholder="Nama Penuh" required>--}}
                                         {{-- </div>--}}
                                     {{-- </div>--}}
                                 {{-- <div class="col-lg-6">--}}
                                     {{-- <div class="form-group">--}}
-                                        {{-- <input type="email" class="form-control" id="email" name="email" --}} {{--
-                                            placeholder="Email" required>--}}
+                                        {{-- <input type="email" class="form-control" id="email" name="email" --}} {{-- placeholder="Email" required>--}}
                                         {{-- </div>--}}
                                     {{-- </div>--}}
 
                                 {{-- <div class="col-lg-6">--}}
                                     {{-- <div class="form-group">--}}
-                                        {{-- <input type="text" class="form-control phone_no" id="telno" name="telno"
-                                            --}} {{-- placeholder="Nombor Telefon" required>--}}
+                                        {{-- <input type="text" class="form-control phone_no" id="telno" name="telno" --}} {{-- placeholder="Nombor Telefon" required>--}}
                                         {{-- </div>--}}
                                     {{-- </div>--}}
 
                                 {{-- <div class="col-lg-12">--}}
                                     {{-- <div class="form-group textarea">--}}
-                                        {{-- <textarea name="message" id="message" class="form-control" cols="30"
-                                            rows="10" --}} {{-- placeholder="Mesej" required></textarea>--}}
+                                        {{-- <textarea name="message" id="message" class="form-control" cols="30" rows="10" --}} {{-- placeholder="Mesej" required></textarea>--}}
                                         {{-- </div>--}}
-                                    {{-- <button class="submit-btn  btn-rounded gd-bg-1"
-                                        type="submit">Hantar</button>--}}
+                                    {{-- <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>--}}
                                     {{-- </div>--}}
                                 {{-- </div>--}}
                             {{-- </form>--}}
@@ -1147,10 +1113,8 @@
                 {{-- <div class="col-lg-6">--}}
                     {{-- <div class="contact-area-wrapper" id="contact">--}}
                         {{-- <div class="map-responsive">--}}
-                            {{-- <iframe--}} {{--
-                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                --}} {{-- width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
-                                --}} {{-- aria-hidden="false" tabindex="0">--}}
+                            {{-- <iframe--}} {{-- src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed" --}} {{-- width="600" height="450" frameborder="0"
+                                style="border:0;" allowfullscreen="" --}} {{-- aria-hidden="false" tabindex="0">--}}
                                 {{-- </iframe>--}}
 
                                 {{-- <br>--}}
@@ -1170,9 +1134,8 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
-                            <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                            <p>People Relationship Information Management (PRiM) adalah sebuah sistem untuk
                                 menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
 
                         </div>
@@ -1194,13 +1157,9 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget" style="text-align: center">
-                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""
-                                    style="max-width: 70%"></a>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt="" style="max-width: 70%"></a>
 
-                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""
-                                    style="max-width: 70%"></a>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt="" style="max-width: 70%"></a>
 
                             <ul class="social-icon" style="text-align: center; ">
                                 <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a>
@@ -1208,8 +1167,7 @@
                                 <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a>
                                 </li>
                                 <li><a href="https://twitter.com/myutem"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i
-                                            class="fab fa-youtube"></i></a></li>
+                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>

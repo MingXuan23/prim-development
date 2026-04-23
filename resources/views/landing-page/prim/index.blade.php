@@ -151,8 +151,7 @@
                     </a>
                     {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
                 </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
-                    aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
@@ -223,8 +222,7 @@
                     </div>
                 </div>
                 <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: right">
-                    <img src="{{ URL::asset('assets/landing-page/img/header-mockup-yuran-2.png') }}"
-                        alt="header right image" style="max-width: 110%;" id="headerhover">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-mockup-yuran-2.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
                 </div>
             </div>
             {{-- <div class="row justify-content-center" style="padding-top: 120px">
@@ -269,7 +267,7 @@
                         <!-- section title -->
                         {{-- <span class="subtitle">Our Team</span> --}}
                         <h3 class="title">Tentang PRiM</h3>
-                        <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
+                        <p>People Relationship Information Management (PRiM) adalah sebuah sistem untuk menghubungkan
                             ibu bapa serta penjaga dengan pihak sekolah. PRiM menyediakan gerbang pembayaran yuran
                             sekolah secara dalam talian dan juga pengumuman kelas dan sekolah. Di samping itu, PRiM juga
                             menyediakan perkhidmatan lain dalam talian seperti kutipan derma bagi organisasi berdaftar.
@@ -289,8 +287,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="feature-area">
-                        <ul class="feature-list wow fadeInUp d-flex justify-content-center"
-                            style="visibility: visible; animation-name: fadeInUp;">
+                        <ul class="feature-list wow fadeInUp d-flex justify-content-center" style="visibility: visible; animation-name: fadeInUp;">
                             <li class="single-feature-list col-md-9 col-lg-4">
                                 <div class="icon icon-bg-2">
                                     <i class="flaticon-checked"></i>
@@ -336,32 +333,6 @@
     </section>
     <!--====== TESTIMONIAL PART ENDS ======-->
 
-    <!-- RECOGNIZED BY SECTION START -->
-    <section class="recognized-by-section">
-        <div class="container" style="margin-bottom: 10rem">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="section-title">
-                        <!-- section title -->
-                        <h3 class="title extra">Diiktiraf Oleh</h3>
-                    </div><!-- //. section title -->
-                </div>
-            </div>
-            <div class="row text-center">
-                <div class="col-lg-12">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                            <img src="{{ URL::asset('assets/landing-page/img/MySTI-Color-Logo.png') }}" alt=""
-                                style="max-width:70%">
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- RECOGNIZED BY SECTION END -->
-
     <!-- team member area start -->
     <section class="team-member-area" id="ourteam">
 
@@ -391,8 +362,7 @@
                     {{-- <div class="row justify-content-center">--}}
                         {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
                             {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt=""
-                                    style="max-width:70%; width: 250px">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
                                 {{-- </div>--}}
                             {{-- <div class="pt-3">--}}
                                 {{-- <h4>Yahya Bin Ibrahim</h4>--}}
@@ -402,8 +372,7 @@
 
                         {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
                             {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt=""
-                                    style="max-width:70%; width: 250px">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
                                 {{-- </div>--}}
                             {{-- <div class="pt-3">--}}
                                 {{-- <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>--}}
@@ -413,8 +382,7 @@
 
                         {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
                             {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt=""
-                                    style="max-width:70%; width: 250px">--}}
+                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
                                 {{-- </div>--}}
                             {{-- <div class="pt-3">--}}
                                 {{-- <h4>Chuan Chuan You</h4>--}}
@@ -441,19 +409,16 @@
                     <div class="col-lg-12">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt=""
-                                    style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt="" style="max-width:70%">
                             </div>
 
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt=""
-                                    style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt="" style="max-width:70%">
 
                             </div>
 
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt=""
-                                    style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt="" style="max-width:70%">
 
                             </div>
 
@@ -469,38 +434,32 @@
                         {{-- --}}{{-- <span class="subtitle">Contact us</span> --}}
                         {{-- <h3 class="title">Hubungi Kami</h3>--}}
                         {{-- <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>--}}
-                        {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin"
-                            --}} {{-- enctype="multipart/form-data">--}}
+                        {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin" --}} {{-- enctype="multipart/form-data">--}}
 
                             {{-- @csrf--}}
                             {{-- <div class="row">--}}
                                 {{-- <div class="col-lg-12">--}}
                                     {{-- <div class="form-group">--}}
-                                        {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{--
-                                            placeholder="Nama Penuh" required>--}}
+                                        {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{-- placeholder="Nama Penuh" required>--}}
                                         {{-- </div>--}}
                                     {{-- </div>--}}
                                 {{-- <div class="col-lg-6">--}}
                                     {{-- <div class="form-group">--}}
-                                        {{-- <input type="email" class="form-control" id="email" name="email" --}} {{--
-                                            placeholder="Email" required>--}}
+                                        {{-- <input type="email" class="form-control" id="email" name="email" --}} {{-- placeholder="Email" required>--}}
                                         {{-- </div>--}}
                                     {{-- </div>--}}
 
                                 {{-- <div class="col-lg-6">--}}
                                     {{-- <div class="form-group">--}}
-                                        {{-- <input type="text" class="form-control phone_no" id="telno" name="telno"
-                                            --}} {{-- placeholder="Nombor Telefon" required>--}}
+                                        {{-- <input type="text" class="form-control phone_no" id="telno" name="telno" --}} {{-- placeholder="Nombor Telefon" required>--}}
                                         {{-- </div>--}}
                                     {{-- </div>--}}
 
                                 {{-- <div class="col-lg-12">--}}
                                     {{-- <div class="form-group textarea">--}}
-                                        {{-- <textarea name="message" id="message" class="form-control" cols="30"
-                                            rows="10" --}} {{-- placeholder="Mesej" required></textarea>--}}
+                                        {{-- <textarea name="message" id="message" class="form-control" cols="30" rows="10" --}} {{-- placeholder="Mesej" required></textarea>--}}
                                         {{-- </div>--}}
-                                    {{-- <button class="submit-btn  btn-rounded gd-bg-1"
-                                        type="submit">Hantar</button>--}}
+                                    {{-- <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>--}}
                                     {{-- </div>--}}
                                 {{-- </div>--}}
                             {{-- </form>--}}
@@ -509,10 +468,8 @@
                 {{-- <div class="col-lg-6">--}}
                     {{-- <div class="contact-area-wrapper" id="contact">--}}
                         {{-- <div class="map-responsive">--}}
-                            {{-- <iframe--}} {{--
-                                src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed"
-                                --}} {{-- width="600" height="450" frameborder="0" style="border:0;" allowfullscreen=""
-                                --}} {{-- aria-hidden="false" tabindex="0">--}}
+                            {{-- <iframe--}} {{-- src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed" --}} {{-- width="600" height="450" frameborder="0"
+                                style="border:0;" allowfullscreen="" --}} {{-- aria-hidden="false" tabindex="0">--}}
                                 {{-- </iframe>--}}
 
                                 {{-- <br>--}}
@@ -532,9 +489,8 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
-                            <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                            <p>People Relationship Information Management (PRiM) adalah sebuah sistem untuk
                                 menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
 
                         </div>
@@ -556,13 +512,9 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget" style="text-align: center">
-                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""
-                                    style="max-width: 70%"></a>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt="" style="max-width: 70%"></a>
 
-                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""
-                                    style="max-width: 70%"></a>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt="" style="max-width: 70%"></a>
 
                             <ul class="social-icon" style="text-align: center; ">
                                 <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a>
@@ -570,8 +522,7 @@
                                 <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a>
                                 </li>
                                 <li><a href="https://twitter.com/myutem"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i
-                                            class="fab fa-youtube"></i></a></li>
+                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>

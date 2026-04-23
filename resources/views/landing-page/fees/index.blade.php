@@ -28,13 +28,13 @@
             transform: scale(1.2);
         }
 
-        .form-control{
-            border-color:#5e5e5e!important;
+        .form-control {
+            border-color: #5e5e5e !important;
             transition: all 0.2s ease;
         }
 
 
-        @media only screen and (max-width: 991px){
+        @media only screen and (max-width: 991px) {
             .navbar-area .nav-container .navbar-collapse ul.navbar-nav li:hover {
                 transform: scale(1.0);
             }
@@ -58,8 +58,7 @@
                         <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
                     </a>
                 </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
-                    aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
@@ -76,8 +75,8 @@
                         </ul>
                     </li>
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
-{{--                    <li class="slash">|</li>--}}
-{{--                    <li><a href="#contact">Hubungi Kami</a></li>--}}
+                    {{-- <li class="slash">|</li>--}}
+                    {{-- <li><a href="#contact">Hubungi Kami</a></li>--}}
                 </ul>
             </div>
             <div class="nav-right-content">
@@ -94,13 +93,13 @@
         <!--whatsapp contact button-->
 
         <section aria-label="Click to reach out to us at WhatsApp" id="btn-whatsapp">
-            <a href="https://wa.me/139017388" target="_blank" class="social-link" >
+            <a href="https://wa.me/139017388" target="_blank" class="social-link">
                 <div class="Btn">
                     <div class="sign">
                         <svg class="socialSvg whatsappSvg" viewBox="0 0 16 16">
                             <path
-                                d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"
-                            ></path>
+                                d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z">
+                            </path>
                         </svg>
                     </div>
                     <div class="text">Hubungi Kami</div>
@@ -116,34 +115,16 @@
                     <p class="mb-2 slide-from-bottom-element" style="--transition-delay: 0.15s">Urus pembayaran sekolah anak anda dalam talian dengan
                         selamat dan cepat.</p>
                     <!-- From Uiverse.io by Creatlydev -->
-                    <button  id="btn-sign-up"  class="btn btn-primary slide-from-bottom-element"  style="--transition-delay: 0.3s" >
-                      <span class="btn__icon-wrapper">
-                        <svg
-                            viewBox="0 0 14 15"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="btn__icon-svg"
-                            width="10"
-                        >
-                          <path
-                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-                              fill="currentColor"
-                          ></path>
-                        </svg>
+                    <button id="btn-sign-up" class="btn btn-primary slide-from-bottom-element" style="--transition-delay: 0.3s">
+                        <span class="btn__icon-wrapper">
+                            <svg viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="btn__icon-svg" width="10">
+                                <path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"></path>
+                            </svg>
 
-                        <svg
-                            viewBox="0 0 14 15"
-                            fill="none"
-                            width="10"
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="btn__icon-svg btn__icon-svg--copy"
-                        >
-                          <path
-                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-                              fill="currentColor"
-                          ></path>
-                        </svg>
-                      </span>
+                            <svg viewBox="0 0 14 15" fill="none" width="10" xmlns="http://www.w3.org/2000/svg" class="btn__icon-svg btn__icon-svg--copy">
+                                <path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"></path>
+                            </svg>
+                        </span>
                         <a href="/login">
                             Log Masuk
                         </a>
@@ -151,14 +132,15 @@
 
                 </article>
 
-                <img class="slide-from-bottom-element" style="--transition-delay: 0.45s" id="img-hero" src="{{ URL::asset('assets/landing-page/img/images/hero_student.png') }}" alt="Hero Section's Image includes a picture of a student">
+                <img class="slide-from-bottom-element" style="--transition-delay: 0.45s" id="img-hero" src="{{ URL::asset('assets/landing-page/img/images/hero_student.png') }}"
+                    alt="Hero Section's Image includes a picture of a student">
             </div>
         </section>
         <!--feature section-->
         <section id="section-feature" aria-label="Feature Section" class="container">
             <div id="feature-wrapper">
                 <div class="mb-1-2 section-heading">
-                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
                     <h2 class="h2 text-center">Cabaran & Solusi</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4"> Transformasi cara pembayaran yuran sekolah.</p>
@@ -167,19 +149,22 @@
                     <article class="feature-card slide-from-bottom-element">
                         <img class="img-fluid mb-1-2" src="{{ URL::asset('assets/landing-page/img/images/icon_online_payment.png') }}" alt="Icon for online payment">
                         <h3 class="mb-1">Ibu bapa perlu ke sekolah untuk bayar yuran</h3>
-                        <p class="text-justify">Sistem ini membolehkan ibu bapa membuat pembayaran secara dalam talian tanpa perlu hadir ke sekolah. Proses lebih mudah, cepat dan fleksibel mengikut keselesaan ibu bapa.</p>
+                        <p class="text-justify">Sistem ini membolehkan ibu bapa membuat pembayaran secara dalam talian tanpa perlu hadir ke sekolah. Proses lebih mudah, cepat dan fleksibel mengikut
+                            keselesaan ibu bapa.</p>
                     </article>
 
                     <article class="feature-card slide-from-bottom-element" style="--transition-delay: 0.15s">
                         <img class="img-fluid mb-1-2" src="{{ URL::asset('assets/landing-page/img/images/icon_tracking.png') }}" alt="Icon for easy tracking">
                         <h3 class="mb-1">Cikgu akan kumpul tunai yang banyak dan resit akan hilang</h3>
-                        <p class="text-justify">Pembayaran tanpa tunai mengurangkan beban guru untuk mengurus wang fizikal. Semua transaksi direkodkan secara automatik dan selamat dalam sistem. Dengan ini, guru tidak perlu risau resit hilang.</p>
+                        <p class="text-justify">Pembayaran tanpa tunai mengurangkan beban guru untuk mengurus wang fizikal. Semua transaksi direkodkan secara automatik dan selamat dalam sistem. Dengan
+                            ini, guru tidak perlu risau resit hilang.</p>
                     </article>
 
                     <article class="feature-card slide-from-bottom-element" style="--transition-delay: 0.3s">
                         <img class="img-fluid mb-1-2" src="{{ URL::asset('assets/landing-page/img/images/icon_verification.png') }}" alt="Icon for payments verification">
                         <h3 class="mb-1"> Cikgu perlu ambil masa untuk tulis resit secara manual</h3>
-                        <p class="text-justify">Setiap transaksi akan disertakan dengan resit digital yang dijana secara automatik. Guru tidak perlu lagi tulis resit secara manual dan menjadikan proses tersebut lebih efisien serta kurang risiko kesilapan.</p>
+                        <p class="text-justify">Setiap transaksi akan disertakan dengan resit digital yang dijana secara automatik. Guru tidak perlu lagi tulis resit secara manual dan menjadikan
+                            proses tersebut lebih efisien serta kurang risiko kesilapan.</p>
                     </article>
                 </div>
             </div>
@@ -189,19 +174,25 @@
         <section id="section-showcase" aria-label="Application Showcase Section" class="container">
             <div id="showcase-wrapper">
                 <div class="mb-1-2 section-heading">
-                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
                     <h2 class="h2 text-center">Paparan Sistem</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4"> Setiap fungsi direka untuk memudahkan urusan pembayaran yuran.</p>
 
                 <div id="showcase-container">
-                    <div id="showcase-buttons" >
+                    <div id="showcase-buttons">
                         <button id="btn-showcase-left" class="btn-showcase">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: scaleY(-1);msFilter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);"><path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                style="fill: rgba(0, 0, 0, 1);transform: scaleY(-1);msFilter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1);">
+                                <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path>
+                            </svg>
                         </button>
 
                         <button id="btn-showcase-right" class="btn-showcase">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: rotate(180deg);msFilter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2);"><path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                style="fill: rgba(0, 0, 0, 1);transform: rotate(180deg);msFilter:progid:DXImageTransform.Microsoft.BasicImage(rotation=2);">
+                                <path d="M12.707 17.293 8.414 13H18v-2H8.414l4.293-4.293-1.414-1.414L4.586 12l6.707 6.707z"></path>
+                            </svg>
                         </button>
                     </div>
                     <div id="showcase-screenshots">
@@ -223,24 +214,24 @@
             </div>
 
         </section>
-        {{--   tutorial section     --}}
+        {{-- tutorial section --}}
         <section id="section-tutorial" aria-label="Tutorial on how to use the application section" class="container">
             <div id="tutorial-wrapper">
                 <div class="mb-1-2 section-heading">
-                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
                     <h2 class="h2 text-center">Cara Penggunaan Sistem</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4"> Video langkah demi langkah untuk membantu anda menggunakan sistem tersebut.</p>
-                    <div id="video-container" class="d-flex justify-content-center align-items-center slide-from-bottom-element">
-                        <iframe id="iframe-tutorial"  src="https://www.youtube.com/embed/m5GUnMwcG28?loop=1&controls=1"  allowfullscreen>
-                        </iframe>
-                    </div>
+                <div id="video-container" class="d-flex justify-content-center align-items-center slide-from-bottom-element">
+                    <iframe id="iframe-tutorial" src="https://www.youtube.com/embed/m5GUnMwcG28?loop=1&controls=1" allowfullscreen>
+                    </iframe>
                 </div>
+            </div>
         </section>
         <!-- stats section-->
         <section id="section-stat" aria-label="Statistic Section">
             <div id="stat-wrapper">
-                <article class="stat slide-from-bottom-element"  >
+                <article class="stat slide-from-bottom-element">
                     <div class="stat-number mb-1-2">{{number_format($organizationCount)}}</div>
                     <div class="stat-text">Jumlah Sekolah Berdaftar</div>
                 </article>
@@ -255,7 +246,7 @@
                     <div class="stat-text">Jumlah Keseluruhan Yuran Dibayar</div>
                 </article>
 
-                <article class="stat slide-from-bottom-element" >
+                <article class="stat slide-from-bottom-element">
                     <div class="stat-number mb-1-2">RM{{number_format($totalFeeThisYear, 2)}}</div>
                     <div class="stat-text">Jumlah Yuran Dibayar Tahun ini</div>
                 </article>
@@ -265,10 +256,11 @@
         <section id="section-member" aria-label="Member Section" class="container">
             <div id="member-wrapper">
                 <div class="section-heading">
-                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
                     <h2 class="h2 text-center">Ahli-ahli Berdaftar</h2>
                 </div>
-                <p class="text-center text-subtitle mb-4">Terokai sekolah-sekolah di Malaysia yang telah berdaftar dengan platform kami serta Bank Islam dan menikmati kemudahan pembayaran yuran yang lebih mudah, pantas, dan selamat.</p>
+                <p class="text-center text-subtitle mb-4">Terokai sekolah-sekolah di Malaysia yang telah berdaftar dengan platform kami serta Bank Islam dan menikmati kemudahan pembayaran yuran yang
+                    lebih mudah, pantas, dan selamat.</p>
 
                 <form id="form-school">
                     <div class="text-center mb-1">Pilih Negeri & Daerah</div>
@@ -291,81 +283,63 @@
 
                 <!--list of registered school members-->
                 <div class="members">
-                    @foreach($organization2 as $key=>$org)
+                    @foreach($organization2 as $key => $org)
                         <article class="member-card" data-state="{{$org->state}}" data-district="{{$org->district}}">
-                        <div class="member-card-header">
-                            <img src="{{ URL::asset('organization-picture/' . $org->organization_picture ) }}" alt="{{ $org->url_name }} logo">
-                            <div class="member-info-wrapper">
-                                <div class="member-info mb-1-2">
-{{--                                    <img src="{{ URL::asset('assets/landing-page/img/images/icon_school.png') }}" alt="Icon of school">--}}
-                                    <h3>{{ $org->nama }}</h3>
-                                </div>
-                                <div class="member-info member-info-stats mb-1-2">
-
-                                    <div>
-
-{{--                                            {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
-                                        @php
-                                            // Find the organization entry with the matching URL
-                                            $matchedOrg = $organization2->firstWhere('url', $org->url_name);
-                                            
-                                            $tcountLatest = $org->data[0]['tcount'];
-                                            $tcountYearLatest = $org->data[0]['year'];
-                                            $tcountPrevious = $org->data[1]['tcount'];
-                                            $tcountYearPrev = $org->data[1]['year'];
-
-                                        @endphp
-
-                                        @if ($tcountLatest > 0) {{ $tcountLatest }} <span class="text-small"> transaksi pada {{ $tcountYearLatest }}</span> @endif
-
+                            <div class="member-card-header">
+                                <img src="{{ URL::asset('organization-picture/' . $org->organization_picture) }}" alt="{{ $org->url_name }} logo">
+                                <div class="member-info-wrapper">
+                                    <div class="member-info mb-1-2">
+                                        {{-- <img src="{{ URL::asset('assets/landing-page/img/images/icon_school.png') }}" alt="Icon of school">--}}
+                                        <h3>{{ $org->nama }}</h3>
                                     </div>
-                                    <div>
-                                        @if($tcountPrevious > 0) {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $tcountYearPrev }}</span> @endif
+                                    <div class="member-info member-info-stats mb-1-2">
+
+                                        <div>
+
+                                            {{-- {{ $results[$org->id]['this_year']['completed_count'] }} <span class="text-small"> pelajar bayar yuran {{ date("Y") }}</span>--}}
+                                            @php
+                                                // Find the organization entry with the matching URL
+                                                $matchedOrg = $organization2->firstWhere('url', $org->url_name);
+
+                                                $tcountLatest = $org->data[0]['tcount'];
+                                                $tcountYearLatest = $org->data[0]['year'];
+                                                $tcountPrevious = $org->data[1]['tcount'];
+                                                $tcountYearPrev = $org->data[1]['year'];
+
+                                            @endphp
+
+                                            @if ($tcountLatest > 0) {{ $tcountLatest }} <span class="text-small"> transaksi pada {{ $tcountYearLatest }}</span> @endif
+
+                                        </div>
+                                        <div>
+                                            @if($tcountPrevious > 0) {{ $tcountPrevious }} <span class="text-small"> transaksi pada {{ $tcountYearPrev }}</span> @endif
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="member-card-footer pt-3">
-                            <button  class="btn btn-primary" >
-                      <span class="btn__icon-wrapper">
-                        <svg
-                            viewBox="0 0 14 15"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="btn__icon-svg"
-                            width="10"
-                        >
-                          <path
-                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-                              fill="currentColor"
-                          ></path>
-                        </svg>
+                            <div class="member-card-footer pt-3">
+                                <button class="btn btn-primary">
+                                    <span class="btn__icon-wrapper">
+                                        <svg viewBox="0 0 14 15" fill="none" xmlns="http://www.w3.org/2000/svg" class="btn__icon-svg" width="10">
+                                            <path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"></path>
+                                        </svg>
 
-                        <svg
-                            viewBox="0 0 14 15"
-                            fill="none"
-                            width="10"
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="btn__icon-svg btn__icon-svg--copy"
-                        >
-                          <path
-                              d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-                              fill="currentColor"
-                          ></path>
-                        </svg>
-                      </span>
-                                <a href="/{{ $org->url_name }}">
-                                    Log Masuk
-                                </a>
-                            </button>
-                            {{--check whether the school has ongoing donations--}}
-                            @if($organizationDonations->where("organization_id" , $org->id)->first())
-                                <button class="btn-derma">
-                                    <a href="/sumbangan/{{$organizationDonations->where("organization_id" , $org->id)->first()->url}}">Derma</a>
+                                        <svg viewBox="0 0 14 15" fill="none" width="10" xmlns="http://www.w3.org/2000/svg" class="btn__icon-svg btn__icon-svg--copy">
+                                            <path d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z" fill="currentColor"></path>
+                                        </svg>
+                                    </span>
+                                    <a href="/{{ $org->url_name }}">
+                                        Log Masuk
+                                    </a>
                                 </button>
-                            @endif
-                        </div>
-                    </article>
+                                {{--check whether the school has ongoing donations--}}
+                                @if($organizationDonations->where("organization_id", $org->id)->first())
+                                    <button class="btn-derma">
+                                        <a href="/sumbangan/{{$organizationDonations->where("organization_id", $org->id)->first()->url}}">Derma</a>
+                                    </button>
+                                @endif
+                            </div>
+                        </article>
 
                     @endforeach
                 </div>
@@ -407,11 +381,29 @@
         <!--                </div>-->
         <!--            </div>-->
         <!--        </section>-->
+        <!-- RECOGNIZED BY SECTION START -->
+        <section aria-label="Platform's Recognition" id="section-recognized-by">
+            <div id="recognition-wrapper" class="container">
+                <div class="mb-1-2 section-heading">
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
+                    <h2 class="h2 text-center">Diiktiraf Oleh</h2>
+                </div>
+                <p class="text-center text-subtitle mb-4">Laman web ini telah diiktiraf oleh MySTI.
+                </p>
+
+                <div id="recognized-by">
+                    <img class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/MySTI-Color-Logo.png') }}" alt="Logo of MySTI"
+                        style="max-width:300px; margin: 0 auto; display: block;">
+                </div>
+            </div>
+        </section>
+        <!-- RECOGNIZED BY SECTION END -->
+
         <!--collaborators-->
         <section aria-label="Platform's Collaborators Section" id="section-collab">
             <div id="collab-wrapper" class="container">
                 <div class="mb-1-2 section-heading">
-                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
                     <h2 class="h2 text-center">Dengan Kerjasama</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4">Laman web ini telah diakui dan disahkan selamat untuk digunakan.
@@ -419,8 +411,9 @@
 
                 <div id="collaborators">
                     <img class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/paynet_logo.png') }}" alt="Logo of Paynet Malaysia">
-                    <img style="--transition-delay: 0.15s"   class="slide-from-bottom-element"  src="{{ URL::asset('assets/landing-page/img/images/bank_islam_logo.png') }}" alt="Logo of Bank Islam">
-                    <img style="--transition-delay: 0.3s"  class="slide-from-bottom-element"   src="{{ URL::asset('assets/landing-page/img/images/utem_logo.png') }}" alt="Logo of Universiti Teknikal Malaysia Melaka">
+                    <img style="--transition-delay: 0.15s" class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/bank_islam_logo.png') }}" alt="Logo of Bank Islam">
+                    <img style="--transition-delay: 0.3s" class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/utem_logo.png') }}"
+                        alt="Logo of Universiti Teknikal Malaysia Melaka">
                 </div>
             </div>
         </section>
@@ -428,7 +421,7 @@
         <section aria-label="FAQ Section" id="section-faq">
             <div id="faq-wrapper" class="container">
                 <div class="mb-1-2 section-heading">
-                    <img alt="" class="h2-deco-right" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}" >
+                    <img alt="" class="h2-deco-left" src="{{ URL::asset('assets/landing-page/img/images/arrow_orange.png') }}">
                     <h2 class="h2 text-center">Soalan Lazim</h2>
                 </div>
                 <p class="text-center text-subtitle mb-4">Jawapan kepada persoalan yang sering ditanya oleh pengguna
@@ -438,7 +431,7 @@
                     <div class="card slide-from-bottom-element">
                         <div class="card-header collapsed" id="headingOne" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                             <div class="mb-0">
-                                1.	Apakah bayaran yang dikenakan kepada sekolah untuk menggunakan laman web yuran ini?
+                                1. Apakah bayaran yang dikenakan kepada sekolah untuk menggunakan laman web yuran ini?
                             </div>
 
                             <img class="faq-arrow" src="{{ URL::asset('assets/landing-page/img/images/chevron_down.png') }}" alt="Click to show the answer for this question">
@@ -446,16 +439,17 @@
 
                         <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                             <div class="card-body">
-                                Kami tidak mengenakan sebarang bayaran kepada pihak PIBG sekolah. Walaubagaimanapun, setiap kali pembayaran dibuat oleh ibu bapa atau penjaga, sistem akan mengenakan caj sebanyak 50 sen.
+                                Kami tidak mengenakan sebarang bayaran kepada pihak PIBG sekolah. Walaubagaimanapun, setiap kali pembayaran dibuat oleh ibu bapa atau penjaga, sistem akan mengenakan
+                                caj sebanyak 50 sen.
                             </div>
                         </div>
                     </div>
 
 
-                    <div class="card slide-from-bottom-element" style="--transition-delay: 0.15s" >
+                    <div class="card slide-from-bottom-element" style="--transition-delay: 0.15s">
                         <div class="card-header collapsed" id="headingTwo" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                             <div class="mb-0">
-                                2.	Apakah langkah yang PIBG sekolah perlu buat bagi membolehkan ibu bapa membayar yuran?
+                                2. Apakah langkah yang PIBG sekolah perlu buat bagi membolehkan ibu bapa membayar yuran?
                             </div>
 
                             <img class="faq-arrow" src="{{ URL::asset('assets/landing-page/img/images/chevron_down.png') }}" alt="Click to show the answer for this question">
@@ -463,7 +457,8 @@
 
                         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                             <div class="card-body">
-                                Ibu bapa perlu login ke dalam laman web dengan menggunakan nombor kad pengenalan. Pihak sekolah akan daftarkan setiap ibu bapa sebelum ibu bapa dibenarkan untuk log masuk.
+                                Ibu bapa perlu login ke dalam laman web dengan menggunakan nombor kad pengenalan. Pihak sekolah akan daftarkan setiap ibu bapa sebelum ibu bapa dibenarkan untuk log
+                                masuk.
                             </div>
                         </div>
                     </div>
@@ -544,9 +539,8 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
-                            <p>Parental Relationship Information Management (PRiM) adalah sebuah sistem untuk
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                            <p>People Relationship Information Management (PRiM) adalah sebuah sistem untuk
                                 menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
 
                         </div>
@@ -568,13 +562,9 @@
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget" style="text-align: center">
-                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt=""
-                                    style="max-width: 70%"></a>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt="" style="max-width: 70%"></a>
 
-                            <a href="#" style="pointer-events: none;" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""
-                                    style="max-width: 70%"></a>
+                            <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt="" style="max-width: 70%"></a>
 
                             <ul class="social-icon" style="text-align: center; ">
                                 <li><a href="https://www.facebook.com/MyUTeM/"><i class="fab fa-facebook-f"></i></a>
@@ -582,8 +572,7 @@
                                 <li><a href="https://www.instagram.com/myutem/"><i class="fab fa-instagram"></i></a>
                                 </li>
                                 <li><a href="https://twitter.com/myutem"><i class="fab fa-twitter"></i></a></li>
-                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i
-                                            class="fab fa-youtube"></i></a></li>
+                                <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
                     </div>
@@ -638,7 +627,7 @@
     @include('landing-page.footer-script')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const organizations = JSON.parse(@json("$organization2"));
             const heroSlideFromBottomElements = document.querySelectorAll('#section-hero .slide-from-bottom-element');
             const featureSlideFromBottomElements = document.querySelectorAll('#section-feature .slide-from-bottom-element');
@@ -650,6 +639,7 @@
             const collabSlideFromBottomElements = document.querySelectorAll('#section-collab .slide-from-bottom-element');
             const faqSlideFromBottomElements = document.querySelectorAll('#section-faq .slide-from-bottom-element');
             const contactSlideFromBottomElements = document.querySelectorAll('#section-contact .slide-from-bottom-element');
+            const recognitionSlideFromBottomElements = document.querySelectorAll('#section-recognized-by .slide-from-bottom-element');
             //   setup intersection observers
             const observerSlideBottomElement = new IntersectionObserver((entries) => {
                 for (let entry of entries) {
@@ -693,6 +683,9 @@
                 observerSlideBottomElement.observe(el);
             }
             for (let el of contactSlideFromBottomElements) {
+                observerSlideBottomElement.observe(el);
+            }
+            for (let el of recognitionSlideFromBottomElements) {
                 observerSlideBottomElement.observe(el);
             }
 
@@ -940,12 +933,12 @@
                 }
             }
 
-// for schools filtering
-// Create objects to count organizations by state and district
+            // for schools filtering
+            // Create objects to count organizations by state and district
             const stateCount = {};
             const districtsByState = {};
 
-// Add pagination variables
+            // Add pagination variables
             const cardsPerPage = 6;
             let currentPage = 1;
             let filteredCards = [];
@@ -954,7 +947,7 @@
             let userState = null;
             let userDistrict = null;
 
-// Process organizations
+            // Process organizations
             organizations.forEach(org => {
                 // Count by state
                 if (org.state) {
@@ -973,7 +966,7 @@
                 }
             });
 
-// Populate states dropdown
+            // Populate states dropdown
             const statesSelect = document.getElementById('states');
             Object.keys(stateCount).sort().forEach(state => {
                 const option = document.createElement('option');
@@ -982,11 +975,11 @@
                 statesSelect.appendChild(option);
             });
 
-// Initially disable district dropdown
+            // Initially disable district dropdown
             const districtSelect = document.getElementById('district');
             districtSelect.disabled = true;
 
-// Handle state selection to populate districts
+            // Handle state selection to populate districts
             statesSelect.addEventListener('change', function () {
                 const selectedState = this.value;
 
@@ -1014,7 +1007,7 @@
                 // filterOrganizations(selectedState, districtSelect.value);
             });
 
-// Form submission handler
+            // Form submission handler
             document.getElementById('form-school').addEventListener('submit', function (e) {
                 e.preventDefault();
                 // Add your filter logic here
@@ -1068,7 +1061,7 @@
                 displayCurrentPageCards();
             }
 
-// Function to display cards for the current page
+            // Function to display cards for the current page
             function displayCurrentPageCards() {
                 const startIndex = (currentPage - 1) * cardsPerPage;
                 const endIndex = Math.min(startIndex + cardsPerPage, filteredCards.length);
@@ -1103,7 +1096,7 @@
                 isFirstLoad = false;
             }
 
-// Function to create and update pagination controls
+            // Function to create and update pagination controls
             function updatePagination() {
                 const totalPages = Math.ceil(filteredCards.length / cardsPerPage);
 
@@ -1301,4 +1294,5 @@
         });
     </script>
 </body>
+
 </html>
