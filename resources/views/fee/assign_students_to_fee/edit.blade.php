@@ -140,12 +140,12 @@
                     _token: _token
                 },
                 success: function (result) {
-                    var classId = $("#classes");
+                    var classes = $("#classes");
 
-                    $(classId).empty();
-                    $(classId).append("<option value='' selected disabled>Pilih Kelas</option>");
+                    classes.empty();
+                    classes.append("<option value='' selected disabled>Pilih Kelas</option>");
                     jQuery.each(result.success, function (key, value) {
-                        $(classId).append("<option value='" + value.cid + "'>" + value.cname + "</option>");
+                        classes.append("<option value='" + value.cid + "'>" + value.cname + "</option>");
                     });
                 }
             })
