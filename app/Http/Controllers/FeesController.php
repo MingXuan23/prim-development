@@ -1904,6 +1904,15 @@ class FeesController extends AppBaseController
         }
 
         $oid = $request->get('oid');
+
+        $organization = DB::table("organizations")
+            ->where("id", "=", $oid)
+            ->first();
+
+        if ($organization->parent_org != null) {
+            $oid = $organization->parent_org;
+        }
+
         $classId = $request->get('classid');
         $routeName = $request->get("routeName");
 
