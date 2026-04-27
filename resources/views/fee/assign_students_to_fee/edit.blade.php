@@ -25,8 +25,7 @@
                     </ul>
                 </div>
             @endif
-            <form class="form-validation" method="POST" action="{{ route('fees.assignStudentsToFeeUpdate') }}"
-                enctype="multipart/form-data">
+            <form class="form-validation" method="POST" action="{{ route('fees.assignStudentsToFeeUpdate') }}" enctype="multipart/form-data">
 
                 @csrf
                 <div class="card-body">
@@ -41,8 +40,7 @@
 
                     <div class="form-group">
                         <label>Kategori Yuran</label>
-                        <input type="text" name="category" class="form-control" value="{{ $currentFee['fee_category'] }}"
-                            readonly>
+                        <input type="text" name="category" class="form-control" value="{{ $currentFee['fee_category'] }}" readonly>
                     </div>
 
 
@@ -64,16 +62,14 @@
                     <div class="form-row">
                         <div class="form-group col-md-6">
                             <label>Senarai Pelajar</label>
-                            <select name="students[]" id="students" multiple class="form-control h-5"
-                                style="min-height: 200px;">
+                            <select name="students[]" id="students" multiple class="form-control h-5" style="min-height: 200px;">
 
                             </select>
                         </div>
 
                         <div class="form-group col-md-6 h-5">
                             <label for="students_selected">Pelajar Dipilih Untuk Bayar Yuran</label>
-                            <select name="students_selected[]" id="students-selected" multiple class="form-control"
-                                style="min-height: 200px;">
+                            <select name="students_selected[]" id="students-selected" multiple class="form-control" style="min-height: 200px;">
 
                             </select>
                         </div>
@@ -131,27 +127,28 @@
             $("form").on("submit", function () {
                 $("#students-selected option").prop("selected", true);
                 $("#students-selected option").prop("disabled", false);
-            })
+            });
+
+            var _token = $('input[name="_token"]').val();
 
             // ************************** get all classes by current organization id ********************************
             $.ajax({
-                url: "{{ route('class.getClassesDatatable') }}",
-                method: "GET",
+                url: "{{ route('fees.fetchClassForCateYuran') }}",
+                method: "POST",
                 data: {
-                    oid: $("#organization-id").val(),
-                    hasOrganization: true
+                    oid: $('#organization-id').val(),
+                    _token: _token
                 },
                 success: function (result) {
                     var classes = $("#classes");
 
                     classes.empty();
-                    classes.append("<option value='' selected disabled>Sila pilih kelas</option>")
-
-                    result.data.forEach(classObj => {
-                        classes.append("<option value='" + classObj.cid + "'>" + classObj.cnama + "</option>")
+                    classes.append("<option value='' selected disabled>Pilih Kelas</option>");
+                    jQuery.each(result.success, function (key, value) {
+                        classes.append("<option value='" + value.cid + "'>" + value.cname + "</option>");
                     });
                 }
-            });
+            })
 
             // ************************** get all selected students for current fee based on class ********************************
             $("#classes").on("change", function () {
