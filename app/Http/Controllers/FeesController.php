@@ -1450,13 +1450,16 @@ class FeesController extends AppBaseController
         $classId = $request->get("class_id");
         $oid = $request->get("oid");
         $studentId = $request->get("student_id");
+        $currentOrg = DB::table("organizations")
+            ->where('id', '=', $oid)
+            ->first();
 
         // get the class_student by student id to obtain its class_student_id to be assigned to student_fees_new
         $class_student = DB::table("class_student as cs")
             ->join("class_organization as co", "cs.organclass_id", "=", "co.id")
             ->select("cs.*")
             ->where("co.class_id", "=", $classId)
-            ->where("co.organization_id", "=", $oid)
+            ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
             ->where("cs.student_id", "=", $studentId)
             ->get()
             ->first();
@@ -1578,6 +1581,9 @@ class FeesController extends AppBaseController
         $feeId = $request->get("fee_id");
         $selectedStudentIds = $request->get("students_selected");
         $classId = $request->get("classes");
+        $currentOrg = DB::table("organizations")
+            ->where('id', '=', $oid)
+            ->first();
 
         if (!isset($classId)) {
             return redirect()->back()->withErrors("Sila pilih kelas.");
@@ -1593,7 +1599,7 @@ class FeesController extends AppBaseController
             ->join("class_organization as co", "cs.organclass_id", "=", "co.id")
             ->join("student_fees_new as sfn", "cs.id", "=", "sfn.class_student_id")
             ->select("cs.student_id as student_id")
-            ->where("co.organization_id", "=", $oid)
+            ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
             ->where("co.class_id", "=", $classId)
             ->where("sfn.fees_id", "=", $feeId)
             ->get()
@@ -1610,7 +1616,7 @@ class FeesController extends AppBaseController
                     $classStudent = DB::table("class_student as cs")
                         ->join("class_organization as co", "co.id", "=", "cs.organclass_id")
                         ->select("cs.*")
-                        ->where("co.organization_id", "=", $oid)
+                        ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
                         ->where("co.class_id", "=", $classId)
                         ->where("cs.student_id", "=", $selectedStudentId)
                         ->first();
@@ -1641,7 +1647,7 @@ class FeesController extends AppBaseController
                 $classStudent = DB::table("class_student as cs")
                     ->join("class_organization as co", "co.id", "=", "cs.organclass_id")
                     ->select("cs.id as id")
-                    ->where("co.organization_id", "=", $oid)
+                    ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
                     ->where("co.class_id", "=", $classId)
                     ->where("cs.student_id", "=", $existingStudentId)
                     ->first();
@@ -1675,10 +1681,17 @@ class FeesController extends AppBaseController
             return redirect('/login');
         }
 
+        $childOrg = DB::table('organizations')
+            ->where('parent_org', '=', $oid)
+            ->pluck('id')
+            ->toArray();
+
+        $allOrgIds = array_merge([$oid], $childOrg);
+
         return DB::table("fees_new as fn")
             ->join("organizations as o", "fn.organization_id", "=", "o.id")
             ->select("fn.id as fee_id", "fn.name as fee_name", "fn.category as fee_category", "fn.status as fee_status")
-            ->where("o.id", "=", $oid)
+            ->whereIn('fn.organization_id', $allOrgIds)
             ->whereIn("fn.category", $categories)
             ->where("fn.status", "=", 1)
             ->orderBy("fn.category", "asc")
