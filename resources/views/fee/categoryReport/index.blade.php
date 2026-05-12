@@ -53,6 +53,13 @@
                         </select>
                     </div>
 
+                    <div class="form-group">
+                        <label>Tingkatan</label>
+                        <select name="tingkatan" id="tingkatan" class="form-control">
+                            <option value="" disabled selected>Pilih Tingkatan</option>
+                        </select>
+                    </div>
+
                     <div id="dkelas" class="form-group">
                         <label> Kelas </label>
                         <select name="classes" id="classes" class="form-control">
@@ -77,12 +84,10 @@
                 </div>
 
                 <div class="col-md-12">
-                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
-                        data-target="#modalJumlahBayaran"><i class="fas fa-plus"></i> Export Jumlah Bayaran Ibu/Bapa</a>
-                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
-                        data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
-                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal"
-                        data-target="#modalExportSemuaYuran"><i class="fas fa-plus"></i> Export Semua Yuran</a>
+                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal" data-target="#modalJumlahBayaran"><i class="fas fa-plus"></i> Export Jumlah Bayaran
+                        Ibu/Bapa</a>
+                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal" data-target="#modalByYuran"><i class="fas fa-plus"></i> Export Yuran</a>
+                    <a style="float: right; margin: 0px 0px 10px 10px" class="btn btn-primary" data-toggle="modal" data-target="#modalExportSemuaYuran"><i class="fas fa-plus"></i> Export Semua Yuran</a>
                     <div style="float: left; margin-left: 15px;">
                         <input type="checkbox" name="includeMasihBerhutang" id="includeMasihBerhutangCheckbox" checked>
                         <label for="includeMasihBerhutang">Termasuk Pelajar Masih Berhutang</label>
@@ -92,8 +97,7 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="table-responsive">
-                            <table id="yuranTable" class="table table-bordered table-striped dt-responsive wrap"
-                                style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <table id="yuranTable" class="table table-bordered table-striped dt-responsive wrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                                 <thead>
                                     <tr style="text-align:center">
                                         <th>No</th>
@@ -167,8 +171,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalJumlahBayaran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-        aria-hidden="true">
+    <div class="modal fade" id="modalJumlahBayaran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -178,8 +181,7 @@
                     </button>
                 </div>
 
-                <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post" onsubmit="remindMessage()"
-                    id="exportJumlahBayaranIbuBapaForm">
+                <form action="{{ route('exportJumlahBayaranIbuBapa') }}" method="post" onsubmit="remindMessage()" id="exportJumlahBayaranIbuBapaForm">
                     <div class="modal-body">
                         {{ csrf_field() }}
                         <div class="form-group">
@@ -203,14 +205,10 @@
                                 <label class="control-label">Tempoh Transaksi</label>
 
                                 <div class="input-daterange input-group" id="date">
-                                    <input type="text" class="form-control" id="date_started" name="date_started"
-                                        placeholder="Tarikh Awal" autocomplete="off"
-                                        data-parsley-required-message="Sila masukkan tarikh awal"
-                                        data-parsley-errors-container=".errorMessage" required />
-                                    <input type="text" class="form-control" id="date_end" name="date_end"
-                                        placeholder="Tarikh Akhir" autocomplete="off"
-                                        data-parsley-required-message="Sila masukkan tarikh akhir"
-                                        data-parsley-errors-container=".errorMessage" required />
+                                    <input type="text" class="form-control" id="date_started" name="date_started" placeholder="Tarikh Awal" autocomplete="off"
+                                        data-parsley-required-message="Sila masukkan tarikh awal" data-parsley-errors-container=".errorMessage" required />
+                                    <input type="text" class="form-control" id="date_end" name="date_end" placeholder="Tarikh Akhir" autocomplete="off"
+                                        data-parsley-required-message="Sila masukkan tarikh akhir" data-parsley-errors-container=".errorMessage" required />
                                 </div>
                                 <div class="errorMessage"></div>
                             </div>
@@ -225,8 +223,7 @@
     </div>
 
     {{-- modal export semua yuran --}}
-    <div class="modal fade" id="modalExportSemuaYuran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId"
-        aria-hidden="true">
+    <div class="modal fade" id="modalExportSemuaYuran" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -321,7 +318,7 @@
                     var organizationid = $("#organExport").val();
                     var classid = $('#class_export').val();
                     var _token = $('input[name="_token"]').val();
-                    fetch_class_data(organizationid, '#class_export', '#fee_year_export', '#yuranExport');
+                    fetch_class_data(organizationid, '', '#class_export', '#fee_year_export', '#yuranExport');
                 }
             });
 
@@ -330,7 +327,7 @@
                 var classid = $('#class_export').val();
                 var _token = $('input[name="_token"]').val();
 
-                fetch_yuran_data(organizationid, classid, '#fee_year_export', '#yuranExport');
+                fetch_yuran_data(organizationid, '', classid, '#fee_year_export', '#yuranExport');
             });
 
             $('#fee_year_export').change(function () {
@@ -340,25 +337,45 @@
             $('#organExportAllYuran').change(function () {
                 var organizationid = $("#organExportAllYuran").val();
                 var _token = $('input[name="_token"]').val();
-                fetch_class_data(organizationid, '', '#feeYearExportAllYuran', '');
+                fetch_class_data(organizationid, '', '', '#feeYearExportAllYuran', '');
             });
 
             $('#organExport1').change(function () {
                 var organizationid = $("#organExport1").val();
                 var _token = $('input[name="_token"]').val();
-                fetch_class_data(organizationid, '#yuranExport1', "", "");
+                fetch_class_data(organizationid, '', '#yuranExport1', "", "");
             });
 
             $("#organization").prop("selectedIndex", 0);
 
-            function fetch_class_data(oid = '', classHtmlId = '', feeYearHtmlId, feeHtmlId) {
+            function fetch_tingkatan_data(oid) {
+                var _token = $('input[name="_token"]').val();
+                $.ajax({
+                    url: "{{ route('fees.fetchClassYear') }}",
+                    method: "GET",
+                    data: {
+                        oid: oid,
+                        _token: _token
+                    },
+                    success: function (result) {
+                        $("#tingkatan").empty();
+                        $("#tingkatan").append("<option value=''>Semua Tingkatan</option>");
+                        jQuery.each(result.datayear, function (key, value) {
+                            $("#tingkatan").append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
+                        })
+                    }
+                });
+            }
+
+            function fetch_class_data(oid = '', classLevel = '', classHtmlId = '', feeYearHtmlId, feeHtmlId) {
                 var _token = $('input[name="_token"]').val();
                 $.ajax({
                     url: "{{ route('fees.fetchClassForCateYuran') }}",
                     method: "POST",
                     data: {
                         oid: oid,
-                        _token: _token
+                        _token: _token,
+                        classLevel: classLevel
                     },
                     success: function (result) {
                         $(classHtmlId).empty();
@@ -372,12 +389,12 @@
                             $(feeYearHtmlId).append("<option value='" + value.year + "'>Tahun " + value.year + "</option>");
                         });
 
-                        fetch_yuran_data(oid, classHtmlId, feeYearHtmlId, feeHtmlId);
+                        fetch_yuran_data(oid, classLevel, classHtmlId, feeYearHtmlId, feeHtmlId);
                     }
                 })
             }
 
-            function fetch_yuran_data(oid, classid, feeYearHtmlId, feeHtmlId) {
+            function fetch_yuran_data(oid, classLevel = '', classid, feeYearHtmlId, feeHtmlId) {
                 var _token = $('input[name="_token"]').val();
                 var fee_year = $(feeYearHtmlId).val();
                 var feeSelect = $(feeHtmlId);
@@ -388,6 +405,7 @@
                     data: {
                         classid: classid,
                         oid: oid,
+                        classlevel: classLevel,
                         _token: _token,
                         fee_year: fee_year
                     },
@@ -414,6 +432,7 @@
                         type: 'GET',
                         data: {
                             feeid: $("#fees").val(),
+                            classlevel: $('#tingkatan').val(),
                             classid: $("#classes").val(),
                             orgId: $("#organization").val(),
                             feeYear: $('#fee_year').val(),
@@ -467,13 +486,19 @@
 
             $('#organization').change(function () {
                 if ($(this).val() != '') {
-                    fetch_class_data($(this).val(), '#classes', '#fee_year', '#fees');
+                    fetch_tingkatan_data($(this).val());
+                    fetch_class_data($(this).val(), '', '#classes', '#fee_year', '#fees');
                 }
+            });
+
+            $('#tingkatan').change(function () {
+                fetch_class_data($('#organization').val(), $('#tingkatan').val(), '#classes', '#fee_year', '#fees');
+                // fetch_yuran_data($('#organization').val(), $('#tingkatan').val(), '#classes', '#fee_year', '#fees');
             });
 
             $('#classes').change(function () {
                 var organizationid = $('#organization').val();
-                fetch_yuran_data(organizationid, '#classes', '#fee_year', '#fees');
+                fetch_yuran_data(organizationid, '', '#classes', '#fee_year', '#fees');
             });
 
             $('#fee_year').change(function () {
