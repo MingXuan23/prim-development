@@ -816,8 +816,12 @@ class FeesController extends AppBaseController
         // dd($request->oid);
 
         if (request()->ajax()) {
+            $org = DB::table("organizations")
+                ->where("id", "=", $request->oid)
+                ->first();
+
             $type = $request->type;
-            $oid = $request->oid;
+            $oid = $org->parent_org != null ? $org->parent_org : $request->oid;
             // dd($type);
             $userId = Auth::id();
 
@@ -1962,12 +1966,12 @@ class FeesController extends AppBaseController
             $oid = $organization->parent_org;
         }
 
-        if ($level == "1") {
-            $list = DB::table('organizations')
-                ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
-                ->where('organizations.id', $oid)
-                ->first();
+        $list = DB::table('organizations')
+            ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
+            ->where('organizations.id', $oid)
+            ->first();
 
+        if ($level != "") {
             $class_organization = DB::table('classes')
                 ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                 ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
@@ -1976,29 +1980,32 @@ class FeesController extends AppBaseController
                 ->where('classes.levelid', $level)
                 ->where('class_organization.organization_id', $oid)
                 ->get();
-
-            // dd($class_organization);
-
-            return response()->json(['data' => $list, 'datayear' => $class_organization]);
-        } elseif ($level == "2") {
-            $list = DB::table('organizations')
-                ->select('organizations.id as oid', 'organizations.nama as organizationname', 'organizations.type_org')
-                ->where('organizations.id', $oid)
-                ->first();
-
-            $class_organization = DB::table('classes')
-                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
-                ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
-                ->distinct()
-                ->where('classes.status', 1)
-                ->where('classes.levelid', $level)
-                ->where('class_organization.organization_id', $oid)
-                ->get();
-
-            // dd($class_organization);
-
-            return response()->json(['data' => $list, 'datayear' => $class_organization]);
         }
+        // elseif ($level == "2") {
+        //     $class_organization = DB::table('classes')
+        //         ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+        //         ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
+        //         ->distinct()
+        //         ->where('classes.status', 1)
+        //         ->where('classes.levelid', $level)
+        //         ->where('class_organization.organization_id', $oid)
+        //         ->get();
+
+        //     return response()->json(['data' => $list, 'datayear' => $class_organization]);
+        // }
+        else {
+            $class_organization = DB::table('classes')
+                ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
+                ->select(DB::raw('substr(classes.nama, 1, 1) as year'))
+                ->distinct()
+                ->where('classes.status', 1)
+                ->where('classes.levelid', '>', 0)
+                ->where('class_organization.organization_id', $oid)
+                ->get();
+
+        }
+
+        return response()->json(['data' => $list, 'datayear' => $class_organization]);
     }
 
     public function allLevel($name, $desc, $quantity, $price, $total, $date_started, $date_end, $level, $oid, $gender, $category)
@@ -2836,6 +2843,7 @@ class FeesController extends AppBaseController
 
         // dd($request->get('schid'));
         $organ = Organization::find($request->get('oid'));
+        $classLevel = $request->get('classLevel');
 
         if (Auth::user()->hasRole('Superadmin') || Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta')) {
 
@@ -2846,6 +2854,9 @@ class FeesController extends AppBaseController
                     ['class_organization.organization_id', $organ->parent_org != null ? $organ->parent_org : $organ->id],
                     ['classes.status', 1]
                 ])
+                ->when(isset($classLevel), function ($query) use ($classLevel) {
+                    $query->where('classes.nama', 'like', "$classLevel%");
+                })
                 ->orderBy('classes.nama')
                 ->get();
         } else {
@@ -2858,6 +2869,9 @@ class FeesController extends AppBaseController
                     ['classes.status', 1],
                     ['organization_user.user_id', Auth::id()]
                 ])
+                ->when(isset($classLevel), function ($query) use ($classLevel) {
+                    $query->where('classes.nama', 'like', "$classLevel%");
+                })
                 ->orderBy('classes.nama')
                 ->get();
         }
@@ -2882,14 +2896,24 @@ class FeesController extends AppBaseController
 
     public function fetchYuran(Request $request)
     {
+        $oid = $request->oid;
+        $classLevel = $request->classlevel;
+        $year = $request->fee_year;
+
         $class = null;
+        // $classIds = [];
 
         if ($request->classid != null) {
             $class = ClassModel::find($request->classid);
         }
-
-        $oid = $request->oid;
-        $year = $request->fee_year;
+        // else {
+        //     $classIds = DB::table("classes as c")
+        //         ->join("class_organization as co", "co.class_id", "=", "c.id")
+        //         ->where("co.organization_id", "=", $oid)
+        //         ->where("c.nama", "like", "$classLevel%")
+        //         ->pluck("c.id")
+        //         ->toArray();
+        // }
 
         $lists = DB::table('fees_new as fn')
             ->leftJoin('student_fees_new as sfn', 'sfn.fees_id', '=', 'fn.id')
@@ -2918,6 +2942,29 @@ class FeesController extends AppBaseController
 
         foreach ($lists as $key => $list) {
             $target = json_decode($list->target);
+
+            // if ($class == null) {
+            //     if (count($classIds) == 0) {
+            //         continue;
+            //     }
+
+            //     if (is_array($target->data)) {
+            //         if (array_intersect($target->data, $classIds)) {
+            //             continue;
+            //         }
+            //     }
+            // } else {
+            //     if ($target->data == "All_Level" || $target->data == "ALL" || $target->data == $class->levelid) {
+            //         continue;
+            //     }
+
+            //     if (is_array($target->data)) {
+            //         if (in_array($class->id, $target->data)) {
+            //             continue;
+            //         }
+            //     }
+
+            // }
 
             if ($class == null) {
                 continue;
@@ -2955,6 +3002,7 @@ class FeesController extends AppBaseController
     public function studentDebtDatatable(Request $request)
     {
         $fees = Fee_New::find($request->feeid);
+        $classLevel = $request->classlevel;
         $year = $request->feeYear;
         $includeMasihBerhutang = $request->includeMasihBerhutang;
 
@@ -2967,6 +3015,9 @@ class FeesController extends AppBaseController
                     ->join('class_organization as co', 'co.id', 'cs.organclass_id')
                     ->join('classes as c', 'c.id', '=', 'co.class_id')
                     ->where('co.organization_id', '=', $request->orgId)
+                    ->when(isset($classLevel), function ($query) use ($classLevel) {
+                        $query->where('c.nama', 'like', "$classLevel%");
+                    })
                     ->when(isset($request->classid), function ($query) use ($request) {
                         $query->where('co.class_id', '=', $request->classid);
                     })
@@ -3016,6 +3067,9 @@ class FeesController extends AppBaseController
                         ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
+                        ->when(isset($classLevel), function ($query) use ($classLevel) {
+                            $query->where('c.nama', 'like', "$classLevel%");
+                        })
                         ->when(isset($request->classid), function ($query) use ($request) {
                             $query->where('co.class_id', '=', $request->classid);
                         })
@@ -3042,6 +3096,9 @@ class FeesController extends AppBaseController
                         ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
                         ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
                         ->where('sfn.fees_id', $fees->id)
+                        ->when(isset($classLevel), function ($query) use ($classLevel) {
+                            $query->where('c.nama', 'like', "$classLevel%");
+                        })
                         ->when(isset($request->classid), function ($query) use ($request) {
                             $query->where('co.class_id', '=', $request->classid);
                         })
