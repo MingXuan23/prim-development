@@ -33,6 +33,15 @@
 
                 </li>
                 @endrole
+
+                <li>
+                    <a href="/social-media" class="waves-effect" target="_blank">
+                        <i class="fas fa-users"></i>
+                        <span>Media Sosial</span>
+                    </a>
+
+                </li>
+
                 @role('Admin|Pentadbir')
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -443,8 +452,7 @@
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
                         @role('Superadmin|Pentadbir|Pentadbir Swasta|Guru|Guru Swasta')
                         <li>
-                            <a href="{{ route('student.parentRegisterStudents.index') }}" class=" waves-effect"
-                                aria-expanded="true">
+                            <a href="{{ route('student.parentRegisterStudents.index') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-user-graduate"></i>
                                 <span>Pendaftaran Pelajar</span>
                             </a>
@@ -575,15 +583,13 @@
 
                         @role('Superadmin|Pentadbir|Pentadbir Swasta')
                         <li>
-                            <a href="{{ route('fees.assignFeesToStudentIndex') }}" class=" waves-effect"
-                                aria-expanded="true">
+                            <a href="{{ route('fees.assignFeesToStudentIndex') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-edit"></i>
                                 <span>Ubah Yuran</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('fees.assignStudentsToFeeIndex') }}" class=" waves-effect"
-                                aria-expanded="true">
+                            <a href="{{ route('fees.assignStudentsToFeeIndex') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-edit"></i>
                                 <span>Ubah Pembayar</span>
                             </a>
