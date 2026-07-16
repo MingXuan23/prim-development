@@ -136,6 +136,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     //Route::get('getReferralCode', 'PointController@getReferralCode')->name('donate.getReferralCode');
 });
 
+// Route::get("updateStreak", "DonationController@updateStreak");
+
 
 Route::get('point/policy', 'PointController@pointPolicy')->name('point.pointPolicy');
 Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
@@ -168,6 +170,29 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('testRepeater', 'OrganizationController@testRepeater');
     Route::post('parent-koop', 'OrganizationController@fetchAvailableParentKoop')->name('organization.fetchAvailableParentKoop');
     Route::get('/edit-merchant/{id}', 'Merchant\AdminRegular\DashboardController@edit')->name('admin-reg.edit-merchant'); // edit for merchant
+});
+
+Route::group(['prefix' => 'social-media', 'middleware' => 'auth'], function () {
+    // page routes
+    Route::get('/', 'SocialMediaController@index')->name('social-media.index');
+    Route::get('/profile', 'SocialMediaController@profile')->name('social-media.profile');
+    Route::get('/create-post', 'SocialMediaController@createPost')->name('social-media.createPost');
+    Route::get('/saves', 'SocialMediaController@saves')->name('social-media.saves');
+    Route::get('/search-user-page', 'SocialMediaController@searchUserIndex')->name('social-media.searchUserIndex');
+    Route::get('/donation-posts', 'SocialMediaController@donationPostsIndex')->name('social-media.donationPostsIndex');
+
+    // crud routes
+    Route::post('/add-post', 'SocialMediaController@addPost')->name('social-media.addPost');
+    Route::post('/add-comment', 'SocialMediaController@addComment')->name('social-media.addComment');
+    Route::post('/toggle-like', 'SocialMediaController@toggleLike')->name('social-media.toggleLike');
+    Route::post('/toggle-save', 'SocialMediaController@toggleSave')->name('social-media.toggleSave');
+    Route::get("/comments", "SocialMediaController@getCommentsByPostIdJson")->name('social-media.getCommentsByPostIdJson');
+    Route::get("/getPhotoPostsByUserIdJson", "SocialMediaController@getPhotoPostsByUserIdJson")->name('social-media.getPhotoPostsByUserIdJson');
+    Route::get("/getVideoPostsByUserIdJson", "SocialMediaController@getVideoPostsByUserIdJson")->name('social-media.getVideoPostsByUserIdJson');
+    Route::get("/getPostByIdJson", "SocialMediaController@getPostByIdJson")->name('social-media.getPostByIdJson');
+    Route::get("/getDonationsByUserIdJson", "SocialMediaController@getDonationsByUserIdJson")->name('social-media.getDonationsByUserIdJson');
+    Route::get("/getPostsByUserIdJson", "SocialMediaController@getPostsByUserIdJson")->name('social-media.getPostsByUserIdJson');
+    Route::post("/followUser", "SocialMediaController@followUser")->name('social-media.followUser');
 });
 
 Route::group(['prefix' => 'teacher'], function () {
@@ -623,6 +648,7 @@ Route::group(['middleware' => ['auth']], function () {
         'admin/reward' => 'ReferralCodeRewardController'
     ]);
 });
+// Route::get('testUpdateTransaction/{id}/{status}', 'DirectPayController@testUpdateTransaction')->name('testUpdateTransaction');
 Route::get('adminTestFpx/{id}/', 'DirectPayController@adminTestFpx')->name('adminTestFpx');
 Route::get('adminHandle', 'DirectPayController@handle');
 Route::get('testcallback', 'DirectPayController@testcallback');
