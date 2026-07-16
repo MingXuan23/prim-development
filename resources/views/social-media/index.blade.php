@@ -114,7 +114,6 @@
                     <div class="shared-donation-card">
                         <img src="{{ URL::asset('donation-poster/' . $post->donation_post->donation_poster) }}" class="donation-poster">
                         <h5>{{ $post->donation_post->nama }}</h5>
-                        {{ $post->donation_share_url }}
                         <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->donation_share_url) ? $post->donation_share_url : $post->donation_post->url) }}" target="_blank">Derma
                             Sekarang</a>
                     </div>
