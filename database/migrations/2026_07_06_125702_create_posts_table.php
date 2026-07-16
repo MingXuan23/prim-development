@@ -20,6 +20,7 @@ class CreatePostsTable extends Migration
             $table->string("media_url", 255)->nullable();
             $table->foreignId("user_id")->constrained("users")->onDelete("restrict");
             $table->foreignId("post_id")->nullable()->constrained("posts")->onDelete("restrict");
+            $table->foreignId("shared_donation_id")->nullable()->constrained("donations")->onDelete("restrict");
             $table->timestamps();
         });
     }
