@@ -172,7 +172,7 @@ Route::group(['prefix' => 'organization'], function () {
     Route::get('/edit-merchant/{id}', 'Merchant\AdminRegular\DashboardController@edit')->name('admin-reg.edit-merchant'); // edit for merchant
 });
 
-Route::group(['prefix' => 'social-media'], function () {
+Route::group(['prefix' => 'social-media', 'middleware' => 'auth'], function () {
     // page routes
     Route::get('/', 'SocialMediaController@index')->name('social-media.index');
     Route::get('/profile', 'SocialMediaController@profile')->name('social-media.profile');

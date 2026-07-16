@@ -17,45 +17,17 @@ class SocialMediaController extends Controller
 {
     private $MAX_RESULT_LIMIT = 15;
 
-    // method to check if the user has liked or saved the post
-    private function getIsLikedAndIsSaved($posts)
-    {
-        $posts->each(function ($post) {
-            // check whether the current user has liked this post
-            $post->is_liked = $post->likes()
-                ->where("user_id", "=", Auth::id())
-                ->exists();
-
-            // check whether the current user has saved this post
-            $post->is_saved = $post->saves()
-                ->where("user_id", "=", Auth::id())
-                ->exists();
-        });
-
-        return $posts;
-    }
-
     public function index(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         $search = $request->get('search');
 
         $posts = $this->getPostsByUserId(null, null, $search);
-
-        $posts = $this->getIsLikedAndIsSaved($posts);
 
         return view('social-media.index', compact('posts'));
     }
 
     public function searchUserIndex(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         $search = trim($request->get('search'));
 
         $users = User::select("id", "name", "profile_image")
@@ -80,19 +52,11 @@ class SocialMediaController extends Controller
 
     public function createPost()
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         return view('social-media.create-post');
     }
 
     public function toggleLike(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -131,10 +95,6 @@ class SocialMediaController extends Controller
 
     public function toggleSave(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -173,10 +133,6 @@ class SocialMediaController extends Controller
 
     public function addPost(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         $content = $request->get('content');
         $media = null;
         $sharedDonationId = $request->get('shared_donation_id');  // used for sharing donation posters
@@ -196,10 +152,6 @@ class SocialMediaController extends Controller
 
     public function addComment(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -258,30 +210,33 @@ class SocialMediaController extends Controller
 
     public function saves()
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         $posts = Post::with("user:id,name,profile_image")
             ->whereNull("post_id")
             ->withCount(["likes", "comments"])
+            ->withCount([
+                "likes as is_liked" => function ($query) {
+                    $query->where("user_id", "=", Auth::id());
+                },
+                "saves as is_saved" => function ($query) {
+                    $query->where("user_id", "=", Auth::id());
+                }
+            ])
             ->whereHas("saves", function ($query) {
                 $query->where("user_id", "=", Auth::id());
             })
             ->orderByDesc("created_at")
             ->get();
 
-        $posts = $this->getIsLikedAndIsSaved($posts);
+        $posts->each(function ($post) {
+            $post->is_liked = $post->is_liked > 0;
+            $post->is_saved = $post->is_saved > 0;
+        });
 
         return view('social-media.index', compact('posts'));
     }
 
     public function getCommentsByPostIdJson(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -318,10 +273,6 @@ class SocialMediaController extends Controller
 
     public function profile(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         $userId = $request->get("user_id") ?? Auth::id();
         $user = User::withCount(["followers", "followed_users", "organization"])->find($userId);
 
@@ -345,10 +296,6 @@ class SocialMediaController extends Controller
 
     public function getPostsByUserIdJson(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -360,7 +307,6 @@ class SocialMediaController extends Controller
         }
 
         $posts = $this->getPostsByUserId($userId, null, null);
-        $posts = $this->getIsLikedAndIsSaved($posts);
 
         return response()->json(["posts" => $posts]);
     }
@@ -371,6 +317,14 @@ class SocialMediaController extends Controller
             ->with("donation_post")
             ->whereNull("post_id")
             ->withCount(["likes", "comments"])
+            ->withCount([
+                "likes as is_liked" => function ($query) {
+                    $query->where("user_id", "=", Auth::id());
+                },
+                "saves as is_saved" => function ($query) {
+                    $query->where("user_id", "=", Auth::id());
+                }
+            ])
             ->when(isset($userId), function ($query) use ($userId) {
                 $query->where("user_id", "=", $userId);
             })
@@ -384,6 +338,9 @@ class SocialMediaController extends Controller
             ->get();
 
         $posts->each(function ($post) {
+            $post->is_liked = $post->is_liked > 0;
+            $post->is_saved = $post->is_saved > 0;
+
             $referralCode = app(PointController::class)->getReferralCode(true, $post->user->id);
 
             if (isset($referralCode) && isset($post->donation_post)) {
@@ -396,10 +353,6 @@ class SocialMediaController extends Controller
 
     public function getPostByIdJson(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -413,25 +366,30 @@ class SocialMediaController extends Controller
         $post = Post::with("user:id,name,profile_image")
             ->whereNull("post_id")
             ->withCount(["likes", "comments"])
+            ->withCount([
+                "likes as is_liked" => function ($query) {
+                    $query->where("user_id", "=", Auth::id());
+                },
+                "saves as is_saved" => function ($query) {
+                    $query->where("user_id", "=", Auth::id());
+                }
+            ])
             ->where("id", "=", $postId)
             ->orderByDesc("created_at")
             ->first();
 
-        $post = $this->getIsLikedAndIsSaved(collect([$post]))[0];
-
         if (!isset($post)) {
             return response()->json(["error" => "No post found with given post ID."]);
         }
+
+        $post->is_liked = $post->is_liked > 0;
+        $post->is_saved = $post->is_saved > 0;
 
         return response()->json(["post" => $post]);
     }
 
     public function getPhotoPostsByUserIdJson(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -445,10 +403,6 @@ class SocialMediaController extends Controller
 
     public function getVideoPostsByUserIdJson(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -462,10 +416,6 @@ class SocialMediaController extends Controller
 
     public function getDonationsByUserIdJson(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         if (!$request->ajax()) {
             return;
         }
@@ -538,10 +488,6 @@ class SocialMediaController extends Controller
 
     public function donationPostsIndex(Request $request)
     {
-        if (Auth::user() == null) {
-            return redirect('/login');
-        }
-
         $search = $request->get('search');
 
         $donations = Donation::where("status", "=", 1)
