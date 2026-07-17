@@ -13,6 +13,11 @@
             margin: 0 auto;
         }
 
+        #media-input-section {
+            display: flex;
+            gap: 5px;
+        }
+
         .post-card {
             background-color: white;
             border-radius: 10px;
@@ -23,6 +28,13 @@
 
         textarea {
             resize: none !important;
+        }
+
+        #media-preview {
+            max-height: 350px;
+            display: block;
+            margin: 10px auto;
+            object-fit: contain;
         }
     </style>
 @endsection
@@ -50,7 +62,11 @@
                 </div>
                 <div class="form-group">
                     <label>Media</label>
-                    <input type="file" class="form-control" name="media" accept="image/*,video/*">
+                    <div id="media-input-section">
+                        <input type="file" class="form-control" name="media" id="media" accept="image/*,video/*">
+                        <button class="btn btn-secondary" type="button" id="close-preview-btn">Clear</button>
+                    </div>
+                    <img src="" id="media-preview">
                 </div>
 
                 <div class="text-center">
@@ -67,6 +83,23 @@
         $(document).ready(function () {
             $("#cancel").click(function () {
                 window.location = "/social-media";
+            });
+
+            $("#media").change(function () {
+                let media = $(this)[0].files[0];
+
+                if (!media) return;
+
+                let mediaUrl = URL.createObjectURL(media);
+
+                $("#media-preview").prop("src", mediaUrl);
+            });
+
+            $("#close-preview-btn").click(function (e) {
+                e.preventDefault();
+
+                $("#media").val("");
+                $("#media-preview").prop("src", "");
             })
         });
     </script>
