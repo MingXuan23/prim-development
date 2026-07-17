@@ -282,6 +282,7 @@
                 e.preventDefault();
 
                 closeMediaPreview();
+                $("#comment-media").val("");
             });
 
             function closeMediaPreview() {

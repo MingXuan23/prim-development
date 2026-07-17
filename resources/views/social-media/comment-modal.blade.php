@@ -37,8 +37,18 @@
         cursor: pointer;
     }
 
-    #comments-modal {
+    #comment-modal {
         max-height: 700px;
+    }
+
+    .modal-content {
+        height: 100%;
+    }
+
+    .modal-dialog {
+        height: 100%;
+        max-height: 600px;
+        margin: 20px auto;
     }
 
     #modal-footer {
@@ -60,7 +70,8 @@
 
     #comment-media-preview .preview-media {
         width: 100%;
-        object-fit: cover;
+        max-height: 100px;
+        object-fit: contain;
         border-radius: 10px;
     }
 
