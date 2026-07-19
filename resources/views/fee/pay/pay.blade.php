@@ -33,7 +33,7 @@
             $i =0 ;
             @endphp
             <div class="card-text p-4">
-                <img src="{{ URL::asset('/organization-picture/' . $getorganization->organization_picture }}" height="100" class="d-block mx-auto mb-3">
+                <img src="{{ URL::asset('/organization-picture/'  . $getorganization->organization_picture) }}" height="100" class="d-block mx-auto mb-3">
 
                 <h4 class=" mb-3" style="text-align: center">
                     {{ $getorganization->nama }}</h4>
