@@ -96,7 +96,7 @@
                                                         aria-expanded="true"
                                                         aria-controls="collapse{{ $organization->id }}-{{ $organization->user_id }}"
                                                         class="d-block position-relative text-dark text-uppercase collapsible-link py-2">
-                                                        {{ $data->category }}</a></h6>
+                                                        {{ $data->category }} &nbsp;&nbsp;&nbsp; (Sila tanda ✅ pada jenis yuran yang ingin dibayar)</a></h6>
 
                                                 <div id="collapse{{ $organization->id }}-{{ $organization->user_id }}"
                                                     aria-labelledby="heading{{ $organization->id }}-{{ $organization->user_id }}"
@@ -116,8 +116,7 @@
                                                                 <br>
                                                                 <span
                                                                     style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }}
-                                                                    ({{ $item->quantity }}
-                                                                    kuantiti)</span>
+                                                                    </span>
                                                             </label>
 
                                                             {{-- hidden input checkbox second --}}
@@ -217,7 +216,7 @@
                                                                             aria-expanded="true"
                                                                             aria-controls="collapse{{ $data->studentid }}-{{ $data->organization_id  }}"
                                                                             class="d-block position-relative text-dark text-uppercase collapsible-link py-2">
-                                                                            {{ $data->category }}</a></h6>
+                                                                            {{ $data->category }} &nbsp;&nbsp;&nbsp; (Sila tanda ✅ pada jenis yuran yang ingin dibayar)</a></h6>
 
                                                                     <div id="collapse{{ $data->studentid }}-{{ $data->organization_id }}"
                                                                         aria-labelledby="heading{{ $data->studentid }}-{{ $data->organization_id  }}"
@@ -238,7 +237,7 @@
                                                                                     <label for="option-{{ $item->id }}-{{ $data->studentid }}">
                                                                                         <span style="font-size: 18px">{{ $item->name }}</span>
                                                                                         <br>
-                                                                                        <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
+                                                                                        <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->totalAmount, 2, '.', '') }}</span>
                                                                                     </label>
 
                                                                                     {{-- hidden input checkbox second --}}
@@ -266,7 +265,7 @@
                                                                                         <span style="font-size: 14px;font-weight:100;">{{ date('d/m/Y', strtotime($item->start_date)) }} - {{ date('d/m/Y', strtotime($item->end_date)) }} ({{ $item->totalDay }} hari)</span>
                                                                                         <br>
                                                                                         @if($item->totalAmount == $item->finalAmount)
-                                                                                            <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
+                                                                                            <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }}</span>
                                                                                         @else
                                                                                             <div class="icons d-inline">
                                                                                                 <div class="fas fa-info-circle" 
@@ -276,7 +275,7 @@
                                                                                                     Jumlah Terkini = RM{{  number_format((float)$item->finalAmount / $item->totalDay, 2, '.', '') }}/hari.">
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <span class="d-inline" style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span>
+                                                                                            <span class="d-inline" style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }}</span>
                                                                                         @endif
                                                                                         {{-- <span style="font-size: 14px;font-weight:100;">RM{{  number_format((float)$item->finalAmount, 2, '.', '') }} ({{ $item->quantity }} kuantiti)</span> --}}
                                                                                         {{-- <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="right" title="Tooltip on right">
