@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,17 +92,24 @@
             color: #999;
             padding: 20px;
         }
+
         .footer a {
             color: #999;
         }
-        .footer p, .footer a, .footer unsubscribe, .footer td {
+
+        .footer p,
+        .footer a,
+        .footer unsubscribe,
+        .footer td {
             font-size: 12px;
         }
 
         /* -------------------------------------
             TYPOGRAPHY
         ------------------------------------- */
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
             color: #000;
             margin: 40px 0 0;
@@ -128,11 +135,16 @@
             font-weight: 600;
         }
 
-        p, ul, ol {
+        p,
+        ul,
+        ol {
             margin-bottom: 10px;
             font-weight: normal;
         }
-        p li, ul li, ol li {
+
+        p li,
+        ul li,
+        ol li {
             margin-left: 5px;
             list-style-position: inside;
         }
@@ -199,18 +211,22 @@
             text-align: center;
             border-radius: 3px 3px 0 0;
         }
+
         .alert a {
             color: #fff;
             text-decoration: none;
             font-weight: 500;
             font-size: 16px;
         }
+
         .alert.alert-warning {
             background: #f8ac59;
         }
+
         .alert.alert-bad {
             background: #ed5565;
         }
+
         .alert.alert-good {
             background: #1ab394;
         }
@@ -224,15 +240,19 @@
             text-align: left;
             width: 80%;
         }
+
         .invoice td {
             padding: 5px 0;
         }
+
         .invoice .invoice-items {
             width: 100%;
         }
+
         .invoice .invoice-items td {
             border-top: #eee 1px solid;
         }
+
         .invoice .invoice-items .total td {
             border-top: 2px solid #333;
             border-bottom: 2px solid #333;
@@ -243,7 +263,11 @@
             RESPONSIVE AND MOBILE FRIENDLY STYLES
         ------------------------------------- */
         @media only screen and (max-width: 640px) {
-            h1, h2, h3, h4 {
+
+            h1,
+            h2,
+            h3,
+            h4 {
                 font-weight: 600 !important;
                 margin: 20px 0 5px !important;
             }
@@ -264,7 +288,8 @@
                 width: 100% !important;
             }
 
-            .content, .content-wrap {
+            .content,
+            .content-wrap {
                 padding: 10px !important;
             }
 
@@ -274,67 +299,79 @@
         }
     </style>
 </head>
+
 <body>
     <table class="body-wrap">
-    <tbody><tr>
-        <td></td>
-        <td class="container" width="600">
-            <div class="content">
-                <table class="main" width="100%" cellpadding="0" cellspacing="0">
-                    <tbody><tr>
-                        <td class="content-wrap aligncenter">
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tbody><tr>
-                                    <td class="content-block">
-                                        <h2>{{ $organizationName }}</h2>
-                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">({{ $ogranizationAddress }})</h3>
-                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
-                                    </td>
-                                </tr>
+        <tbody>
+            <tr>
+                <td></td>
+                <td class="container" width="600">
+                    <div class="content">
+                        <table class="main" width="100%" cellpadding="0" cellspacing="0">
+                            <tbody>
                                 <tr>
-                                    <td class="content-block">
-                                        <table class="invoice">
+                                    <td class="content-wrap aligncenter">
+                                        <table width="100%" cellpadding="0" cellspacing="0">
                                             <tbody>
                                                 <tr>
-                                                <td>
-                                                    <b>Nama :</b> {{ $transactionUsername }}<br>
-                                                    <b>Email :</b> {{ $transactionEmail }}<br>
-                                                    <b>Nombor Resit :</b> {{ $transactionName }}<br>
-                                                    <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transactionDate)) }}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <table class="invoice-items" cellpadding="0" cellspacing="0">
-                                                        <tbody><tr>
-                                                            <td>{{ $donationName }}</td>
-                                                            <td class="alignright">RM {{ number_format($transactionAmount , 2, '.', '') }}</td>
-                                                        </tr>
-                                                        {{-- <tr>
-                                                            <td>Tax (Paid By JAIM)</td>
-                                                            <td class="alignright">RM 1.00</td>
-                                                        </tr> --}}
-                                                        <tr class="total">
-                                                            <td class="alignright" width="80%">Total</td>
-                                                            <td class="alignright">RM  {{ number_format($transactionAmount , 2, '.', '') }}</td>
-                                                        </tr>
-                                                    </tbody></table>
-                                                </td>
-                                            </tr>
-                                        </tbody></table>
+                                                    <td class="content-block">
+                                                        <center>
+                                                            <img src="{{ URL::asset('/organization-picture/' . $organizationPic) }}" height="80" />
+                                                        </center>
+
+                                                        <h2>{{ $organizationName }}</h2>
+                                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">({{ $ogranizationAddress }})</h3>
+                                                        <h3 style="margin: 20px 0 0 0; font-size: 14px !important">{{ $organizationTelNo }} | {{ $organizationEmail }}</h3>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="content-block">
+                                                        <table class="invoice">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <b>Nama :</b> {{ $transactionUsername }}<br>
+                                                                        <b>Email :</b> {{ $transactionEmail }}<br>
+                                                                        <b>Nombor Resit :</b> {{ $transactionName }}<br>
+                                                                        <b>Tarikh Derma :</b> {{ date('d-m-Y', strtotime($transactionDate)) }}
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>
+                                                                        <table class="invoice-items" cellpadding="0" cellspacing="0">
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{{ $donationName }}</td>
+                                                                                    <td class="alignright">RM {{ number_format($transactionAmount, 2, '.', '') }}</td>
+                                                                                </tr>
+                                                                                {{-- <tr>
+                                                                                    <td>Tax (Paid By JAIM)</td>
+                                                                                    <td class="alignright">RM 1.00</td>
+                                                                                </tr> --}}
+                                                                                <tr class="total">
+                                                                                    <td class="alignright" width="80%">Total</td>
+                                                                                    <td class="alignright">RM {{ number_format($transactionAmount, 2, '.', '') }}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-        </td>
-        <td></td>
-    </tr>
-</tbody>
-</table>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
 </body>
+
 </html>
