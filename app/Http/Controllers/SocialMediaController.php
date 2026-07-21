@@ -371,6 +371,7 @@ class SocialMediaController extends Controller
         }
 
         $post = Post::with("user:id,name,profile_image")
+            ->with("donation_post")
             ->whereNull("post_id")
             ->withCount(["likes", "comments"])
             ->withCount([

@@ -245,7 +245,8 @@
 
         <div class="profile-card-header">
             <div class="user-info-section">
-                <img src="{{ URL::asset('assets/images/users/user-4.jpg') }}" class="profile-img-lg">
+                <img src="{{ isset($userData['profile_image']) ? URL::asset('uploads/profile_picture/' . $userData['profile_image']) : URL::asset('assets/images/users/user-4.jpg') }}"
+                    class="profile-img-lg">
 
                 <div class="personal-info">
                     <h3>{{ $userData["name"] }}</h3>
@@ -622,6 +623,7 @@
                                 mediaElement = "<video src='/uploads/post_media/" + (post.media_url) + "' class='post-media' controls></video>"
                             } else if (post.donation_post) {
                                 mediaElement = "<div class='shared-donation-card'><img src='/donation-poster/" + post.donation_post.donation_poster + "' class='donation-poster'>" +
+                                    "<h5>" + post.donation_post.nama + "</h5>" +
                                     "<a class='btn btn-primary' href='/sumbangan_anonymous/" + post.donation_post.url + "' target='_blank'>Derma Sekarang</a>";
                             }
 
@@ -746,6 +748,7 @@
                 $("#comments-section").empty();
                 $("#comment-modal .modal-body #like-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .modal-body #save-icon").addClass("far").removeClass("fas");
+                $("#comment-modal .shared-donation-card").hide();
 
                 $.ajax({
                     type: "GET",
@@ -790,6 +793,14 @@
                         $("#comment-modal .modal-body #comments-count").text(commentsCount);
                         $("#comment-modal .modal-body .post-card-footer").data("postid", postId);
 
+                        if (response.post.donation_post) {
+                            // shared donation poster
+                            $("#comment-modal .shared-donation-card").show();
+                            $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
+                            $("#comment-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
+                            $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
+                        }
+
                         $(".post-card-footer[data-postid='" + postId + "']").find(".like-btn p").text(likesCount);
                         $(".post-card-footer[data-postid='" + postId + "']").find(".comment-btn p").text(commentsCount);
 
@@ -827,7 +838,7 @@
 
             function addCommentCard(comment) {
                 // function to add comments to the UI
-                let profileImagePath = comment.user.profile_image ? "/uploads/profile_image/" + comment.user.profile_image : "/assets/images/users/user-4.jpg";
+                let profileImagePath = comment.user.profile_image ? "/uploads/profile_picture/" + comment.user.profile_image : "/assets/images/users/user-4.jpg";
                 let mediaPath = comment.media_url == "" ? "" : "/uploads/post_media/" + comment.media_url;
                 let newComment = "<div class='comment'>" +
                     "<img src='" + profileImagePath + "' class='profile-img'>" +
