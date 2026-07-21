@@ -53,13 +53,13 @@
             justify-content: space-between;
         }
 
-        .social-media-buttons {
+        .post-action-buttons {
             width: 30%;
             display: flex;
             justify-content: space-between;
         }
 
-        .social-media-buttons a,
+        .post-action-buttons a,
         .save-btn {
             cursor: pointer;
         }
@@ -120,7 +120,7 @@
                 @endif
 
                 <div class="post-card-footer" data-postid="{{ $post->id }}">
-                    <div class="social-media-buttons">
+                    <div class="post-action-buttons">
                         <a class="text-danger like-btn">
                             <i class="{{ $post->is_liked ? 'fas' : 'far' }} fa-heart" id="like-icon"></i>
                             <p class="d-inline">{{ $post->likes_count }}</p>
