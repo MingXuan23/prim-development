@@ -53,19 +53,19 @@
         <div id="users" class="w-100 d-flex flex-column align-items-center">
             @foreach ($notifications as $notification)
                 <div class="notification-card">
-                    @if ($notification->type == "like")
+                    @if ($notification->source_name == "likes")
                         <i class="fas fa-heart" id="like-icon"></i>
                         <div class="notification-info">
-                            <a href="{{ route('social-media.profile', ['user_id' => $notification->like->user_id]) }}">
+                            <a href="{{ route('social-media.profile', ['user_id' => $notification->from_user_id]) }}">
                                 <h5>{{ $notification->content }}</h5>
                             </a>
                             <p class="text-gray">{{ $notification->created_at }}</p>
                         </div>
-                    @elseif ($notification->type == "follow")
-                        <img src="{{ isset($notification->follow->follower->profile_image) ? URL::asset('uploads/profile_picture/' . $notification->follow->follower->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}"
+                    @elseif ($notification->source_name == "follows")
+                        <img src="{{ isset($notification->profile_image) ? URL::asset('uploads/profile_picture/' . $notification->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}"
                             class="notification-profile-img">
                         <div class="notification-info">
-                            <a href="{{ route('social-media.profile', ['user_id' => $notification->follow->follower_user_id]) }}">
+                            <a href="{{ route('social-media.profile', ['user_id' => $notification->follower_user_id]) }}">
                                 <h5>{{ $notification->content }}</h5>
                             </a>
                             <p class="text-gray">{{ $notification->created_at }}</p>

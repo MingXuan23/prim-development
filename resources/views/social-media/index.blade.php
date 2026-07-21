@@ -366,7 +366,7 @@
 
             function addCommentCard(comment) {
                 // function to add comments to the UI
-                let profileImagePath = comment.user.profile_image ? "uploads/profile_image/" + comment.user.profile_image : "assets/images/users/user-4.jpg";
+                let profileImagePath = comment.user.profile_image ? "uploads/profile_picture/" + comment.user.profile_image : "assets/images/users/user-4.jpg";
                 let mediaPath = comment.media_url == "" ? "" : "uploads/post_media/" + comment.media_url;
                 let newComment = "<div class='comment'>" +
                     "<img src='" + profileImagePath + "' class='profile-img'>" +

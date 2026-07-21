@@ -294,7 +294,8 @@ class SocialMediaController extends Controller
             "organization_count" => $user->organization_count,
             "followers_count" => $user->followers_count,
             "followed_users_count" => $user->followed_users_count,
-            "is_following" => $user->is_following
+            "is_following" => $user->is_following,
+            "profile_image" => $user->profile_image
         ];
 
         return view('social-media.profile', compact('userData'));
@@ -511,33 +512,24 @@ class SocialMediaController extends Controller
 
     public function notificationsIndex()
     {
-        $notifications = Notification::where("user_id", "=", Auth::id())
-            ->orderByDesc("created_at")
+        $notifications = Notification::leftJoin("likes as l", function ($query) {
+            $query->on("notifications.source_id", "l.id")
+                ->where("notifications.source_name", "likes");
+        })
+            ->leftJoin("follows as f", function ($query) {
+                $query->on("notifications.source_id", "f.id")
+                    ->where("notifications.source_name", "follows");
+            })
+            ->leftJoin("users as u", "u.id", "f.follower_user_id")
+            ->where("notifications.user_id", "=", Auth::id())
+            ->select(
+                "notifications.*",
+                "f.follower_user_id",
+                "u.profile_image",
+                "l.user_id as from_user_id"  // the user who liked the post
+            )
+            ->orderByDesc("notifications.created_at")
             ->get();
-
-        $likeIds = [];
-        $followIds = [];
-
-        foreach ($notifications as $notification) {
-            $notification->decoded_data = json_decode($notification->data);
-
-            if ($notification->type == "like") {
-                $likeIds[] = $notification->decoded_data->like_id;
-            } else if ($notification->type == "follow") {
-                $followIds[] = $notification->decoded_data->follow_id;
-            }
-        }
-
-        $likes = Like::whereIn("id", $likeIds)->get()->keyBy("id");
-        $follows = Follow::whereIn("id", $followIds)->get()->keyBy("id");
-
-        foreach ($notifications as $notification) {
-            if ($notification->type == "like") {
-                $notification->like = $likes[$notification->decoded_data->like_id];
-            } else if ($notification->type == "follow") {
-                $notification->follow = $follows[$notification->decoded_data->follow_id];
-            }
-        }
 
         return view('social-media.notifications', compact('notifications'));
     }
@@ -550,30 +542,23 @@ class SocialMediaController extends Controller
     //         $content = "$user->name has liked your post.";
     //     }
 
-    //     $json = json_encode([
-    //         "like_id" => $like->id
-    //     ]);
-
-    //     $this->insertNotification($content, "like", $post->user_id, $json);
+    //     $this->insertNotification($content, "likes", $post->user_id, $like->id);
     // }
 
     // private function createFollowNotification($user, $follow)
     // {
     //     $content = "$user->name has followed you.";
-    //     $json = json_encode([
-    //         "follow_id" => $follow->id
-    //     ]);
 
-    //     $this->insertNotification($content, "follow", $follow->followed_user_id, $json);
+    //     $this->insertNotification($content, "follows", $follow->followed_user_id, $follow->id);
     // }
 
-    // private function insertNotification($content, $type, $userId, $json)
+    // private function insertNotification($content, $sourceName, $userId, $sourceId)
     // {
     //     Notification::create([
     //         "content" => $content,
-    //         "type" => $type,
+    //         "source_name" => $sourceName,
+    //         "source_id" => $sourceId,
     //         "user_id" => $userId,
-    //         "data" => $json,
     //     ]);
     // }
 }

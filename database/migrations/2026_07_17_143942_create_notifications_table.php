@@ -16,10 +16,13 @@ class CreateNotificationsTable extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
             $table->string("content");
-            $table->string("type");
             $table->timestamps();
-            $table->json("data");
+            $table->json("data")->nullable();
+            $table->string("source_name");
+            $table->bigInteger("source_id", false, true);
             $table->foreignId("user_id")->constrained("users")->onDelete("restrict");
+
+            $table->index(["source_name", "source_id"]);
         });
     }
 
