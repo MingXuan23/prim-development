@@ -180,6 +180,7 @@ Route::group(['prefix' => 'social-media', 'middleware' => 'auth'], function () {
     Route::get('/saves', 'SocialMediaController@saves')->name('social-media.saves');
     Route::get('/search-user-page', 'SocialMediaController@searchUserIndex')->name('social-media.searchUserIndex');
     Route::get('/donation-posts', 'SocialMediaController@donationPostsIndex')->name('social-media.donationPostsIndex');
+    Route::get('/notifications', 'SocialMediaController@notificationsIndex')->name('social-media.notificationsIndex');
 
     // crud routes
     Route::post('/add-post', 'SocialMediaController@addPost')->name('social-media.addPost');

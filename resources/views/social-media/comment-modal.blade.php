@@ -131,6 +131,24 @@
         max-height: 500px;
         overflow: auto;
     }
+
+    .shared-donation-card {
+        max-width: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin: 0 auto;
+    }
+
+    .shared-donation-card img {
+        width: 100%;
+        border-radius: 10px;
+    }
+
+    .shared-donation-card a {
+        width: 100%;
+    }
 </style>
 
 {{-- comment modal --}}
@@ -157,6 +175,12 @@
                     <p class="text-lg" id="post-content"></p>
 
                     <div id="modal-media"></div>
+
+                    <div class="shared-donation-card">
+                        <img src="" class="donation-poster">
+                        <h5 id="donation-name"></h5>
+                        <a class="btn btn-primary" href="" target="_blank" id="donate-now-btn">Derma Sekarang</a>
+                    </div>
 
                     <div class="post-card-footer">
                         <div class="post-action-buttons">

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Follow;
 use App\Like;
 use App\Models\Donation;
+use App\Notification;
 use App\Post;
 use App\Save;
 use App\User;
@@ -62,30 +63,39 @@ class SocialMediaController extends Controller
         }
 
         try {
+            $user = Auth::user();
             $postId = $request->get("post_id");
-            $userId = Auth::id();
 
-            // check if it is liked or not
-            $isLiked = Like::where("user_id", "=", $userId)
-                ->where("post_id", "=", $postId)
-                ->exists();
-
-            if ($isLiked) {
-                // if yes, remove the like 
-                Like::where("user_id", "=", $userId)
+            DB::transaction(function () use ($postId, $user) {
+                // check if it is liked or not
+                $like = Like::where("user_id", "=", $user->id)
                     ->where("post_id", "=", $postId)
-                    ->delete();
-            } else {
-                // if not, create a new like
-                Like::create([
-                    "user_id" => $userId,
-                    "post_id" => $postId,
-                ]);
-            }
+                    ->first();
 
-            $updatedLikesCount = Post::withCount("likes")
-                ->find($postId)
-                ->likes_count;
+                if ($like) {
+                    // if yes, remove the like with the notification
+                    // Notification::where("type", "=", "like")
+                    //     ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.like_id')) = ?", [$like->id])
+                    //     ->delete();
+
+                    $like->delete();
+                } else {
+                    // if not, create a new like
+                    $newLike = Like::create([
+                        "user_id" => $user->id,
+                        "post_id" => $postId,
+                    ]);
+
+                    // $post = Post::find($postId);
+
+                    // if ($post->user_id != $user->id) {
+                    //     // if the current user liking other people's post, create a new notification for the liked user
+                    //     $this->createLikeNotification($user, $newLike, $post);
+                    // }
+                }
+            });
+
+            $updatedLikesCount = Like::where("post_id", "=", $postId)->count();
 
             return response()->json(["updatedLikesCount" => $updatedLikesCount]);
         } catch (Exception $e) {
@@ -104,15 +114,13 @@ class SocialMediaController extends Controller
             $userId = Auth::id();
 
             // check if it is saved or not
-            $isSaved = Save::where("user_id", "=", $userId)
+            $save = Save::where("user_id", "=", $userId)
                 ->where("post_id", "=", $postId)
-                ->exists();
+                ->first();
 
-            if ($isSaved) {
+            if ($save) {
                 // if yes, remove the save 
-                Save::where("user_id", "=", $userId)
-                    ->where("post_id", "=", $postId)
-                    ->delete();
+                $save->delete();
             } else {
                 // if not, create a new save
                 Save::create([
@@ -121,9 +129,7 @@ class SocialMediaController extends Controller
                 ]);
             }
 
-            $updatedSavesCount = Post::withCount("saves")
-                ->find($postId)
-                ->saves_count;
+            $updatedSavesCount = Save::where("post_id", "=", $postId)->count();
 
             return response()->json(["updatedSavesCount" => $updatedSavesCount]);
         } catch (Exception $e) {
@@ -288,7 +294,8 @@ class SocialMediaController extends Controller
             "organization_count" => $user->organization_count,
             "followers_count" => $user->followers_count,
             "followed_users_count" => $user->followed_users_count,
-            "is_following" => $user->is_following
+            "is_following" => $user->is_following,
+            "profile_image" => $user->profile_image
         ];
 
         return view('social-media.profile', compact('userData'));
@@ -364,6 +371,7 @@ class SocialMediaController extends Controller
         }
 
         $post = Post::with("user:id,name,profile_image")
+            ->with("donation_post")
             ->whereNull("post_id")
             ->withCount(["likes", "comments"])
             ->withCount([
@@ -442,38 +450,41 @@ class SocialMediaController extends Controller
     public function followUser(Request $request)
     {
         try {
-            if (Auth::user() == null) {
-                return redirect('/login');
-            }
-
             if (!$request->ajax()) {
                 return;
             }
 
+            $user = Auth::user();
             $followedUserId = $request->get("followed_user_id");  // user that is being followed by current user
-            $followerUserId = Auth::id();  // current user that is following others
+            $followerUserId = $user->id;  // current user that is following others
 
             if (!isset($followedUserId)) {
                 return response()->json(["error" => "The ID of followed user is required."]);
             }
 
-            // check if the user is already being followed by current user
-            $isFollowing = Follow::where("followed_user_id", "=", $followedUserId)
-                ->where("follower_user_id", "=", $followerUserId)
-                ->exists();
-
-            if ($isFollowing) {
-                // if yes, unfollow the user by deleting the follow data
-                Follow::where("followed_user_id", "=", $followedUserId)
+            DB::transaction(function () use ($followedUserId, $followerUserId, $user) {
+                // check if the user is already being followed by current user
+                $follow = Follow::where("followed_user_id", "=", $followedUserId)
                     ->where("follower_user_id", "=", $followerUserId)
-                    ->delete();
-            } else {
-                // if no, follow the user by adding a new follow data
-                Follow::create([
-                    "follower_user_id" => $followerUserId,
-                    "followed_user_id" => $followedUserId
-                ]);
-            }
+                    ->first();
+
+                if ($follow) {
+                    // if yes, unfollow the user by deleting the follow data with the notification
+                    // Notification::where("type", "=", "follow")
+                    //     ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.follow_id')) = ?", [$follow->id])
+                    //     ->delete();
+
+                    $follow->delete();
+                } else {
+                    // if no, follow the user by adding a new follow data
+                    $newFollow = Follow::create([
+                        "follower_user_id" => $followerUserId,
+                        "followed_user_id" => $followedUserId
+                    ]);
+
+                    // $this->createFollowNotification($user, $newFollow);
+                }
+            });
 
             $updatedFollowCount = User::withCount(["followers", "followed_users"])->find($followedUserId);
 
@@ -499,4 +510,56 @@ class SocialMediaController extends Controller
 
         return view('social-media.donation-post', compact('donations'));
     }
+
+    public function notificationsIndex()
+    {
+        $notifications = Notification::leftJoin("likes as l", function ($query) {
+            $query->on("notifications.source_id", "l.id")
+                ->where("notifications.source_name", "likes");
+        })
+            ->leftJoin("follows as f", function ($query) {
+                $query->on("notifications.source_id", "f.id")
+                    ->where("notifications.source_name", "follows");
+            })
+            ->leftJoin("users as u", "u.id", "f.follower_user_id")
+            ->where("notifications.user_id", "=", Auth::id())
+            ->select(
+                "notifications.*",
+                "f.follower_user_id",
+                "u.profile_image",
+                "l.user_id as from_user_id"  // the user who liked the post
+            )
+            ->orderByDesc("notifications.created_at")
+            ->get();
+
+        return view('social-media.notifications', compact('notifications'));
+    }
+
+    // private function createLikeNotification($user, $like, $post)
+    // {
+    //     if (isset($post->content)) {
+    //         $content = "$user->name has liked your post about '" . substr($post->content, 0, 30) . "...'";
+    //     } else {
+    //         $content = "$user->name has liked your post.";
+    //     }
+
+    //     $this->insertNotification($content, "likes", $post->user_id, $like->id);
+    // }
+
+    // private function createFollowNotification($user, $follow)
+    // {
+    //     $content = "$user->name has followed you.";
+
+    //     $this->insertNotification($content, "follows", $follow->followed_user_id, $follow->id);
+    // }
+
+    // private function insertNotification($content, $sourceName, $userId, $sourceId)
+    // {
+    //     Notification::create([
+    //         "content" => $content,
+    //         "source_name" => $sourceName,
+    //         "source_id" => $sourceId,
+    //         "user_id" => $userId,
+    //     ]);
+    // }
 }

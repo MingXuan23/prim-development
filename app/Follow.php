@@ -9,4 +9,9 @@ class Follow extends Model
     public $timestamps = false;
 
     protected $fillable = ["follower_user_id", "followed_user_id"];
+
+    public function follower()
+    {
+        return $this->belongsTo(User::class, "follower_user_id");
+    }
 }

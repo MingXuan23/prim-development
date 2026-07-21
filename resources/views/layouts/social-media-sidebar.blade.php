@@ -38,13 +38,13 @@
                         <span>Simpan</span>
                     </a>
                 </li>
-                <!-- <li>
-                    <a class="waves-effect">
+                <li>
+                    <a class="waves-effect" href="{{ route('social-media.notificationsIndex') }}">
                         <i class="far fa-bell"></i>
                         <span>Notifikasi</span>
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a class="waves-effect">
                         <i class="far fa-envelope"></i>
                         <span>Mesej</span>
