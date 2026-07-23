@@ -561,6 +561,9 @@
                     return;
                 }
 
+                let postCommentBtn = $(this);
+                postCommentBtn.prop("disabled", true);
+
                 let formData = new FormData();
                 formData.append("post_id", $("#comment-modal .modal-body .post-card-footer").data("postid"));
                 formData.append("comment", $("#comment-content").val());
@@ -579,13 +582,14 @@
                             return;
                         }
 
-                        $("#comments-section").prepend(response.comment);
+                        $("#comments-section").prepend(response.html);
                         let commentsCount = parseInt($("#comments-count").text());
                         $("#comments-count").text(commentsCount + 1);
                         $(".post-card-footer[data-postid='" + selectedPostId + "']").find(".comment-btn p").text(commentsCount + 1);
                         $("#comment-content").val("");
                         closeMediaPreview();
                         $("#comment-media").val("");
+                        postCommentBtn.prop("disabled", false);
                     }
                 });
             });
@@ -873,6 +877,7 @@
 
                         $("#comment-loading").show();
                         isCommentLoading = true;
+                        currentCommentsPage = 0;
                         fetchComments(postId);
                     }
                 });
@@ -899,27 +904,6 @@
                         hasMoreComments = response.hasMorePages;
                     }
                 });
-            }
-
-            function addCommentCard(comment) {
-                // function to add comments to the UI
-                let profileImagePath = comment.user.profile_image ? "/uploads/profile_picture/" + comment.user.profile_image : "/assets/images/users/user-4.jpg";
-                let mediaPath = comment.media_url == "" ? "" : "/uploads/post_media/" + comment.media_url;
-                let newComment = "<div class='comment'>" +
-                    "<img src='" + profileImagePath + "' class='profile-img'>" +
-                    "<div class='comment-content'>" +
-                    "<h6 class='comment-author-name'>" + comment.user.name + "</h6>" +
-                    "<p>" + (comment.content != null ? comment.content : "") + "</p>"
-
-                if (comment.media_type == "image") {
-                    newComment += "<img src='" + mediaPath + "' class='post-media'>";
-                } else if (comment.media_type == "video") {
-                    newComment += "<video src='" + mediaPath + "' class='post-media' controls></video>";
-                }
-
-                newComment += "</div></div>";
-
-                $("#comments-section").prepend(newComment);
             }
 
             function loadAboutSection() {
