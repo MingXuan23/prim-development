@@ -11,7 +11,6 @@
         .table th {
             padding: .3rem !important;
         }
-
     </style>
 
 @endsection
@@ -22,8 +21,8 @@
             <div class="page-title-box">
                 <h4 class="font-size-18">Resit</h4>
                 <!-- <ol class="breadcrumb mb-0">
-                                                        <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                                                    </ol> -->
+                                                            <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                                        </ol> -->
             </div>
         </div>
     </div>
@@ -64,7 +63,7 @@
                         <div class="col-12 pt-3">
                             <table style="width:100%" class="infotbl">
                                 <tr style="background-color:#e9ecef">
-                                    <th colspan="9" class="text-center">Maklumat Penjaga</th>
+                                    <th colspan="9" class="text-center">Maklumat Pembayar</th>
                                 </tr>
                                 <tr>
                                     <td class="py-2">Nama</td>
@@ -136,8 +135,7 @@
         {{-- <div class="col-12 pt-3">
             <button class="btn btn-light p-2 w-25 mx-2 btn-fill float-right" style="font-size:18px">PRINT</button>
             <a href="/sales">
-                <button class="btn btn-light p-2 w-25 mx-2 float-right"
-                    style="font-size:18px;background-color:#983535;color:white !important">CLOSE</button>
+                <button class="btn btn-light p-2 w-25 mx-2 float-right" style="font-size:18px;background-color:#983535;color:white !important">CLOSE</button>
             </a>
         </div> --}}
     </div>
