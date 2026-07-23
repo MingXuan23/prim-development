@@ -63,7 +63,7 @@
                             <div class="col-12 pt-3">
                                 <table style="width:100%" class="infotbl">
                                     <tr style="background-color:#e9ecef">
-                                        <th colspan="9" class="text-center">Maklumat Penjaga</th>
+                                        <th colspan="9" class="text-center">Maklumat Pembayar</th>
                                     </tr>
                                     <tr>
                                         <td class="py-2">Nama</td>
@@ -91,54 +91,56 @@
                                 </table>
 
                                 @foreach ($getstudent as $student)
-                                <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                                    {{ $student->studentnama }}
-                                </div>
-                                <center class="my-2">
-                                    <span style="font-weight: bold;text-transform: uppercase;">
-                                        {{ $student->feename }}
-                                    </span>
-                                </center>
+                                    <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
+                                        {{ $student->studentnama }}
+                                    </div>
+                                    <center class="my-2">
+                                        <span style="font-weight: bold;text-transform: uppercase;">
+                                            {{ $student->feename }}
+                                        </span>
+                                    </center>
 
-                                @foreach ($getcategory as $category)
+                                    @foreach ($getcategory as $category)
 
-                                <div class="pt-2 pb-2">
-                                    Kategori : {{ $category->catname }}
-                                </div>
+                                        <div class="pt-2 pb-2">
+                                            Kategori : {{ $category->catname }}
+                                        </div>
 
-                                <table class="table table-bordered table-striped" style="">
-                                    <tr style="text-align: center">
-                                        <th style="width:3%">Bil.</th>
-                                        <th>Item</th>
-                                        <th style="width:10%">Kuantiti</th>
-                                        <th style="width:20%">Amaun per item (RM)</th>
-                                        <th style="width:20%">Amaun (RM)</th>
-                                    </tr>
-                                    @foreach ($getdetail->where('studentid', $student->studentid)->where('catid',
-                                    $category->catid) as $item)
-                                    <tr>
-                                        <td style="text-align: center"> {{ $loop->iteration }}.</td>
-                                        <td>
-                                            <div class="pl-2"> {{ $item->detailsname }} </div>
-                                        </td>
-                                        <td style="text-align: center">{{ $item->quantity }}</td>
-                                        <td style="text-align: center">
-                                            {{  number_format((float)$item->detailsprice, 2, '.', '') }} </td>
-                                        <td style="text-align: center">
-                                            {{  number_format((float)$item->totalamount, 2, '.', '')  }}</td>
-                                    </tr>
+                                        <table class="table table-bordered table-striped" style="">
+                                            <tr style="text-align: center">
+                                                <th style="width:3%">Bil.</th>
+                                                <th>Item</th>
+                                                <th style="width:10%">Kuantiti</th>
+                                                <th style="width:20%">Amaun per item (RM)</th>
+                                                <th style="width:20%">Amaun (RM)</th>
+                                            </tr>
+                                            @foreach ($getdetail->where('studentid', $student->studentid)->where(
+                                                    'catid',
+                                                    $category->catid
+                                                ) as $item)
+                                                <tr>
+                                                    <td style="text-align: center"> {{ $loop->iteration }}.</td>
+                                                    <td>
+                                                        <div class="pl-2"> {{ $item->detailsname }} </div>
+                                                    </td>
+                                                    <td style="text-align: center">{{ $item->quantity }}</td>
+                                                    <td style="text-align: center">
+                                                        {{  number_format((float) $item->detailsprice, 2, '.', '') }} </td>
+                                                    <td style="text-align: center">
+                                                        {{  number_format((float) $item->totalamount, 2, '.', '')  }}</td>
+                                                </tr>
+                                            @endforeach
+
+                                            <tr>
+                                                <td></td>
+                                                <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
+                                                <td style="text-align:center">
+                                                    <b>{{ number_format($getdetail->where('catid', $category->catid)->sum('totalamount'), 2)  }}</b>
+                                                </td>
+                                            </tr>
+
+                                        </table>
                                     @endforeach
-
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
-                                        <td style="text-align:center">
-                                            <b>{{ number_format($getdetail->where('catid', $category->catid)->sum('totalamount'), 2)  }}</b>
-                                        </td>
-                                    </tr>
-
-                                </table>
-                                @endforeach
 
 
 
@@ -151,7 +153,7 @@
                                             Caj yang dikenakan oleh organisasi (RM)
                                         </td>
                                         <td style="text-align:center;width:20%">
-                                            {{  number_format((float)$get_fee_organization->fixed_charges, 2, '.', '') }}
+                                            {{  number_format((float) $get_fee_organization->fixed_charges, 2, '.', '') }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -159,7 +161,7 @@
                                         <td colspan="3" style="text-align:right;font-size:18px;"><b>Jumlah Bayaran
                                                 (RM)</b> </td>
                                         <td style="text-align:center; width:20%; font-size:18px">
-                                            <b>{{  number_format((float)$get_transaction->amount, 2, '.', '') }}</b>
+                                            <b>{{  number_format((float) $get_transaction->amount, 2, '.', '') }}</b>
                                         </td>
                                     </tr>
                                 </table>
