@@ -984,7 +984,9 @@ class FeesController extends AppBaseController
                 ->join('classes', 'classes.id', '=', 'class_organization.class_id')
                 ->select('students.*')
                 ->where('classes.id', $class_id)
-                ->where('class_student.fees_status', 'LIKE', isset($status) ? $status : '%%')
+                ->when(isset($status), function ($query) use ($status) {
+                    return $query->where('class_student.fees_status', $status);
+                })
                 ->where('class_student.status', 1)
                 ->orderBy('students.nama')
                 ->get();
@@ -1465,6 +1467,7 @@ class FeesController extends AppBaseController
             ->where("co.class_id", "=", $classId)
             ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
             ->where("cs.student_id", "=", $studentId)
+            ->where("cs.status", "=", 1)
             ->get()
             ->first();
 
@@ -1606,6 +1609,7 @@ class FeesController extends AppBaseController
             ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
             ->where("co.class_id", "=", $classId)
             ->where("sfn.fees_id", "=", $feeId)
+            ->where("cs.status", "=", 1)
             ->get()
             ->pluck("student_id")
             ->toArray();
@@ -1623,6 +1627,7 @@ class FeesController extends AppBaseController
                         ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
                         ->where("co.class_id", "=", $classId)
                         ->where("cs.student_id", "=", $selectedStudentId)
+                        ->where("cs.status", "=", 1)
                         ->first();
 
                     // update fees status for class_student to 'Not Complete'
@@ -1654,6 +1659,7 @@ class FeesController extends AppBaseController
                     ->where("co.organization_id", "=", $currentOrg->parent_org ?? $oid)
                     ->where("co.class_id", "=", $classId)
                     ->where("cs.student_id", "=", $existingStudentId)
+                    ->where("cs.status", "=", 1)
                     ->first();
 
                 // find the student_fees_new to remove it
@@ -1835,7 +1841,6 @@ class FeesController extends AppBaseController
             ->when(isset($studentId), function ($query) use ($studentId) {
                 $query->where('s.id', '=', $studentId);
             })
-            ->where('fn.status', '=', 1)
             ->where('cs.status', '=', 1)
             ->orderBy("fee_category", "asc")
             ->orderBy("fee_name", "asc")
