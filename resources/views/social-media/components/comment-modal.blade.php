@@ -5,7 +5,7 @@
         width: fit-content;
     }
 
-    .post-profile-img {
+    .profile-img {
         border-radius: 50%;
         max-width: 50px;
         max-height: 50px;
@@ -93,32 +93,10 @@
         gap: 10px;
     }
 
-    .profile-img {
-        border-radius: 50%;
-        max-width: 50px;
-        max-height: 50px;
-    }
-
     #modal-footer .profile-img,
     .comment .profile-img {
         width: 40px;
         height: 40px;
-    }
-
-    .comment {
-        display: flex;
-        gap: 10px;
-    }
-
-    .comment-content {
-        background-color: lightgray;
-        border-radius: 10px;
-        color: black;
-        padding: 10px;
-    }
-
-    .comment-content .comment-author-name {
-        font-weight: bold;
     }
 
     .modal-title {
@@ -207,6 +185,8 @@
                 <hr>
 
                 <div id="comments-section"></div>
+
+                <div id="comment-loading" class="text-center">Loading...</div>
             </div>
 
             <div id="modal-footer">

@@ -7,142 +7,26 @@
             color: red;
         }
 
-        .post-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px 18px;
-            margin-bottom: 20px;
+        #posts {
+            width: 100%;
             max-width: 900px;
-            width: 100%;
-        }
-
-        .post-card-header a {
-            display: flex;
-            gap: 10px;
-            color: black;
-            width: fit-content;
-        }
-
-        .post-card-header a:hover {
-            color: black;
-        }
-
-        h5 {
-            color: black;
-            font-weight: bold !important;
-        }
-
-        .profile-img {
-            border-radius: 50%;
-            max-width: 50px;
-            max-height: 50px;
-        }
-
-        .post-media {
-            border-radius: 10px;
-            margin: 10px auto;
-            display: block;
-            max-width: 100%;
-            max-height: 500px;
-        }
-
-        .post-card-footer {
-            margin-top: 10px;
-            font-size: 16px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .post-action-buttons {
-            width: 30%;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .post-action-buttons a,
-        .save-btn {
-            cursor: pointer;
-        }
-
-        .text-gray {
-            color: gray;
-        }
-
-        .shared-donation-card {
-            max-width: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin: 0 auto;
-        }
-
-        .shared-donation-card img {
-            width: 100%;
-            border-radius: 10px;
-        }
-
-        .shared-donation-card a {
-            width: 100%;
         }
     </style>
 @endsection
 
 @section('content')
+    <div class="errorMessage"></div>
+
     <div class="p-4 d-flex flex-column align-items-center">
-        @include('social-media.search-bar', ['searchUrl' => route('social-media.index')])
+        @include('social-media.components.search-bar', ['searchUrl' => route('social-media.index')])
 
-        @foreach ($posts as $post)
-            <div class="post-card">
-                <div class="post-card-header">
-                    <a href="{{ route('social-media.profile', ['user_id' => $post->user->id]) }}">
-                        <img src="{{ $post->user->profile_image ? URL::asset('uploads/profile_picture/' . $post->user->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}" class="profile-img">
-                        <div>
-                            <h5 class="fw-bold text-black">{{ $post->user->name }}</h5>
-                            <p class="text-gray">{{ $post->created_at }}</p>
-                        </div>
-                    </a>
-                </div>
+        <div id="posts">
+            @include('social-media.components.post-list', ['posts' => $posts])
+        </div>
 
-                <p class="text-lg">{{ $post->content }}</p>
+        <div id="post-loading">Loading...</div>
 
-                @if($post->media_type == "image")
-                    <img src="{{ URL::asset('uploads/post_media/' . $post->media_url) }}" class="post-media">
-                @elseif ($post->media_type == "video")
-                    <video src="{{ URL::asset('uploads/post_media/' . $post->media_url) }}" class="post-media" controls></video>
-                @elseif (isset($post->shared_donation_id))
-                    <div class="shared-donation-card">
-                        <img src="{{ URL::asset('donation-poster/' . $post->donation_post->donation_poster) }}" class="donation-poster">
-                        <h5>{{ $post->donation_post->nama }}</h5>
-                        <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->donation_share_url) ? $post->donation_share_url : $post->donation_post->url) }}" target="_blank">Derma
-                            Sekarang</a>
-                    </div>
-                @endif
-
-                <div class="post-card-footer" data-postid="{{ $post->id }}">
-                    <div class="post-action-buttons">
-                        <a class="text-danger like-btn">
-                            <i class="{{ $post->is_liked ? 'fas' : 'far' }} fa-heart" id="like-icon"></i>
-                            <p class="d-inline">{{ $post->likes_count }}</p>
-                        </a>
-                        <a class="text-primary comment-btn">
-                            <i class="far fa-comment"></i>
-                            <p class="d-inline">{{ $post->comments_count }}</p>
-                        </a>
-                        <a class="text-primary">
-                            <i class="fas fa-share"></i>
-                            <p class="d-inline">0</p>
-                        </a>
-                    </div>
-
-                    <a class="text-primary save-btn">
-                        <i class="{{ $post->is_saved ? 'fas' : 'far' }} fa-bookmark" id="save-icon"></i>
-                    </a>
-                </div>
-            </div>
-        @endforeach
-
-        @include('social-media.comment-modal')
+        @include('social-media.components.comment-modal')
     </div>
 @endsection
 
@@ -150,6 +34,9 @@
     <script>
         $(document).ready(function () {
             $("#modal-alert").hide();
+            $(".errorMessage").hide();
+            $("#post-loading").hide();
+            $("#comment-loading").hide();
 
             $.ajaxSetup({
                 headers: {
@@ -157,7 +44,60 @@
                 }
             });
 
-            $(".like-btn").click(function (e) {
+            let currentPostPage = parseInt("{{ $posts->currentPage() }}");
+            let isPostLoading = false;
+            let hasMorePostPages = "{{ $posts->hasMorePages() ? 'true' : 'false' }}";
+
+            $(window).scroll(function () {
+                if (isPostLoading || !hasMorePostPages) return;
+
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                    isPostLoading = true;
+                    $("#post-loading").show();
+
+                    $.ajax({
+                        type: "GET",
+                        url: window.location.pathname.includes("/saves") ? "{{ route('social-media.saves') }}" : "{{ route('social-media.index') }}",
+                        data: {
+                            search: $("#search-bar").val(),
+                            page: currentPostPage + 1
+                        },
+                        success: function (response) {
+                            if (!response || response.error) {
+                                $(".errorMessage").text(response.error).show();
+                                return;
+                            }
+
+                            $("#posts").append(response.html);
+
+                            isPostLoading = false;
+                            $("#post-loading").hide();
+                            currentPostPage++;
+                            hasMorePostPages = response.hasMorePages;
+                        }
+                    })
+                }
+            });
+
+            let currentCommentPage = 0;
+            let isCommentLoading = false;
+            let hasMoreCommentPages = true;
+            let selectedPostId = null;
+
+            $("#comment-modal .modal-body").on("scroll", function () {
+                // check for comments scrolling
+                let modalBody = $(this);
+
+                if (isCommentLoading || !hasMoreCommentPages) return;
+
+                if (modalBody.scrollTop() + modalBody.innerHeight() >= modalBody[0].scrollHeight - 50) {
+                    isCommentLoading = true;
+                    $("#comment-loading").show();
+                    fetchComments(selectedPostId);
+                }
+            })
+
+            $(document).on("click", ".like-btn", function (e) {
                 e.preventDefault();
                 let likeBtn = $(this);
                 let postId = $(this).parent().parent().data("postid");
@@ -180,7 +120,7 @@
                 })
             });
 
-            $(".save-btn").click(function (e) {
+            $(document).on("click", ".save-btn", function (e) {
                 e.preventDefault();
                 let saveBtn = $(this);
                 let postId = $(this).parent().data("postid");
@@ -201,13 +141,19 @@
                 })
             });
 
-            $(".comment-btn").click(function (e) {
+            $(document).on("click", ".comment-btn", function (e) {
                 e.preventDefault();
 
-                let postId = $(this).parent().parent().data("postid");
+                selectedPostId = $(this).parent().parent().data("postid");
                 $("#comment-modal").modal("show");
                 $("#comment-content").val("");
-                fetchPostById(postId);
+                $("#comments-section").empty();
+
+                isCommentLoading = true;
+                $("#comment-loading").show();
+                currentCommentPage = 0;
+
+                fetchPostById(selectedPostId);
             });
 
             $("#comment-media-btn").click(function (e) {
@@ -248,6 +194,9 @@
                     return;
                 }
 
+                let postCommentBtn = $(this);
+                postCommentBtn.prop("disabled", true);
+
                 let formData = new FormData();
                 formData.append("post_id", $("#comment-modal .modal-body .post-card-footer").data("postid"));
                 formData.append("comment", $("#comment-content").val());
@@ -266,14 +215,14 @@
                             return;
                         }
 
-                        addCommentCard(response.newComment);
+                        $("#comments-section").prepend(response.html);
                         let commentsCount = parseInt($("#comments-count").text());
-                        let postId = $("#comment-modal .post-card-footer").data("postid");
                         $("#comments-count").text(commentsCount + 1);
-                        $(".post-card-footer[data-postid='" + postId + "']").find(".comment-btn p").text(commentsCount + 1);
+                        $(".post-card-footer[data-postid='" + selectedPostId + "']").find(".comment-btn p").text(commentsCount + 1);
                         $("#comment-content").val("");
                         $("#comment-media").val("");
                         closeMediaPreview();
+                        postCommentBtn.prop("disabled", false);
                     }
                 });
             });
@@ -304,6 +253,10 @@
                 $("#comment-modal .modal-body #like-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .modal-body #save-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .modal-body #modal-media").empty();
+                $(".donation-poster").prop("src", "");
+                $("#donation-name").text("");
+                $("#donate-now-btn").prop("href", "");
+                $(".shared-donation-card").hide();
 
                 $.ajax({
                     type: "GET",
@@ -313,8 +266,7 @@
                     },
                     success: function (response) {
                         if (response.error) {
-                            $("#error-message").show();
-                            $("#error-message").text(response.error);
+                            $("#error-message").text(response.error).show();
                             return;
                         }
 
@@ -359,52 +311,39 @@
                             $("#comment-modal .modal-body #modal-media").html("<video src='uploads/post_media/" + mediaUrl + "' class='post-media' controls></video>");
                         }
 
+                        if (response.post.donation_post) {
+                            // shared donation poster
+                            $("#comment-modal .shared-donation-card").show();
+                            $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
+                            $("#comment-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
+                            $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
+                        }
+
                         fetchComments(postId);
                     }
                 });
             }
 
-            function addCommentCard(comment) {
-                // function to add comments to the UI
-                let profileImagePath = comment.user.profile_image ? "uploads/profile_picture/" + comment.user.profile_image : "assets/images/users/user-4.jpg";
-                let mediaPath = comment.media_url == "" ? "" : "uploads/post_media/" + comment.media_url;
-                let newComment = "<div class='comment'>" +
-                    "<img src='" + profileImagePath + "' class='profile-img'>" +
-                    "<div class='comment-content'>" +
-                    "<h6 class='comment-author-name'>" + comment.user.name + "</h6>" +
-                    "<p>" + (comment.content != null ? comment.content : "") + "</p>"
-
-                if (comment.media_type == "image") {
-                    newComment += "<img src='" + mediaPath + "' class='post-media'>";
-                } else if (comment.media_type == "video") {
-                    newComment += "<video src='" + mediaPath + "' class='post-media' controls></video>";
-                }
-
-                newComment += "</div></div>";
-
-                $("#comments-section").prepend(newComment);
-            }
-
-            function fetchComments(postId) {
-                $("#comments-section").empty();
-
+            function fetchComments(postId = '') {
                 // fetch comments
                 $.ajax({
                     type: "GET",
                     url: "{{ route('social-media.getCommentsByPostIdJson') }}",
                     data: {
-                        "post_id": postId
+                        "post_id": postId,
+                        "page": currentCommentPage + 1
                     },
                     success: function (response) {
                         if (response.error) {
-                            $("#modal-alert").text(response.error);
-                            $("#modal-alert").show();
+                            $("#modal-alert").text(response.error).show();
                             return;
                         }
 
-                        response.comments.forEach(comment => {
-                            addCommentCard(comment);
-                        });
+                        $("#comments-section").append(response.html);
+                        isCommentLoading = false;
+                        currentCommentPage++;
+                        $("#comment-loading").hide();
+                        hasMoreCommentPages = response.hasMorePages;
                     }
                 });
             }

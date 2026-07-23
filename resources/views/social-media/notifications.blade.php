@@ -50,31 +50,11 @@
     <div class="errorMessage"></div>
 
     <div class="pt-4 d-flex flex-column align-items-center">
-        <div id="users" class="w-100 d-flex flex-column align-items-center">
-            @foreach ($notifications as $notification)
-                <div class="notification-card">
-                    @if ($notification->source_name == "likes")
-                        <i class="fas fa-heart" id="like-icon"></i>
-                        <div class="notification-info">
-                            <a href="{{ route('social-media.profile', ['user_id' => $notification->from_user_id]) }}">
-                                <h5>{{ $notification->content }}</h5>
-                            </a>
-                            <p class="text-gray">{{ $notification->created_at }}</p>
-                        </div>
-                    @elseif ($notification->source_name == "follows")
-                        <img src="{{ isset($notification->profile_image) ? URL::asset('uploads/profile_picture/' . $notification->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}"
-                            class="notification-profile-img">
-                        <div class="notification-info">
-                            <a href="{{ route('social-media.profile', ['user_id' => $notification->follower_user_id]) }}">
-                                <h5>{{ $notification->content }}</h5>
-                            </a>
-                            <p class="text-gray">{{ $notification->created_at }}</p>
-                        </div>
-                    @endif
-
-                </div>
-            @endforeach
+        <div id="notifications" class="w-100 d-flex flex-column align-items-center">
+            @include('social-media.components.notifications-list', ['notifications' => $notifications])
         </div>
+
+        <div id="loading">Loading...</div>
     </div>
 @endsection
 
@@ -82,6 +62,7 @@
     <script>
         $(document).ready(function () {
             $(".errorMessage").hide();
+            $("#loading").hide();
 
             $.ajaxSetup({
                 headers: {
@@ -109,8 +90,39 @@
                             shareBtn.text("Telah Ikuti");
                         }
                     }
-                })
+                });
             });
+
+            let currentPage = parseInt("{{ $notifications->currentPage() }}");
+            let isLoading = false;
+            let hasMorePages = "{{ $notifications->hasMorePages() ? 'true' : 'false' }}";
+
+            $(window).scroll(function () {
+                if (isLoading || !hasMorePages) return;
+
+                isLoading = true;
+                $("#loading").show();
+
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('social-media.notificationsIndex') }}",
+                    data: {
+                        page: currentPage + 1
+                    },
+                    success: function (response) {
+                        if (!response || response.error) {
+                            $(".errorMessage").text(response.error).show();
+                            return;
+                        }
+
+                        $("#notifications").append(response.html);
+                        isLoading = false;
+                        $("#loading").hide();
+                        hasMorePages = response.hasMorePages;
+                        currentPage++;
+                    }
+                })
+            })
         });
     </script>
 @endsection

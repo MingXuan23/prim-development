@@ -114,6 +114,13 @@
         /* ----------------------------------- end profile styling ----------------------------------- */
 
         /* ----------------------------------- post styling ----------------------------------- */
+        #posts {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background-color: #f8f9fa;
+        }
+
         .post {
             padding: 10px 0;
         }
@@ -290,15 +297,16 @@
     </div>
 
     <div class="profile-card">
+        <div id="posts"></div>
         <div class="profile-body">
             <div id="about"></div>
-            <div id="posts"></div>
             <div id="medias"></div>
             <div id="donations"></div>
+            <div id="loading" class="text-center">Loading...</div>
         </div>
     </div>
 
-    @include('social-media.comment-modal')
+    @include('social-media.components.comment-modal')
 
     {{-- share donation modal --}}
     <div id="share-donation-modal" class="modal fade" role="dialog">
@@ -339,6 +347,14 @@
     <script>
         $(document).ready(function () {
             $("#modal-alert").hide();
+            $("#loading").hide();
+            $("#comment-loading").hide();
+
+            let selectedPostId = null;
+            let currentPage = 0;
+            let isLoading = false;
+            let hasMorePages = true;
+            let activeTab = $(".nav-item.active").text();
 
             $.ajaxSetup({
                 headers: {
@@ -347,6 +363,40 @@
             });
 
             fetchDataByTabSelected($(".nav-item.active").text());
+
+            // normal screen scroll
+            $(window).scroll(function () {
+                if (isLoading || !hasMorePages || activeTab == "Maklumat Pengguna") return;
+
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                    showLoading();
+
+                    if (activeTab == "Post") {
+                        fetchPosts();
+                    } else if (activeTab == "Gambar") {
+                        fetchPhotoPosts();
+                    } else if (activeTab == "Video") {
+                        fetchVideoPosts();
+                    }
+                }
+            });
+
+            let currentCommentsPage = 0;
+            let isCommentLoading = false;
+            let hasMoreComments = true;
+
+            // comment modal scroll
+            $("#comment-modal .modal-body").scroll(function () {
+                if (isCommentLoading || !hasMoreComments) return;
+
+                let modalBody = $(this);
+
+                if (modalBody.scrollTop() + modalBody.innerHeight() >= modalBody[0].scrollHeight - 50) {
+                    isCommentLoading = true;
+                    $("#comment-loading").show();
+                    fetchComments(selectedPostId);
+                }
+            });
 
             $(".nav-item").click(function () {
                 // remove active from all nav items class
@@ -362,21 +412,49 @@
                 // add active class to current clicked nav item
                 $(this).addClass("active");
 
-                fetchDataByTabSelected($(this).text())
+                activeTab = $(this).text();
+
+                fetchDataByTabSelected(activeTab);
             });
 
+            function showLoading() {
+                isLoading = true;
+                $("#loading").show();
+            }
+
+            function hideLoading() {
+                isLoading = false;
+                $("#loading").hide();
+            }
+
+            function nextPage(isHasMorePages) {
+                currentPage++;
+                hasMorePages = isHasMorePages;
+                hideLoading();
+            }
+
             function fetchDataByTabSelected(tabName) {
+                currentPage = 0;
+                hasMorePages = true;
+                hideLoading();
+
                 switch (tabName) {
                     case "Maklumat Pengguna":
                         loadAboutSection();
                         break;
                     case "Post":
+                        showLoading();
+                        $("#posts").empty();
                         fetchPosts();
                         break;
                     case "Gambar":
+                        showLoading();
+                        $("#medias").empty();
                         fetchPhotoPosts();
                         break;
                     case "Video":
+                        showLoading();
+                        $("#medias").empty();
                         fetchVideoPosts();
                         break;
                     case "Derma Saya":
@@ -501,11 +579,10 @@
                             return;
                         }
 
-                        addCommentCard(response.newComment);
+                        $("#comments-section").prepend(response.comment);
                         let commentsCount = parseInt($("#comments-count").text());
-                        let postId = $("#comment-modal .post-card-footer").data("postid");
                         $("#comments-count").text(commentsCount + 1);
-                        $(".post-card-footer[data-postid='" + postId + "']").find(".comment-btn p").text(commentsCount + 1);
+                        $(".post-card-footer[data-postid='" + selectedPostId + "']").find(".comment-btn p").text(commentsCount + 1);
                         $("#comment-content").val("");
                         closeMediaPreview();
                         $("#comment-media").val("");
@@ -521,7 +598,8 @@
             $(document).on("click", ".comment-btn", function (e) {
                 e.preventDefault();
 
-                fetchPostById($(this).parent().parent().data("postid"));
+                selectedPostId = $(this).parent().parent().data("postid");
+                fetchPostById(selectedPostId);
                 $("#comment-modal").modal("show");
                 $("#comment-content").val("");
             });
@@ -595,13 +673,13 @@
             function fetchPosts() {
                 let postsDisplay = $("#posts");
                 postsDisplay.show();
-                postsDisplay.empty();
 
                 $.ajax({
                     type: "GET",
                     url: "{{ route('social-media.getPostsByUserIdJson') }}",
                     data: {
-                        "user_id": "{{ $userData['id'] }}"
+                        "user_id": "{{ $userData['id'] }}",
+                        "page": currentPage + 1
                     },
                     success: function (response) {
                         if (response.error) {
@@ -609,36 +687,13 @@
                             return;
                         }
 
-                        if (response.posts.length == 0) {
+                        if (response.html == "") {
                             postsDisplay.text("Tiada post.");
                             return;
                         }
 
-                        response.posts.forEach(post => {
-                            let mediaElement = "";
-
-                            if (post.media_type == "image") {
-                                mediaElement = "<img src='/uploads/post_media/" + post.media_url + "' class='post-media'>";
-                            } else if (post.media_type == "video") {
-                                mediaElement = "<video src='/uploads/post_media/" + (post.media_url) + "' class='post-media' controls></video>"
-                            } else if (post.donation_post) {
-                                mediaElement = "<div class='shared-donation-card'><img src='/donation-poster/" + post.donation_post.donation_poster + "' class='donation-poster'>" +
-                                    "<h5>" + post.donation_post.nama + "</h5>" +
-                                    "<a class='btn btn-primary' href='/sumbangan_anonymous/" + post.donation_post.url + "' target='_blank'>Derma Sekarang</a>";
-                            }
-
-                            let postHtml = "<div class='post'><div class='post-header'>" +
-                                "<a><img src='" + (post.user.profile_image ? "/uploads/profile_picture/" + post.user.profile_image : "/assets/images/users/user-4.jpg") + "' class='post-profile-img'>" +
-                                "<div><h5>" + post.user.name + "</h5><p>" + post.created_at.replace("T", " ").split(".")[0] + "</p></div></a></div>" +
-                                "<div class='post-body'><p>" + (post.content ? post.content : "") + "</p>" + mediaElement
-                                + "</div><div class='post-card-footer' data-postid='" + post.id + "'>" +
-                                "<div class='post-action-buttons'><a class='text-danger like-btn'><i class='" + (post.is_liked ? "fas" : "far") + " fa-heart' id='like-icon'></i> <p class='d-inline'>" + post.likes_count + "</p></a>" +
-                                "<a class='text-primary comment-btn'><i class='far fa-comment'></i> <p class='d-inline'>" + post.comments_count + "</p></a>" +
-                                "<a class='text-primary share-btn'><i class='fas fa-share'></i> <p class='d-inline'>0</p></a></div>" +
-                                "<a class='text-primary save-btn'><i class='" + (post.is_saved ? "fas" : "far") + " fa-bookmark' id='save-icon'></i></a></div></div><hr>";
-
-                            postsDisplay.append(postHtml);
-                        })
+                        postsDisplay.append(response.html);
+                        nextPage(response.hasMorePages);
                     }
                 })
             }
@@ -679,15 +734,15 @@
             }
 
             function fetchPhotoPosts() {
-                let photoSection = $("#medias");
-                photoSection.empty();
-                photoSection.show();
+                let mediaSection = $("#medias");
+                mediaSection.show();
 
                 $.ajax({
                     type: "GET",
                     url: "{{ route('social-media.getPhotoPostsByUserIdJson') }}",
                     data: {
-                        "user_id": "{{ $userData['id'] }}"
+                        "user_id": "{{ $userData['id'] }}",
+                        "page": currentPage + 1
                     },
                     success: function (response) {
                         if (response.error) {
@@ -696,27 +751,30 @@
                         }
 
                         if (response.posts.length == 0) {
-                            photoSection.prepend("<h4 class='text-center w-100'>Tiada post.</h4>");
+                            mediaSection.text("Tiada post gambar.");
+                            nextPage(response.hasMorePages);
                             return;
                         }
 
                         response.posts.forEach(post => {
-                            photoSection.prepend("<img src='/uploads/post_media/" + post.media_url + "' class='media-post' data-postid='" + post.id + "'>");
+                            mediaSection.append("<img src='/uploads/post_media/" + post.media_url + "' class='media-post' data-postid='" + post.id + "'>");
                         });
+
+                        nextPage(response.hasMorePages);
                     }
                 });
             }
 
             function fetchVideoPosts() {
-                let photoSection = $("#medias");
-                photoSection.empty();
-                photoSection.show();
+                let mediaSection = $("#medias");
+                mediaSection.show();
 
                 $.ajax({
                     type: "GET",
                     url: "{{ route('social-media.getVideoPostsByUserIdJson') }}",
                     data: {
-                        "user_id": "{{ $userData['id'] }}"
+                        "user_id": "{{ $userData['id'] }}",
+                        "page": currentPage + 1
                     },
                     success: function (response) {
                         if (response.error) {
@@ -725,13 +783,16 @@
                         }
 
                         if (response.posts.length == 0) {
-                            photoSection.prepend("<h4 class='text-center w-100'>Tiada video.</h4>");
+                            mediaSection.text("Tiada post video.");
+                            nextPage(response.hasMorePages);
                             return;
                         }
 
                         response.posts.forEach(post => {
-                            photoSection.prepend("<video src='/uploads/post_media/" + post.media_url + "' class='media-post' data-postid='" + post.id + "'></video>");
+                            mediaSection.append("<video src='/uploads/post_media/" + post.media_url + "' class='media-post' data-postid='" + post.id + "'></video>");
                         });
+
+                        nextPage(response.hasMorePages);
                     }
                 });
             }
@@ -807,9 +868,11 @@
                         if (mediaType == "image") {
                             $("#comment-modal .modal-body #modal-media").html("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
                         } else if (mediaType == "video") {
-                            $("#comment-modal .modal-body #modal-media").html("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls></video>");
+                            $("#comment-modal .modal-body #modal-media").html("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted autoplay></video>");
                         }
 
+                        $("#comment-loading").show();
+                        isCommentLoading = true;
                         fetchComments(postId);
                     }
                 });
@@ -820,18 +883,20 @@
                     type: "GET",
                     url: "{{ route('social-media.getCommentsByPostIdJson') }}",
                     data: {
-                        "post_id": postId
+                        "post_id": postId,
+                        "page": currentCommentsPage + 1
                     },
                     success: function (response) {
                         if (response.error) {
-                            $("#modal-alert").show();
-                            $("#modal-alert").text(response.error);
+                            $("#modal-alert").text(response.error).show();
                             return;
                         }
 
-                        response.comments.forEach(comment => {
-                            addCommentCard(comment);
-                        });
+                        $("#comments-section").append(response.html);
+                        $("#comment-loading").hide();
+                        isCommentLoading = false;
+                        currentCommentsPage++;
+                        hasMoreComments = response.hasMorePages;
                     }
                 });
             }

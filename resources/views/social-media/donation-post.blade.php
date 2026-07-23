@@ -13,64 +13,18 @@
             justify-content: center;
             gap: 10px;
         }
-
-        .donation-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px 18px;
-            margin-bottom: 20px;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .donation-card img {
-            max-width: 350px;
-            width: 100%;
-            object-fit: cover;
-            border-radius: 10px;
-            min-height: 500px;
-        }
-
-        .donation-card-footer {
-            text-align: center;
-        }
-
-        .donation-card-footer button,
-        .donation-card-footer a {
-            display: block;
-            width: 100%;
-            margin: 10px 0;
-        }
-
-        h5 {
-            color: black;
-            font-weight: bold !important;
-            margin: 10px 0 !important;
-        }
     </style>
 @endsection
 
 @section('content')
     <div class="p-4 d-flex flex-column align-items-center">
-        @include('social-media.search-bar', ['searchUrl' => route('social-media.donationPostsIndex')])
+        @include('social-media.components.search-bar', ['searchUrl' => route('social-media.donationPostsIndex')])
 
-        <div class="donation-cards">
-            @foreach ($donations as $donation)
-                <div class="donation-card" data-donationid="{{ $donation->id }}">
-                    <img src="{{ URL::asset('donation-poster/' . $donation->donation_poster) }}" class="donation-poster" alt="{{ $donation->nama }}'s poster">
-                    <div class="donation-card-footer">
-                        <h5 class="mb-3" id="donation-name">{{ $donation->nama }}</h5>
-                        <button class="btn btn-secondary share-btn">Kongsi</button>
-                        <a href="/sumbangan_anonymous/{{ $donation->url }}" target="_blank" class="btn btn-primary">Derma Sekarang</a>
-                    </div>
-                </div>
-            @endforeach
-
+        <div class="donation-cards" id="donations">
+            @include('social-media.components.donation-posts-list', ['donations' => $donations])
         </div>
 
-        <div id="pagination-section" class="w-100 d-flex justify-content-center">
-            {{ $donations->links() }}
-        </div>
+        <div id="loading">Loading...</div>
 
         {{-- share donation modal --}}
         <div id="share-donation-modal" class="modal fade" role="dialog">
@@ -111,6 +65,8 @@
 @section('script')
     <script>
         $(document).ready(function () {
+            $("#loading").hide();
+
             $(document).on("click", ".share-btn", function (e) {
                 e.preventDefault();
 
@@ -121,6 +77,40 @@
                 $("#share-donation-modal #modal-donation-name").val(donationName);
                 $("#share-donation-modal").modal("show");
             });
+
+            let currentPage = parseInt("{{ $donations->currentPage() }}");
+            let isLoading = false;
+            let hasMorePages = "{{ $donations->hasMorePages() ? 'true' : 'false' }}";
+
+            $(window).scroll(function () {
+                if (isLoading || !hasMorePages) return;
+
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
+                    isLoading = true;
+                    $("#loading").show();
+
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ route('social-media.donationPostsIndex') }}",
+                        data: {
+                            "search": $("#search-bar").val(),
+                            "page": currentPage + 1,
+                        },
+                        success: function (response) {
+                            if (!response || response.error) {
+                                $(".errorMessage").text(response.error).show();
+                                return;
+                            }
+
+                            $("#donations").append(response.html);
+                            isLoading = false;
+                            currentPage++;
+                            hasMorePages = response.hasMorePages;
+                            $("#loading").hide();
+                        }
+                    })
+                }
+            })
         });
     </script>
 @endsection

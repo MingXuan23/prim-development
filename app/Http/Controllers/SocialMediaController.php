@@ -20,9 +20,15 @@ class SocialMediaController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->get('search');
+        $search = trim($request->get('search'));
 
         $posts = $this->getPostsByUserId(null, null, $search);
+
+        if ($request->ajax()) {
+            $html = view('social-media.components.post-list', compact('posts'))->render();
+            return response()->json(['html' => $html, 'hasMorePages' => $posts->hasMorePages()]);
+        }
+
 
         return view('social-media.index', compact('posts'));
     }
@@ -48,6 +54,11 @@ class SocialMediaController extends Controller
             return $this->getIsFollowingUser($user);
         });
 
+        if ($request->ajax()) {
+            $html = view('social-media.components.users-list', compact('users'))->render();
+            return response()->json(['html' => $html, 'hasMorePages' => $users->hasMorePages()]);
+        }
+
         return view('social-media.search-user', compact('users'));
     }
 
@@ -66,34 +77,21 @@ class SocialMediaController extends Controller
             $user = Auth::user();
             $postId = $request->get("post_id");
 
-            DB::transaction(function () use ($postId, $user) {
-                // check if it is liked or not
-                $like = Like::where("user_id", "=", $user->id)
-                    ->where("post_id", "=", $postId)
-                    ->first();
+            // check if it is liked or not
+            $like = Like::where("user_id", "=", $user->id)
+                ->where("post_id", "=", $postId)
+                ->first();
 
-                if ($like) {
-                    // if yes, remove the like with the notification
-                    // Notification::where("type", "=", "like")
-                    //     ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.like_id')) = ?", [$like->id])
-                    //     ->delete();
-
-                    $like->delete();
-                } else {
-                    // if not, create a new like
-                    $newLike = Like::create([
-                        "user_id" => $user->id,
-                        "post_id" => $postId,
-                    ]);
-
-                    // $post = Post::find($postId);
-
-                    // if ($post->user_id != $user->id) {
-                    //     // if the current user liking other people's post, create a new notification for the liked user
-                    //     $this->createLikeNotification($user, $newLike, $post);
-                    // }
-                }
-            });
+            if ($like) {
+                // if yes, remove the like
+                $like->delete();
+            } else {
+                // if not, create a new like
+                Like::create([
+                    "user_id" => $user->id,
+                    "post_id" => $postId,
+                ]);
+            }
 
             $updatedLikesCount = Like::where("post_id", "=", $postId)->count();
 
@@ -178,15 +176,17 @@ class SocialMediaController extends Controller
             return response()->json(["error" => "Sila isikan sekurang-kurangnya satu input (content atau media)."]);
         }
 
-        $newComment = $this->insertPost($content, $media, $postId, null);
+        $comment = $this->insertPost($content, $media, $postId, null);
         $user = Auth::user();
         $userData = [
             "name" => $user->name,
             "profile_image" => $user->profile_image
         ];
-        $newComment["user"] = $userData;
+        $comment->user = (object) $userData;
 
-        return response()->json(["newComment" => $newComment]);
+        $html = view('social-media.components.comment', compact('comment'))->render();
+
+        return response()->json(["html" => $html]);
     }
 
     private function insertPost($content, $media, $postId, $sharedDonationId)
@@ -214,7 +214,7 @@ class SocialMediaController extends Controller
         return $post;
     }
 
-    public function saves()
+    public function saves(Request $request)
     {
         $posts = Post::with("user:id,name,profile_image")
             ->whereNull("post_id")
@@ -231,12 +231,17 @@ class SocialMediaController extends Controller
                 $query->where("user_id", "=", Auth::id());
             })
             ->orderByDesc("created_at")
-            ->get();
+            ->paginate($this->MAX_RESULT_LIMIT);
 
         $posts->each(function ($post) {
             $post->is_liked = $post->is_liked > 0;
             $post->is_saved = $post->is_saved > 0;
         });
+
+        if ($request->ajax()) {
+            $html = view('social-media.components.post-list', compact('posts'))->render();
+            return response()->json(['html' => $html, 'hasMorePages' => $posts->hasMorePages()]);
+        }
 
         return view('social-media.index', compact('posts'));
     }
@@ -250,7 +255,9 @@ class SocialMediaController extends Controller
         $postId = $request->get("post_id");
         $comments = $this->getCommentsByPostId($postId);
 
-        return response()->json(["comments" => $comments]);
+        $html = view('social-media.components.comments-list', compact('comments'))->render();
+
+        return response()->json(["html" => $html, "hasMorePages" => $comments->hasMorePages()]);
     }
 
     private function getCommentsByPostId($postId)
@@ -261,8 +268,8 @@ class SocialMediaController extends Controller
             ->whereHas("parent", function ($query) use ($postId) {
                 $query->where("id", "=", $postId);
             })
-            ->orderBy("created_at")
-            ->get();
+            ->orderByDesc("created_at")
+            ->paginate($this->MAX_RESULT_LIMIT);
 
         return $comments;
     }
@@ -315,7 +322,9 @@ class SocialMediaController extends Controller
 
         $posts = $this->getPostsByUserId($userId, null, null);
 
-        return response()->json(["posts" => $posts]);
+        $html = view('social-media.components.post-list', compact('posts'))->render();
+
+        return response()->json(["html" => $html, "hasMorePages" => $posts->hasMorePages()]);
     }
 
     public function getPostsByUserId($userId, $mediaType, $searchFilter)
@@ -342,7 +351,7 @@ class SocialMediaController extends Controller
                 $query->where("content", "LIKE", "%$searchFilter%");
             })
             ->orderByDesc("created_at")
-            ->get();
+            ->paginate($this->MAX_RESULT_LIMIT);
 
         $posts->each(function ($post) {
             $post->is_liked = $post->is_liked > 0;
@@ -406,7 +415,7 @@ class SocialMediaController extends Controller
 
         $posts = $this->getPostsByUserId($userId, "image", null);
 
-        return response()->json(["posts" => $posts]);
+        return response()->json(["posts" => $posts->items(), "hasMorePages" => $posts->hasMorePages()]);
     }
 
     public function getVideoPostsByUserIdJson(Request $request)
@@ -419,7 +428,7 @@ class SocialMediaController extends Controller
 
         $posts = $this->getPostsByUserId($userId, "video", null);
 
-        return response()->json(["posts" => $posts]);
+        return response()->json(["posts" => $posts->items(), "hasMorePages" => $posts->hasMorePages()]);
     }
 
     public function getDonationsByUserIdJson(Request $request)
@@ -469,20 +478,14 @@ class SocialMediaController extends Controller
                     ->first();
 
                 if ($follow) {
-                    // if yes, unfollow the user by deleting the follow data with the notification
-                    // Notification::where("type", "=", "follow")
-                    //     ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(data, '$.follow_id')) = ?", [$follow->id])
-                    //     ->delete();
-
+                    // if yes, unfollow the user by deleting the follow data
                     $follow->delete();
                 } else {
                     // if no, follow the user by adding a new follow data
-                    $newFollow = Follow::create([
+                    Follow::create([
                         "follower_user_id" => $followerUserId,
                         "followed_user_id" => $followedUserId
                     ]);
-
-                    // $this->createFollowNotification($user, $newFollow);
                 }
             });
 
@@ -508,10 +511,15 @@ class SocialMediaController extends Controller
             ->orderByDesc("id")
             ->paginate($this->MAX_RESULT_LIMIT);
 
+        if ($request->ajax()) {
+            $html = view('social-media.components.donation-posts-list', compact('donations'))->render();
+            return response()->json(["html" => $html, "hasMorePages" => $donations->hasMorePages()]);
+        }
+
         return view('social-media.donation-post', compact('donations'));
     }
 
-    public function notificationsIndex()
+    public function notificationsIndex(Request $request)
     {
         $notifications = Notification::leftJoin("likes as l", function ($query) {
             $query->on("notifications.source_id", "l.id")
@@ -530,36 +538,13 @@ class SocialMediaController extends Controller
                 "l.user_id as from_user_id"  // the user who liked the post
             )
             ->orderByDesc("notifications.created_at")
-            ->get();
+            ->paginate($this->MAX_RESULT_LIMIT);
+
+        if ($request->ajax()) {
+            $html = view('social-media.components.notifications-list', compact('notifications'))->render();
+            return response()->json(['html' => $html, 'hasMorePages' => $notifications->hasMorePages()]);
+        }
 
         return view('social-media.notifications', compact('notifications'));
     }
-
-    // private function createLikeNotification($user, $like, $post)
-    // {
-    //     if (isset($post->content)) {
-    //         $content = "$user->name has liked your post about '" . substr($post->content, 0, 30) . "...'";
-    //     } else {
-    //         $content = "$user->name has liked your post.";
-    //     }
-
-    //     $this->insertNotification($content, "likes", $post->user_id, $like->id);
-    // }
-
-    // private function createFollowNotification($user, $follow)
-    // {
-    //     $content = "$user->name has followed you.";
-
-    //     $this->insertNotification($content, "follows", $follow->followed_user_id, $follow->id);
-    // }
-
-    // private function insertNotification($content, $sourceName, $userId, $sourceId)
-    // {
-    //     Notification::create([
-    //         "content" => $content,
-    //         "source_name" => $sourceName,
-    //         "source_id" => $sourceId,
-    //         "user_id" => $userId,
-    //     ]);
-    // }
 }

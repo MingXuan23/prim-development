@@ -17,7 +17,7 @@
 
 <div class="search-section">
     <form action="{{ $searchUrl }}">
-        <input type="search" class="form-control" name="search" placeholder="Cari" value="{{ request('search') }}">
+        <input type="search" id="search-bar" class="form-control" name="search" placeholder="Cari" value="{{ request('search') }}">
         <button class="btn btn-primary" type="submit">Cari</button>
     </form>
 </div>
