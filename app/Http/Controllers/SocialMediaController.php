@@ -216,6 +216,8 @@ class SocialMediaController extends Controller
 
     public function saves(Request $request)
     {
+        $search = trim($request->get('search'));
+
         $posts = Post::with("user:id,name,profile_image")
             ->whereNull("post_id")
             ->withCount(["likes", "comments"])
@@ -229,6 +231,9 @@ class SocialMediaController extends Controller
             ])
             ->whereHas("saves", function ($query) {
                 $query->where("user_id", "=", Auth::id());
+            })
+            ->when(filled($search), function ($query) use ($search) {
+                $query->where("content", "LIKE", "%$search%");
             })
             ->orderByDesc("created_at")
             ->paginate($this->MAX_RESULT_LIMIT);
