@@ -293,7 +293,11 @@ class StudentController extends Controller
             'parent_icno' => 'required',
         ]);
 
-        $icno = $this->trimString(str_replace('-', '', $request->get('parent_icno')));
+        if ($request->nationality == "Malaysia") {
+            $icno = $this->trimString(str_replace('-', '', $request->get('parent_icno')));
+        } else {
+            $icno = $request->get('parent_icno');
+        }
 
         $parentname = $this->trimString(strtoupper($request->get('parent_name')));
 
