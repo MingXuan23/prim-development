@@ -219,7 +219,8 @@ class ClassController extends Controller
             ->where('id', $id)
             ->where('levelid', '>', 0)
             ->update([
-                'levelid' => $request->get('level')
+                'levelid' => $request->get('level'),
+                'status' => $request->get('status')
             ]);
 
         $update = DB::table('class_organization')->where('class_id', $id);
@@ -275,10 +276,9 @@ class ClassController extends Controller
                     ->join('class_organization', 'class_organization.class_id', '=', 'classes.id')
                     ->leftJoin('organization_user', 'class_organization.organ_user_id', 'organization_user.id')
                     ->leftJoin('users', 'organization_user.user_id', 'users.id')
-                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru', 'class_organization.updated_at')
+                    ->select('classes.id as cid', 'classes.nama as cnama', 'classes.levelid', 'users.name as guru', 'class_organization.updated_at', 'classes.status as class_status')
                     ->where([
-                        ['class_organization.organization_id', $oid],
-                        ['classes.status', "1"]
+                        ['class_organization.organization_id', $oid]
                     ])
                     ->orderBy('classes.nama')
                     ->orderBy('classes.levelid');
@@ -318,6 +318,14 @@ class ClassController extends Controller
                 }
             });
 
+            $table->addColumn('status', function ($row) {
+                if ($row->class_status == 1) {
+                    return '<div class="d-flex justify-content-center">' . '<span class="badge badge-success">Aktif</span></div>';
+                } else {
+                    return '<div class="d-flex justify-content-center"><span class="badge badge-danger">Tidak Aktif</span></div>';
+                }
+            });
+
             $table->addColumn('action', function ($row) {
                 $token = csrf_token();
                 $btn = '<div class="d-flex justify-content-center">';
@@ -327,7 +335,7 @@ class ClassController extends Controller
                 return $btn;
             });
 
-            $table->rawColumns(['totalstudent', 'action', 'gkelas']);
+            $table->rawColumns(['totalstudent', 'action', 'gkelas', 'status']);
             return $table->make(true);
         }
     }

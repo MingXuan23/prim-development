@@ -18,7 +18,11 @@
     <div class="errorMessage"></div>
 
     <div class="p-4 d-flex flex-column align-items-center">
-        @include('social-media.components.search-bar', ['searchUrl' => route('social-media.index')])
+        @if (request()->is("*/saves*"))
+            @include('social-media.components.search-bar', ['searchUrl' => route('social-media.saves')])
+        @else
+            @include('social-media.components.search-bar', ['searchUrl' => route('social-media.index')])
+        @endif
 
         <div id="posts">
             @include('social-media.components.post-list', ['posts' => $posts])
