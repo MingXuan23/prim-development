@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    protected $fillable = ["title", "content", "media_type", "media_url", "created_at", "updated_at", "user_id", "post_id", "shared_donation_id"];
+    protected $fillable = ["title", "content", "media_type", "media_url", "created_at", "updated_at", "user_id", "post_id", "shared_donation_id", "source_name", "source_id"];
 
     public function likes()
     {
@@ -17,6 +17,11 @@ class Post extends Model
     public function saves()
     {
         return $this->hasMany(Save::class);
+    }
+
+    public function shares()
+    {
+        return $this->morphMany(Post::class, "source", "source_name", "source_id");
     }
 
     public function parent()
@@ -37,5 +42,10 @@ class Post extends Model
     public function donation_post()
     {
         return $this->belongsTo(Donation::class, "shared_donation_id");
+    }
+
+    public function source_post()
+    {
+        return $this->morphTo("source_post", "source_name", "source_id");
     }
 }

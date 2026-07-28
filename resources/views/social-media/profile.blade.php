@@ -118,7 +118,6 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-            background-color: #f8f9fa;
         }
 
         .post {
@@ -196,24 +195,9 @@
             gap: 15px;
         }
 
-        #donations .donation-card {
-            text-align: center;
-            border-radius: 10px;
-            width: 100%;
-        }
-
         #donations .donation-card img {
-            width: 100%;
-            border-radius: 10px;
-        }
-
-        #donations .donation-card .donation-card-footer {
-            padding: 15px 0;
-        }
-
-        #donations .donation-card .donation-card-footer a {
-            width: 100%;
-            color: white;
+            min-height: 300px;
+            height: fit-content;
         }
 
         .shared-donation-card {
@@ -297,9 +281,9 @@
     </div>
 
     <div class="profile-card">
-        <div id="posts"></div>
         <div class="profile-body">
             <div id="about"></div>
+            <div id="posts"></div>
             <div id="medias"></div>
             <div id="donations"></div>
             <div id="loading" class="text-center">Loading...</div>
@@ -341,6 +325,8 @@
         </div>
     </div>
     {{-- end share donation modal --}}
+
+    @include('social-media.components.share-post-modal')
 @endsection
 
 @section('script')
@@ -369,15 +355,7 @@
                 if (isLoading || !hasMorePages || activeTab == "Maklumat Pengguna") return;
 
                 if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200) {
-                    showLoading();
-
-                    if (activeTab == "Post") {
-                        fetchPosts();
-                    } else if (activeTab == "Gambar") {
-                        fetchPhotoPosts();
-                    } else if (activeTab == "Video") {
-                        fetchVideoPosts();
-                    }
+                    fetchDataByTabSelected(activeTab);
                 }
             });
 
@@ -409,10 +387,18 @@
                 $("#medias").hide();
                 $("#donations").hide();
 
+                $("#posts").empty();
+                $("#medias").empty();
+                $("#donations").empty();
+
                 // add active class to current clicked nav item
                 $(this).addClass("active");
 
                 activeTab = $(this).text();
+
+                currentPage = 0;
+                hasMorePages = true;
+                hideLoading();
 
                 fetchDataByTabSelected(activeTab);
             });
@@ -434,27 +420,20 @@
             }
 
             function fetchDataByTabSelected(tabName) {
-                currentPage = 0;
-                hasMorePages = true;
-                hideLoading();
+                showLoading();
 
                 switch (tabName) {
                     case "Maklumat Pengguna":
+                        hideLoading();
                         loadAboutSection();
                         break;
                     case "Post":
-                        showLoading();
-                        $("#posts").empty();
                         fetchPosts();
                         break;
                     case "Gambar":
-                        showLoading();
-                        $("#medias").empty();
                         fetchPhotoPosts();
                         break;
                     case "Video":
-                        showLoading();
-                        $("#medias").empty();
                         fetchVideoPosts();
                         break;
                     case "Derma Saya":
@@ -652,16 +631,24 @@
                 });
             });
 
-            $(document).on("click", ".share-btn", function (e) {
+            $(document).on("click", ".share-donation-btn", function (e) {
                 e.preventDefault();
 
                 $("#share-donation-modal #modal-donation-name").val("");
                 let donationId = $(this).closest(".donation-card").data("donationid");
                 let donationName = $(this).closest(".donation-card-footer").find("#donation-name").text();
-                console.log(donationId);
+
                 $("#share-donation-modal #modal-donation-id").val(donationId);
                 $("#share-donation-modal #modal-donation-name").val(donationName);
                 $("#share-donation-modal").modal("show");
+            });
+
+            $(document).on("click", ".share-btn", function (e) {
+                e.preventDefault();
+
+                let postId = $(this).closest(".post-card-footer").data("postid");
+                fetchPostById(postId);
+                $("#share-post-modal").modal("show");
             });
 
             function displayError(message) {
@@ -693,6 +680,7 @@
 
                         if (response.html == "") {
                             postsDisplay.text("Tiada post.");
+                            nextPage(response.hasMorePages);
                             return;
                         }
 
@@ -705,13 +693,13 @@
             function fetchDonation() {
                 let donationsDisplay = $("#donations");
                 donationsDisplay.show();
-                donationsDisplay.empty();
 
                 $.ajax({
                     type: "GET",
                     url: "{{ route('social-media.getDonationsByUserIdJson') }}",
                     data: {
-                        "user_id": "{{ $userData['id'] }}"
+                        "user_id": "{{ $userData['id'] }}",
+                        "page": currentPage + 1
                     },
                     success: function (response) {
                         if (response.error) {
@@ -719,20 +707,14 @@
                             return;
                         }
 
-                        if (response.donations.length == 0) {
+                        if (response.html == "") {
                             donationsDisplay.text("Tiada derma aktif.");
+                            nextPage(response.hasMorePages);
                             return;
                         }
 
-                        response.donations.forEach(donation => {
-                            let donationHtml = "<div class='donation-card' data-donationid='" + donation.id + "'>" +
-                                "<img src='/donation-poster/" + donation.donation_poster + "'/>" +
-                                "<div class='donation-card-footer'><h5 class='mb-3' id='donation-name'>" + donation.nama + "</h5>" +
-                                "<button class='btn btn-secondary w-100 mb-2 share-btn'>Kongsi</button>" +
-                                "<a class='btn btn-primary' href='/sumbangan_anonymous/" + donation.url + "' target='_blank'>Derma Sekarang</a></div></div>";
-
-                            donationsDisplay.prepend(donationHtml);
-                        });
+                        donationsDisplay.append(response.html);
+                        nextPage(response.hasMorePages);
                     }
                 });
             }
@@ -801,7 +783,7 @@
                 });
             }
 
-            function fetchPostById(postId) {
+            function resetCommentModal() {
                 $("#comment-modal #author-profile-image").prop("src", "");
                 $("#comment-modal #author-name").text("");
                 $("#comment-modal #created-at").text("");
@@ -814,6 +796,21 @@
                 $("#comment-modal .modal-body #like-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .modal-body #save-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .shared-donation-card").hide();
+            }
+
+            function resetShareModal() {
+                // reset modal fields
+                $("#shared-post-id").val("");
+                $("#shared-post-author-name").text("");
+                $("#shared-post-created-at").text("");
+                $("#shared-post-content").text("");
+                $("#shared-post-media").empty();
+                $("#share-post-modal .shared-donation-card").hide();
+            }
+
+            function fetchPostById(postId) {
+                resetCommentModal();
+                resetShareModal();
 
                 $.ajax({
                     type: "GET",
@@ -848,6 +845,15 @@
                             $("#comment-modal .modal-body #save-icon").toggleClass("far").toggleClass("fas");
                         }
 
+                        // load data in share modal
+                        $("#shared-post-id").val(postId);
+                        $("#shared-post-author-img").prop("src", profilePicture);
+                        $("#author-profile-link").prop("href", "/social-media/profile?user_id=" + authorId);
+                        $("#shared-post-author-name").text(username);
+                        $("#shared-post-created-at").text(createdAt);
+                        $("#shared-post-content").text(content);
+
+                        // load data in comment modal
                         $("#comment-modal .modal-title").html(username + "'s post");
 
                         $("#comment-modal #author-profile-image").prop("src", profilePicture);
@@ -864,6 +870,12 @@
                             $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
                             $("#comment-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
                             $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
+
+                            // shared donation poster in share modal
+                            $("#share-post-modal .shared-donation-card").show();
+                            $("#share-post-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
+                            $("#share-post-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
+                            $("#share-post-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
                         }
 
                         $(".post-card-footer[data-postid='" + postId + "']").find(".like-btn p").text(likesCount);
@@ -871,8 +883,10 @@
 
                         if (mediaType == "image") {
                             $("#comment-modal .modal-body #modal-media").html("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
+                            $("#shared-post-media").append("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
                         } else if (mediaType == "video") {
                             $("#comment-modal .modal-body #modal-media").html("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted autoplay></video>");
+                            $("#shared-post-media").append("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted></video>");
                         }
 
                         $("#comment-loading").show();

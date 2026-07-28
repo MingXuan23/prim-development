@@ -140,16 +140,20 @@ class SocialMediaController extends Controller
         $content = $request->get('content');
         $media = null;
         $sharedDonationId = $request->get('shared_donation_id');  // used for sharing donation posters
+        $sharedPostId = $request->get('shared_post_id');  // used for sharing posts
 
         if ($request->hasFile("media")) {
             $media = $request->file('media');
         }
 
-        if (!isset($content) && !isset($media) && !isset($sharedDonationId)) {
+        if (!isset($content) && !isset($media) && !isset($sharedDonationId) && !isset($sharedPostId)) {
             return response()->json(["error" => "Sila isikan sekurang-kurangnya satu input (content atau media)."]);
         }
 
-        $this->insertPost($content, $media, null, $sharedDonationId);
+        $sourceName = isset($sharedDonationId) ? "App\Donation" : (isset($sharedPostId) ? "App\Post" : null);
+        $sourceId = isset($sharedDonationId) ? $sharedDonationId : (isset($sharedPostId) ? $sharedPostId : null);
+
+        $this->insertPost($content, $media, null, $sharedDonationId, $sourceName, $sourceId);
 
         return redirect()->route('social-media.index');
     }
@@ -176,7 +180,7 @@ class SocialMediaController extends Controller
             return response()->json(["error" => "Sila isikan sekurang-kurangnya satu input (content atau media)."]);
         }
 
-        $comment = $this->insertPost($content, $media, $postId, null);
+        $comment = $this->insertPost($content, $media, $postId, null, null, null);
         $user = Auth::user();
         $userData = [
             "name" => $user->name,
@@ -189,7 +193,7 @@ class SocialMediaController extends Controller
         return response()->json(["html" => $html]);
     }
 
-    private function insertPost($content, $media, $postId, $sharedDonationId)
+    private function insertPost($content, $media, $postId, $sharedDonationId, $sourceName, $sourceId)
     {
         $filename = null;
         $mediaType = null;
@@ -207,8 +211,10 @@ class SocialMediaController extends Controller
             "created_at" => now(),
             "updated_at" => now(),
             "user_id" => Auth::id(),
-            "post_id" => $postId,
-            "shared_donation_id" => $sharedDonationId
+            "post_id" => $postId,  // for comments
+            "shared_donation_id" => $sharedDonationId,
+            "source_name" => $sourceName,
+            "source_id" => $sourceId
         ]);
 
         return $post;
@@ -334,10 +340,17 @@ class SocialMediaController extends Controller
 
     public function getPostsByUserId($userId, $mediaType, $searchFilter)
     {
-        $posts = Post::with("user:id,name,profile_image")
-            ->with("donation_post")
-            ->whereNull("post_id")
-            ->withCount(["likes", "comments"])
+        $posts = Post::with([
+            "user:id,name,profile_image",
+            "donation_post",
+            "source_post" => function ($morphTo) {
+                $morphTo->morphWith([
+                    Post::class => ["user:id,name,profile_image", "donation_post"]
+                ]);
+            }
+        ])
+            ->whereNull("posts.post_id")
+            ->withCount(["likes", "comments", "shares"])
             ->withCount([
                 "likes as is_liked" => function ($query) {
                     $query->where("user_id", "=", Auth::id());
@@ -364,8 +377,16 @@ class SocialMediaController extends Controller
 
             $referralCode = app(PointController::class)->getReferralCode(true, $post->user->id);
 
-            if (isset($referralCode) && isset($post->donation_post)) {
+            if (!isset($referralCode)) {
+                return;
+            }
+
+            if (isset($post->donation_post)) {
                 $post->donation_share_url = $post->donation_post->url . "?referral_code=$referralCode->code";
+            }
+
+            if (isset($post->source_post->donation_post)) {
+                $post->source_post->donation_share_url = $post->source_post->donation_post->url . "?referral_code=$referralCode->code";
             }
         });
 
@@ -456,9 +477,11 @@ class SocialMediaController extends Controller
                 $query->whereIn("organizations.id", $organizationIds);
             })
             ->where("status", "=", 1)
-            ->get();
+            ->paginate($this->MAX_RESULT_LIMIT);
 
-        return response()->json(["donations" => $donations]);
+        $html = view('social-media.components.donation-posts-list', compact('donations'))->render();
+
+        return response()->json(["html" => $html, "hasMorePages" => $donations->hasMorePages()]);
     }
 
     public function followUser(Request $request)

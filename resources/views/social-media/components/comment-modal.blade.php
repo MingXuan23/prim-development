@@ -41,7 +41,7 @@
         max-height: 700px;
     }
 
-    .modal-content {
+    #comment-modal .modal-content {
         height: 100%;
     }
 
