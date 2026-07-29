@@ -40,22 +40,22 @@
 
                     <div class="shared-post">
                         <div class="shared-post-header">
-                            <a href="" id="author-profile-link">
-                                <img src="" id="shared-post-author-img" class="profile-img">
+                            <a href="" class="author-profile-link">
+                                <img src="" class="profile-img shared-post-author-img">
                                 <div>
-                                    <h5 class="fw-bold text-black" id="shared-post-author-name"></h5>
-                                    <p class="text-gray" id="shared-post-created-at"></p>
+                                    <h5 class="fw-bold text-black shared-post-author-name"></h5>
+                                    <p class="text-gray shared-post-created-at"></p>
                                 </div>
                             </a>
                         </div>
 
-                        <p class="text-lg" id="shared-post-content"></p>
+                        <p class="text-lg shared-post-content"></p>
 
-                        <div id="shared-post-media"></div>
+                        <div class="shared-post-media"></div>
 
                         <div class="shared-donation-card">
                             <img src="" class="donation-poster">
-                            <h5 id="donation-name"></h5>
+                            <h5 id="donation-name" class="text-center"></h5>
                             <a class="btn btn-primary" href="" target="_blank" id="donate-now-btn">Derma Sekarang</a>
                         </div>
                     </div>

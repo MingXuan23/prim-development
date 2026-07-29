@@ -1,9 +1,9 @@
 @extends('layouts.social-media-layouts')
 
 @section('css')
-    <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css"/>
     <!-- for input mask -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap.min.css"/>
     <style>
         /* ----------------------------------- profile styling ----------------------------------- */
         .profile-card {
@@ -647,6 +647,7 @@
                 e.preventDefault();
 
                 let postId = $(this).closest(".post-card-footer").data("postid");
+                $("#shared-post-id").val(postId);
                 fetchPostById(postId);
                 $("#share-post-modal").modal("show");
             });
@@ -800,12 +801,34 @@
 
             function resetShareModal() {
                 // reset modal fields
-                $("#shared-post-id").val("");
-                $("#shared-post-author-name").text("");
-                $("#shared-post-created-at").text("");
-                $("#shared-post-content").text("");
-                $("#shared-post-media").empty();
+                $(".shared-post-author-name").text("");
+                $(".shared-post-created-at").text("");
+                $(".shared-post-content").text("");
+                $(".shared-post-media").empty();
                 $("#share-post-modal .shared-donation-card").hide();
+            }
+
+            function loadSharedPostData(sharedPost) {
+                $(".shared-post-author-img").prop("src", sharedPost.user.profilePicture);
+                $(".author-profile-link").prop("href", "/social-media/profile?user_id=" + sharedPost.user.id);
+                $(".shared-post-author-name").text(sharedPost.user.name);
+                $(".shared-post-created-at").text(sharedPost.created_at.replace("T", " ").split(".")[0]);
+                $(".shared-post-content").text(sharedPost.content);
+                $(".shared-post").show();
+
+                if (sharedPost.media_type == "image") {
+                    $(".shared-post-media").append("<img src='/uploads/post_media/" + sharedPost.media_url + "' class='post-media'>");
+                } else if (sharedPost.media_type == "video") {
+                    $(".shared-post-media").append("<video src='/uploads/post_media/" + sharedPost.media_url + "' class='post-media' controls muted></video>");
+                }
+
+                if (sharedPost.source_name && sharedPost.source_name.includes('Donation')) {
+                    // shared donation in shared post in comment modal
+                    $(".shared-post .shared-donation-card").show();
+                    $(".shared-post .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + sharedPost.source.donation_poster);
+                    $(".shared-post .shared-donation-card #donation-name").text(sharedPost.source.nama);
+                    $(".shared-post .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (sharedPost.donation_share_url != null ? sharedPost.donation_share_url : sharedPost.source.url));
+                }
             }
 
             function fetchPostById(postId) {
@@ -831,11 +854,14 @@
                         let createdAt = response.post.created_at.replace("T", " ").split(".")[0];
                         let likesCount = response.post.likes_count;
                         let commentsCount = response.post.comments_count;
+                        let sharesCount = response.post.shares_count;
                         let isLiked = response.post.is_liked;
                         let isSaved = response.post.is_saved;
                         let username = response.post.user.name;
                         let profilePicture = response.post.user.profile_image ? "/uploads/profile_picture/" + response.post.user.profile_image : "/assets/images/users/user-4.jpg";
                         let authorId = response.post.user.id;
+
+                        let sharedPost = response.post.shared_post;
 
                         if (isLiked) {
                             $("#comment-modal .modal-body #like-icon").toggleClass("far").toggleClass("fas");
@@ -846,12 +872,15 @@
                         }
 
                         // load data in share modal
-                        $("#shared-post-id").val(postId);
-                        $("#shared-post-author-img").prop("src", profilePicture);
-                        $("#author-profile-link").prop("href", "/social-media/profile?user_id=" + authorId);
-                        $("#shared-post-author-name").text(username);
-                        $("#shared-post-created-at").text(createdAt);
-                        $("#shared-post-content").text(content);
+                        $(".shared-post-author-img").prop("src", profilePicture);
+                        $(".author-profile-link").prop("href", "/social-media/profile?user_id=" + authorId);
+                        $(".shared-post-author-name").text(username);
+                        $(".shared-post-created-at").text(createdAt);
+                        $(".shared-post-content").text(content);
+
+                        if (sharedPost && !$("#share-post-modal").hasClass("show")) {
+                            loadSharedPostData(sharedPost);
+                        }
 
                         // load data in comment modal
                         $("#comment-modal .modal-title").html(username + "'s post");
@@ -862,20 +891,21 @@
                         $("#comment-modal .modal-body #post-content").text(content);
                         $("#comment-modal .modal-body #likes-count").text(likesCount);
                         $("#comment-modal .modal-body #comments-count").text(commentsCount);
+                        $("#comment-modal .modal-body #shares-count").text(sharesCount);
                         $("#comment-modal .modal-body .post-card-footer").data("postid", postId);
 
-                        if (response.post.donation_post) {
+                        if (response.post.source_name && response.post.source_name.includes('Donation')) {
                             // shared donation poster
                             $("#comment-modal .shared-donation-card").show();
-                            $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
-                            $("#comment-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
-                            $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
+                            $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.source.donation_poster);
+                            $("#comment-modal .shared-donation-card #donation-name").text(response.post.source.nama);
+                            $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.source.url));
 
                             // shared donation poster in share modal
                             $("#share-post-modal .shared-donation-card").show();
-                            $("#share-post-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
-                            $("#share-post-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
-                            $("#share-post-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
+                            $("#share-post-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.source.donation_poster);
+                            $("#share-post-modal .shared-donation-card #donation-name").text(response.post.source.nama);
+                            $("#share-post-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.source.url));
                         }
 
                         $(".post-card-footer[data-postid='" + postId + "']").find(".like-btn p").text(likesCount);
@@ -883,10 +913,10 @@
 
                         if (mediaType == "image") {
                             $("#comment-modal .modal-body #modal-media").html("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
-                            $("#shared-post-media").append("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
+                            $(".shared-post-media").append("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
                         } else if (mediaType == "video") {
                             $("#comment-modal .modal-body #modal-media").html("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted autoplay></video>");
-                            $("#shared-post-media").append("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted></video>");
+                            $(".shared-post-media").append("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted></video>");
                         }
 
                         $("#comment-loading").show();

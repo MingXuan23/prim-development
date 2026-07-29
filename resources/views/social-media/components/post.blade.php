@@ -116,38 +116,37 @@
         <img src="{{ URL::asset('uploads/post_media/' . $post->media_url) }}" class="post-media">
     @elseif ($post->media_type == "video")
         <video src="{{ URL::asset('/uploads/post_media/' . $post->media_url) }}" class="post-media" controls muted></video>
-    @elseif (isset($post->shared_donation_id))
+    @elseif (isset($post->source))
         <div class="shared-donation-card">
-            <img src="{{ URL::asset('donation-poster/' . $post->donation_post->donation_poster) }}" class="donation-poster">
-            <h5>{{ $post->donation_post->nama }}</h5>
-            <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->donation_share_url) ? $post->donation_share_url : $post->donation_post->url) }}" target="_blank">Derma
+            <img src="{{ URL::asset('donation-poster/' . $post->source->donation_poster) }}" class="donation-poster">
+            <h5 class="text-center">{{ $post->source->nama }}</h5>
+            <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->donation_share_url) ? $post->donation_share_url : $post->source->url) }}" target="_blank">Derma
                 Sekarang</a>
         </div>
-    @elseif (isset($post->source_post))
+    @elseif (isset($post->shared_post))
         <div class="shared-post">
             <div class="shared-post-header">
-                <a href="{{ route('social-media.profile', ['user_id' => $post->source_post->user->id]) }}">
-                    <img src="{{ $post->source_post->user->profile_image ? URL::asset('uploads/profile_picture/' . $post->source_post->user->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}"
+                <a href="{{ route('social-media.profile', ['user_id' => $post->shared_post->user->id]) }}">
+                    <img src="{{ $post->shared_post->user->profile_image ? URL::asset('uploads/profile_picture/' . $post->shared_post->user->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}"
                         class="profile-img">
                     <div>
-                        <h5 class="fw-bold text-black">{{ $post->source_post->user->name }}</h5>
-                        <p class="text-gray">{{ $post->source_post->created_at }}</p>
+                        <h5 class="fw-bold text-black">{{ $post->shared_post->user->name }}</h5>
+                        <p class="text-gray">{{ $post->shared_post->created_at }}</p>
                     </div>
                 </a>
             </div>
 
-            <p class="text-lg">{{ $post->source_post->content }}</p>
+            <p class="text-lg">{{ $post->shared_post->content }}</p>
 
-            @if($post->source_post->media_type == "image")
-                <img src="{{ URL::asset('uploads/post_media/' . $post->source_post->media_url) }}" class="post-media">
-            @elseif ($post->source_post->media_type == "video")
-                <video src="{{ URL::asset('/uploads/post_media/' . $post->source_post->media_url) }}" class="post-media" controls muted></video>
-            @elseif (isset($post->source_post->shared_donation_id))
+            @if($post->shared_post->media_type == "image")
+                <img src="{{ URL::asset('uploads/post_media/' . $post->shared_post->media_url) }}" class="post-media">
+            @elseif ($post->shared_post->media_type == "video")
+                <video src="{{ URL::asset('/uploads/post_media/' . $post->shared_post->media_url) }}" class="post-media" controls muted></video>
+            @elseif (isset($post->shared_post->source))
                 <div class="shared-donation-card">
-                    <img src="{{ URL::asset('donation-poster/' . $post->source_post->donation_post->donation_poster) }}" class="donation-poster">
-                    <h5>{{ $post->source_post->donation_post->nama }}</h5>
-                    <a class="btn btn-primary"
-                        href="{{ '/sumbangan_anonymous/' . (isset($post->source_post->donation_share_url) ? $post->source_post->donation_share_url : $post->source_post->donation_post->url) }}"
+                    <img src="{{ URL::asset('donation-poster/' . $post->shared_post->source->donation_poster) }}" class="donation-poster">
+                    <h5 class="text-center">{{ $post->shared_post->source->nama }}</h5>
+                    <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->shared_post->donation_share_url) ? $post->shared_post->donation_share_url : $post->shared_post->source->url) }}"
                         target="_blank">Derma
                         Sekarang</a>
                 </div>

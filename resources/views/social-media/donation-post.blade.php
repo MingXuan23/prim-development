@@ -35,7 +35,7 @@
                     </div>
                     <form action="{{ route('social-media.addPost') }}" method="post">
                         {{ csrf_field() }}
-                        <input type="hidden" id="modal-donation-id" name="shared_donation_id">
+                        <input type="hidden" id="modal-donation-id" name="source_id">
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Nama Derma</label>
@@ -67,7 +67,7 @@
         $(document).ready(function () {
             $("#loading").hide();
 
-            $(document).on("click", ".share-btn", function (e) {
+            $(document).on("click", ".share-donation-btn", function (e) {
                 e.preventDefault();
 
                 $("#share-donation-modal #modal-donation-name").val("");

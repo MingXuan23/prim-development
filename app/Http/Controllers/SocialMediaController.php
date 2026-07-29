@@ -117,7 +117,7 @@ class SocialMediaController extends Controller
                 ->first();
 
             if ($save) {
-                // if yes, remove the save 
+                // if yes, remove the save
                 $save->delete();
             } else {
                 // if not, create a new save
@@ -139,21 +139,20 @@ class SocialMediaController extends Controller
     {
         $content = $request->get('content');
         $media = null;
-        $sharedDonationId = $request->get('shared_donation_id');  // used for sharing donation posters
         $sharedPostId = $request->get('shared_post_id');  // used for sharing posts
+        $sourceId = $request->get('source_id');  // used for sharing donation posters
 
         if ($request->hasFile("media")) {
             $media = $request->file('media');
         }
 
-        if (!isset($content) && !isset($media) && !isset($sharedDonationId) && !isset($sharedPostId)) {
+        if (!isset($content) && !isset($media) && !isset($sourceId) && !isset($sharedPostId)) {
             return response()->json(["error" => "Sila isikan sekurang-kurangnya satu input (content atau media)."]);
         }
 
-        $sourceName = isset($sharedDonationId) ? "App\Donation" : (isset($sharedPostId) ? "App\Post" : null);
-        $sourceId = isset($sharedDonationId) ? $sharedDonationId : (isset($sharedPostId) ? $sharedPostId : null);
+        $sourceName = isset($sharedDonationId) ? "App\Models\Donation" : null;
 
-        $this->insertPost($content, $media, null, $sharedDonationId, $sourceName, $sourceId);
+        $this->insertPost($content, $media, null, $sharedPostId, $sourceName, $sourceId);
 
         return redirect()->route('social-media.index');
     }
@@ -186,14 +185,14 @@ class SocialMediaController extends Controller
             "name" => $user->name,
             "profile_image" => $user->profile_image
         ];
-        $comment->user = (object) $userData;
+        $comment->user = (object)$userData;
 
         $html = view('social-media.components.comment', compact('comment'))->render();
 
         return response()->json(["html" => $html]);
     }
 
-    private function insertPost($content, $media, $postId, $sharedDonationId, $sourceName, $sourceId)
+    private function insertPost($content, $media, $postId, $sharedPostId, $sourceName, $sourceId)
     {
         $filename = null;
         $mediaType = null;
@@ -212,9 +211,9 @@ class SocialMediaController extends Controller
             "updated_at" => now(),
             "user_id" => Auth::id(),
             "post_id" => $postId,  // for comments
-            "shared_donation_id" => $sharedDonationId,
+            "shared_post_id" => $sharedPostId,  // for sharing post
             "source_name" => $sourceName,
-            "source_id" => $sourceId
+            "source_id" => $sourceId  // for sharing other than posts (e.g. donations)
         ]);
 
         return $post;
@@ -342,10 +341,16 @@ class SocialMediaController extends Controller
     {
         $posts = Post::with([
             "user:id,name,profile_image",
-            "donation_post",
-            "source_post" => function ($morphTo) {
-                $morphTo->morphWith([
-                    Post::class => ["user:id,name,profile_image", "donation_post"]
+            "shared_post",
+            "shared_post.user:id,name,profile_image",
+            "shared_post.source" => function ($morph) {
+                $morph->morphWith([
+                    Donation::class => []
+                ]);
+            },
+            "source" => function ($morph) {
+                $morph->morphWith([
+                    Donation::class => []
                 ]);
             }
         ])
@@ -381,12 +386,12 @@ class SocialMediaController extends Controller
                 return;
             }
 
-            if (isset($post->donation_post)) {
-                $post->donation_share_url = $post->donation_post->url . "?referral_code=$referralCode->code";
+            if (isset($post->source) && str_contains($post->source_name, 'Donation')) {
+                $post->donation_share_url = $post->source->url . "?referral_code=$referralCode->code";
             }
 
-            if (isset($post->source_post->donation_post)) {
-                $post->source_post->donation_share_url = $post->source_post->donation_post->url . "?referral_code=$referralCode->code";
+            if (isset($post->shared_post->source) && str_contains($post->shared_post->source_name, 'Donation')) {
+                $post->shared_post->donation_share_url = $post->shared_post->source->url . "?referral_code=$referralCode->code";
             }
         });
 
@@ -405,10 +410,23 @@ class SocialMediaController extends Controller
             return response()->json(["error" => "Post ID required."]);
         }
 
-        $post = Post::with("user:id,name,profile_image")
-            ->with("donation_post")
+        $post = Post::with([
+            "user:id,name,profile_image",
+            "shared_post",
+            "shared_post.user:id,name,profile_image",
+            "source" => function ($morph) {
+                $morph->morphWith([
+                    Donation::class => []
+                ]);
+            },
+            "shared_post.source" => function ($morph) {
+                $morph->morphWith([
+                    Donation::class => []
+                ]);
+            }
+        ])
             ->whereNull("post_id")
-            ->withCount(["likes", "comments"])
+            ->withCount(["likes", "comments", "shares"])
             ->withCount([
                 "likes as is_liked" => function ($query) {
                     $query->where("user_id", "=", Auth::id());

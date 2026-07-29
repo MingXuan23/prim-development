@@ -127,6 +127,26 @@
     .shared-donation-card a {
         width: 100%;
     }
+
+    #shared-post {
+        background-color: white;
+        border-radius: 10px;
+        padding: 25px 18px;
+        margin-bottom: 20px;
+        max-width: 900px;
+        width: 100%;
+    }
+
+    #shared-post-header a {
+        display: flex;
+        gap: 10px;
+        color: black;
+        width: fit-content;
+    }
+
+    #shared-post-header a:hover {
+        color: black;
+    }
 </style>
 
 {{-- comment modal --}}
@@ -156,8 +176,30 @@
 
                     <div class="shared-donation-card">
                         <img src="" class="donation-poster">
-                        <h5 id="donation-name"></h5>
+                        <h5 id="donation-name" class="text-center"></h5>
                         <a class="btn btn-primary" href="" target="_blank" id="donate-now-btn">Derma Sekarang</a>
+                    </div>
+
+                    <div class="shared-post">
+                        <div class="shared-post-header">
+                            <a href="">
+                                <img src="" class="profile-img shared-post-author-img">
+                                <div>
+                                    <h5 class="fw-bold text-black shared-post-author-name"></h5>
+                                    <p class="text-gray shared-post-created-at"></p>
+                                </div>
+                            </a>
+                        </div>
+
+                        <p class="text-lg shared-post-content"></p>
+
+                        <div class="shared-post-media"></div>
+
+                        <div class="shared-donation-card">
+                            <img src="" class="donation-poster">
+                            <h5 id="donation-name" class="text-center"></h5>
+                            <a class="btn btn-primary" href="" target="_blank" id="donate-now-btn">Derma Sekarang</a>
+                        </div>
                     </div>
 
                     <div class="post-card-footer">
@@ -172,7 +214,7 @@
                             </a>
                             <a class="text-primary">
                                 <i class="fas fa-share"></i>
-                                <p class="d-inline">0</p>
+                                <p class="d-inline" id="shares-count"></p>
                             </a>
                         </div>
 
@@ -195,7 +237,8 @@
                 </div>
                 <div id="comment-actions">
                     <img src="" class="profile-img" id="author-profile-image">
-                    <input type="text" placeholder="Tulis komen anda di sini..." class="form-control" id="comment-content" name="comment_content">
+                    <input type="text" placeholder="Tulis komen anda di sini..." class="form-control"
+                           id="comment-content" name="comment_content">
                     <input type="file" hidden accept="image/*,video/*" id="comment-media" name="comment_media">
 
                     <button class="btn" id="comment-media-btn"><i class="fas fa-image"></i></button>
