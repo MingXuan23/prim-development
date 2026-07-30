@@ -190,6 +190,7 @@ class SocialMediaController extends Controller
         $comment = $this->insertPost($content, $media, $postId, null, null, null);
         $user = Auth::user();
         $userData = [
+            "id" => $user->id,
             "name" => $user->name,
             "profile_image" => $user->profile_image
         ];
