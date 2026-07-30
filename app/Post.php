@@ -7,7 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    protected $fillable = ["title", "content", "media_type", "media_url", "created_at", "updated_at", "user_id", "post_id", "shared_post_id", "source_name", "source_id"];
+    protected $fillable = [
+        "title",
+        "content",
+        "media_type",
+        "media_url",
+        "created_at",
+        "updated_at",
+        "user_id",
+        "post_id",
+        "shared_post_id",
+        "root_shared_post_id",
+        "source_name",
+        "source_id",
+        "likes_count",
+        "comments_count",
+        "shares_count"
+    ];
 
     public function likes()
     {
@@ -39,9 +55,9 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function shared_post()
+    public function root_shared_post()
     {
-        return $this->belongsTo(Post::class, "shared_post_id");
+        return $this->belongsTo(Post::class, "root_shared_post_id");
     }
 
     public function source()

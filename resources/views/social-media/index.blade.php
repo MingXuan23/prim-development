@@ -1,7 +1,7 @@
 @extends('layouts.social-media-layouts')
 
 @section('css')
-    <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
     <style>
         .errorMessage {
             color: red;
@@ -338,7 +338,7 @@
                         let isLiked = response.post.is_liked;
                         let isSaved = response.post.is_saved;
 
-                        let sharedPost = response.post.shared_post;
+                        let sharedPost = response.post.root_shared_post;
 
                         $(".shared-post-author-img").prop("src", profilePicture);
                         $(".author-profile-link").prop("href", "/social-media/profile?user_id=" + authorId);

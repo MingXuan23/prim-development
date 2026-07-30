@@ -77,25 +77,35 @@ class SocialMediaController extends Controller
             $user = Auth::user();
             $postId = $request->get("post_id");
 
+            $post = Post::find($postId);
+
+            if (!$post) {
+                throw new Exception("Post not found.");
+            }
+
             // check if it is liked or not
             $like = Like::where("user_id", "=", $user->id)
                 ->where("post_id", "=", $postId)
                 ->first();
 
-            if ($like) {
-                // if yes, remove the like
-                $like->delete();
-            } else {
-                // if not, create a new like
-                Like::create([
-                    "user_id" => $user->id,
-                    "post_id" => $postId,
-                ]);
-            }
+            DB::transaction(function () use ($like, $post, $user, $postId) {
+                if ($like) {
+                    // if yes, remove the like
+                    $like->delete();
+                    $post->decrement("likes_count");
+                } else {
+                    // if not, create a new like
+                    Like::create([
+                        "user_id" => $user->id,
+                        "post_id" => $postId,
+                    ]);
+                    $post->increment("likes_count");
+                }
+            });
 
-            $updatedLikesCount = Like::where("post_id", "=", $postId)->count();
+            $post->refresh();
 
-            return response()->json(["updatedLikesCount" => $updatedLikesCount]);
+            return response()->json(["updatedLikesCount" => $post->likes_count]);
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()]);
         }
@@ -127,9 +137,7 @@ class SocialMediaController extends Controller
                 ]);
             }
 
-            $updatedSavesCount = Save::where("post_id", "=", $postId)->count();
-
-            return response()->json(["updatedSavesCount" => $updatedSavesCount]);
+            return response()->json(["message" => "Success"]);
         } catch (Exception $e) {
             return response()->json(["error" => $e->getMessage()]);
         }
@@ -150,7 +158,7 @@ class SocialMediaController extends Controller
             return response()->json(["error" => "Sila isikan sekurang-kurangnya satu input (content atau media)."]);
         }
 
-        $sourceName = isset($sharedDonationId) ? "App\Models\Donation" : null;
+        $sourceName = isset($sourceId) ? "App\Models\Donation" : null;
 
         $this->insertPost($content, $media, null, $sharedPostId, $sourceName, $sourceId);
 
@@ -185,7 +193,7 @@ class SocialMediaController extends Controller
             "name" => $user->name,
             "profile_image" => $user->profile_image
         ];
-        $comment->user = (object)$userData;
+        $comment->user = (object) $userData;
 
         $html = view('social-media.components.comment', compact('comment'))->render();
 
@@ -196,11 +204,23 @@ class SocialMediaController extends Controller
     {
         $filename = null;
         $mediaType = null;
+        $rootSharedPostId = null;
 
         if (isset($media)) {
             $mediaType = explode('/', $media->getMimeType())[0];
             $filename = uniqid("media_") . "_" . str_replace(" ", "_", $media->getClientOriginalName());
             $media->move(public_path('uploads/post_media'), $filename);
+        }
+
+        if (isset($sharedPostId)) {
+            // get the original post's ID
+            $sharedPost = Post::select('id', 'root_shared_post_id')->find($sharedPostId);
+
+            if (isset($sharedPost)) {
+                // if there is no root_shared_post_id, meaning it is the original post
+                // retrieve the ID for the original post or root_shared_post_id for nested shared post
+                $rootSharedPostId = $sharedPost->root_shared_post_id ?? $sharedPost->id;
+            }
         }
 
         $post = Post::create([
@@ -210,11 +230,20 @@ class SocialMediaController extends Controller
             "created_at" => now(),
             "updated_at" => now(),
             "user_id" => Auth::id(),
-            "post_id" => $postId,  // for comments
-            "shared_post_id" => $sharedPostId,  // for sharing post
+            "post_id" => $postId,  // parent post for current comment
+            "shared_post_id" => $sharedPostId,  // post ID that will be shared
+            "root_shared_post_id" => $rootSharedPostId,  // used to track the original post being shared for nested shares situation
             "source_name" => $sourceName,
             "source_id" => $sourceId  // for sharing other than posts (e.g. donations)
         ]);
+
+        if (isset($postId)) {
+            Post::find($postId)->increment("comments_count");
+        }
+
+        if (isset($sharedPostId)) {
+            Post::find($sharedPostId)->increment("shares_count");
+        }
 
         return $post;
     }
@@ -225,7 +254,6 @@ class SocialMediaController extends Controller
 
         $posts = Post::with("user:id,name,profile_image")
             ->whereNull("post_id")
-            ->withCount(["likes", "comments"])
             ->withCount([
                 "likes as is_liked" => function ($query) {
                     $query->where("user_id", "=", Auth::id());
@@ -341,9 +369,9 @@ class SocialMediaController extends Controller
     {
         $posts = Post::with([
             "user:id,name,profile_image",
-            "shared_post",
-            "shared_post.user:id,name,profile_image",
-            "shared_post.source" => function ($morph) {
+            "root_shared_post",
+            "root_shared_post.user:id,name,profile_image",
+            "root_shared_post.source" => function ($morph) {
                 $morph->morphWith([
                     Donation::class => []
                 ]);
@@ -354,8 +382,7 @@ class SocialMediaController extends Controller
                 ]);
             }
         ])
-            ->whereNull("posts.post_id")
-            ->withCount(["likes", "comments", "shares"])
+            ->whereNull("posts.post_id")  // not a comment post
             ->withCount([
                 "likes as is_liked" => function ($query) {
                     $query->where("user_id", "=", Auth::id());
@@ -390,8 +417,8 @@ class SocialMediaController extends Controller
                 $post->donation_share_url = $post->source->url . "?referral_code=$referralCode->code";
             }
 
-            if (isset($post->shared_post->source) && str_contains($post->shared_post->source_name, 'Donation')) {
-                $post->shared_post->donation_share_url = $post->shared_post->source->url . "?referral_code=$referralCode->code";
+            if (isset($post->root_shared_post->source) && str_contains($post->root_shared_post->source_name, 'Donation')) {
+                $post->root_shared_post->donation_share_url = $post->root_shared_post->source->url . "?referral_code=$referralCode->code";
             }
         });
 
@@ -412,21 +439,20 @@ class SocialMediaController extends Controller
 
         $post = Post::with([
             "user:id,name,profile_image",
-            "shared_post",
-            "shared_post.user:id,name,profile_image",
+            "root_shared_post",
+            "root_shared_post.user:id,name,profile_image",
             "source" => function ($morph) {
                 $morph->morphWith([
                     Donation::class => []
                 ]);
             },
-            "shared_post.source" => function ($morph) {
+            "root_shared_post.source" => function ($morph) {
                 $morph->morphWith([
                     Donation::class => []
                 ]);
             }
         ])
-            ->whereNull("post_id")
-            ->withCount(["likes", "comments", "shares"])
+            ->whereNull("post_id")  // not a comment post
             ->withCount([
                 "likes as is_liked" => function ($query) {
                     $query->where("user_id", "=", Auth::id());

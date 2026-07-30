@@ -1,9 +1,9 @@
 @extends('layouts.social-media-layouts')
 
 @section('css')
-    <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css"/>
+    <link href="{{ URL::asset('assets/libs/chartist/chartist.min.css')}}" rel="stylesheet" type="text/css" />
     <!-- for input mask -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.0/css/bootstrap.min.css" />
     <style>
         /* ----------------------------------- profile styling ----------------------------------- */
         .profile-card {
@@ -861,7 +861,7 @@
                         let profilePicture = response.post.user.profile_image ? "/uploads/profile_picture/" + response.post.user.profile_image : "/assets/images/users/user-4.jpg";
                         let authorId = response.post.user.id;
 
-                        let sharedPost = response.post.shared_post;
+                        let sharedPost = response.post.root_shared_post;
 
                         if (isLiked) {
                             $("#comment-modal .modal-body #like-icon").toggleClass("far").toggleClass("fas");
