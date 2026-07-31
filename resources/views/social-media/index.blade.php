@@ -31,6 +31,8 @@
         <div id="post-loading">Loading...</div>
 
         @include('social-media.components.comment-modal')
+
+        @include('social-media.components.share-post-modal')
     </div>
 @endsection
 
@@ -238,12 +240,22 @@
                 $("#comment-media").val("");
             });
 
+            $(document).on("click", ".share-btn", function (e) {
+                e.preventDefault();
+
+                let postId = $(this).parent().parent().data("postid");
+                $("#shared-post-id").val(postId);
+                $("#share-post-modal").modal("show");
+
+                fetchPostById(postId);
+            });
+
             function closeMediaPreview() {
                 $("#comment-media-preview").empty();
                 $("#comment-media-preview").hide();
             }
 
-            function fetchPostById(postId) {
+            function resetCommentModal() {
                 // reset modal fields
                 $("#comment-modal #author-profile-image").prop("src", "");
                 $("#comment-modal #author-name").text("");
@@ -257,10 +269,48 @@
                 $("#comment-modal .modal-body #like-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .modal-body #save-icon").addClass("far").removeClass("fas");
                 $("#comment-modal .modal-body #modal-media").empty();
-                $(".donation-poster").prop("src", "");
-                $("#donation-name").text("");
-                $("#donate-now-btn").prop("href", "");
-                $(".shared-donation-card").hide();
+                $("#comment-modal .shared-donation-card .donation-poster").prop("src", "");
+                $("#comment-modal .shared-donation-card #donation-name").text("");
+                $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", "");
+                $("#comment-modal .shared-donation-card").hide();
+                $("#comment-modal .shared-post").hide();
+            }
+
+            function resetShareModal() {
+                // reset modal fields
+                $(".shared-post-author-name").text("");
+                $(".shared-post-created-at").text("");
+                $(".shared-post-content").text("");
+                $(".shared-post-media").empty();
+                $("#share-post-modal .shared-donation-card").hide();
+            }
+
+            function loadSharedPostData(sharedPost) {
+                $(".shared-post-author-img").prop("src", sharedPost.user.profilePicture);
+                $(".author-profile-link").prop("href", "/social-media/profile?user_id=" + sharedPost.user.id);
+                $(".shared-post-author-name").text(sharedPost.user.name);
+                $(".shared-post-created-at").text(sharedPost.created_at.replace("T", " ").split(".")[0]);
+                $(".shared-post-content").text(sharedPost.content);
+                $(".shared-post").show();
+
+                if (sharedPost.media_type == "image") {
+                    $(".shared-post-media").append("<img src='/uploads/post_media/" + sharedPost.media_url + "' class='post-media'>");
+                } else if (sharedPost.media_type == "video") {
+                    $(".shared-post-media").append("<video src='/uploads/post_media/" + sharedPost.media_url + "' class='post-media' controls muted></video>");
+                }
+
+                if (sharedPost.source_name && sharedPost.source_name.includes('Donation')) {
+                    // shared donation in shared post in comment modal
+                    $(".shared-post .shared-donation-card").show();
+                    $(".shared-post .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + sharedPost.source.donation_poster);
+                    $(".shared-post .shared-donation-card #donation-name").text(sharedPost.source.nama);
+                    $(".shared-post .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (sharedPost.donation_share_url != null ? sharedPost.donation_share_url : sharedPost.source.url));
+                }
+            }
+
+            function fetchPostById(postId) {
+                resetCommentModal();
+                resetShareModal();
 
                 $.ajax({
                     type: "GET",
@@ -279,14 +329,29 @@
                         let mediaType = response.post.media_type;
                         let mediaUrl = response.post.media_url;
                         let createdAt = response.post.created_at.replace("T", " ").split(".")[0];
-                        let likesCount = response.post.likes_count;
-                        let commentsCount = response.post.comments_count;
-                        let isLiked = response.post.is_liked;
-                        let isSaved = response.post.is_saved;
                         let username = response.post.user.name;
                         let profilePicture = response.post.user.profile_image ? "/uploads/profile_picture/" + response.post.user.profile_image : "/assets/images/users/user-4.jpg";
                         let authorId = response.post.user.id;
+                        let likesCount = response.post.likes_count;
+                        let commentsCount = response.post.comments_count;
+                        let sharesCount = response.post.shares_count;
+                        let isLiked = response.post.is_liked;
+                        let isSaved = response.post.is_saved;
 
+                        let sharedPost = response.post.root_shared_post;
+
+                        $(".shared-post-author-img").prop("src", profilePicture);
+                        $(".author-profile-link").prop("href", "/social-media/profile?user_id=" + authorId);
+                        $(".shared-post-author-name").text(username);
+                        $(".shared-post-created-at").text(createdAt);
+                        $(".shared-post-content").text(content);
+
+                        // load share post data in share modal and comment modal
+                        if (sharedPost && !$("#share-post-modal").hasClass("show")) {  // check if share post modal is not visible to prevent override of data in share post modal
+                            loadSharedPostData(sharedPost);
+                        }
+
+                        // load data in comment modal
                         $("#comment-modal .modal-title").html(username + "'s post");
 
                         $("#comment-modal #author-profile-image").prop("src", profilePicture);
@@ -295,6 +360,7 @@
                         $("#comment-modal .modal-body #post-content").text(content);
                         $("#comment-modal .modal-body #likes-count").text(likesCount);
                         $("#comment-modal .modal-body #comments-count").text(commentsCount);
+                        $("#comment-modal .modal-body #shares-count").text(sharesCount);
                         $("#comment-modal .modal-body .post-card-footer").data("postid", postId);
                         $("#comment-modal .modal-body .post-card-header a").prop("href", "/social-media/profile?user_id=" + authorId);
 
@@ -311,16 +377,24 @@
 
                         if (mediaType == "image") {
                             $("#comment-modal .modal-body #modal-media").html("<img src='uploads/post_media/" + mediaUrl + "' class='post-media'>");
+                            $(".shared-post-media").append("<img src='/uploads/post_media/" + mediaUrl + "' class='post-media'>");
                         } else if (mediaType == "video") {
                             $("#comment-modal .modal-body #modal-media").html("<video src='uploads/post_media/" + mediaUrl + "' class='post-media' controls></video>");
+                            $(".shared-post-media").append("<video src='/uploads/post_media/" + mediaUrl + "' class='post-media' controls muted></video>");
                         }
 
-                        if (response.post.donation_post) {
-                            // shared donation poster
+                        if (response.post.source_name && response.post.source_name.includes('Donation')) {
+                            // shared donation poster in comment modal
                             $("#comment-modal .shared-donation-card").show();
-                            $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.donation_post.donation_poster);
-                            $("#comment-modal .shared-donation-card #donation-name").text(response.post.donation_post.nama);
-                            $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.donation_post.url));
+                            $("#comment-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.source.donation_poster);
+                            $("#comment-modal .shared-donation-card #donation-name").text(response.post.source.nama);
+                            $("#comment-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.source.url));
+
+                            // shared donation poster in share modal
+                            $("#share-post-modal .shared-donation-card").show();
+                            $("#share-post-modal .shared-donation-card .donation-poster").prop("src", "/donation-poster/" + response.post.source.donation_poster);
+                            $("#share-post-modal .shared-donation-card #donation-name").text(response.post.source.nama);
+                            $("#share-post-modal .shared-donation-card #donate-now-btn").prop("href", '/sumbangan_anonymous/' + (response.post.donation_share_url != null ? response.post.donation_share_url : response.post.source.url));
                         }
 
                         fetchComments(postId);

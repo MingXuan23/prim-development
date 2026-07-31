@@ -77,6 +77,27 @@
     .shared-donation-card a {
         width: 100%;
     }
+
+    .shared-post {
+        background-color: white;
+        border-radius: 10px;
+        padding: 25px 18px;
+        margin-bottom: 20px;
+        max-width: 900px;
+        width: 100%;
+        border: 2px solid lightgray;
+    }
+
+    .shared-post-header a {
+        display: flex;
+        gap: 10px;
+        color: black;
+        width: fit-content;
+    }
+
+    .shared-post-header a:hover {
+        color: black;
+    }
 </style>
 
 <div class="post-card">
@@ -96,12 +117,42 @@
         <img src="{{ URL::asset('uploads/post_media/' . $post->media_url) }}" class="post-media">
     @elseif ($post->media_type == "video")
         <video src="{{ URL::asset('/uploads/post_media/' . $post->media_url) }}" class="post-media" controls muted></video>
-    @elseif (isset($post->shared_donation_id))
+    @elseif (isset($post->source))
         <div class="shared-donation-card">
-            <img src="{{ URL::asset('donation-poster/' . $post->donation_post->donation_poster) }}" class="donation-poster">
-            <h5>{{ $post->donation_post->nama }}</h5>
-            <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->donation_share_url) ? $post->donation_share_url : $post->donation_post->url) }}" target="_blank">Derma
+            <img src="{{ URL::asset('donation-poster/' . $post->source->donation_poster) }}" class="donation-poster">
+            <h5 class="text-center">{{ $post->source->nama }}</h5>
+            <a class="btn btn-primary" href="{{ '/sumbangan_anonymous/' . (isset($post->donation_share_url) ? $post->donation_share_url : $post->source->url) }}" target="_blank">Derma
                 Sekarang</a>
+        </div>
+    @elseif (isset($post->root_shared_post))
+        <div class="shared-post">
+            <div class="shared-post-header">
+                <a href="{{ route('social-media.profile', ['user_id' => $post->root_shared_post->user->id]) }}">
+                    <img src="{{ $post->root_shared_post->user->profile_image ? URL::asset('uploads/profile_picture/' . $post->root_shared_post->user->profile_image) : URL::asset('assets/images/users/user-4.jpg') }}"
+                        class="profile-img">
+                    <div>
+                        <h5 class="fw-bold text-black">{{ $post->root_shared_post->user->name }}</h5>
+                        <p class="text-gray">{{ $post->root_shared_post->created_at }}</p>
+                    </div>
+                </a>
+            </div>
+
+            <p class="text-lg">{{ $post->root_shared_post->content }}</p>
+
+            @if($post->root_shared_post->media_type == "image")
+                <img src="{{ URL::asset('uploads/post_media/' . $post->root_shared_post->media_url) }}" class="post-media">
+            @elseif ($post->root_shared_post->media_type == "video")
+                <video src="{{ URL::asset('/uploads/post_media/' . $post->root_shared_post->media_url) }}" class="post-media" controls muted></video>
+            @elseif (isset($post->root_shared_post->source))
+                <div class="shared-donation-card">
+                    <img src="{{ URL::asset('donation-poster/' . $post->root_shared_post->source->donation_poster) }}" class="donation-poster">
+                    <h5 class="text-center">{{ $post->root_shared_post->source->nama }}</h5>
+                    <a class="btn btn-primary"
+                        href="{{ '/sumbangan_anonymous/' . (isset($post->root_shared_post->donation_share_url) ? $post->root_shared_post->donation_share_url : $post->root_shared_post->source->url) }}"
+                        target="_blank">Derma
+                        Sekarang</a>
+                </div>
+            @endif
         </div>
     @endif
 
@@ -115,9 +166,9 @@
                 <i class="far fa-comment"></i>
                 <p class="d-inline">{{ $post->comments_count }}</p>
             </a>
-            <a class="text-primary">
+            <a class="text-primary share-btn">
                 <i class="fas fa-share"></i>
-                <p class="d-inline">0</p>
+                <p class="d-inline">{{ $post->shares_count }}</p>
             </a>
         </div>
 
@@ -125,4 +176,6 @@
             <i class="{{ $post->is_saved ? 'fas' : 'far' }} fa-bookmark" id="save-icon"></i>
         </a>
     </div>
+
+    <hr>
 </div>
