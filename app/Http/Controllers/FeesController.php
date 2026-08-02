@@ -2732,9 +2732,12 @@ class FeesController extends AppBaseController
         }
 
         if ($request->start_date != null && $request->end_date != null) {
-            $listHisotry = $listHisotry->where(function ($query) use ($request) {
-                $query->whereBetween('t.datetime_of_success', [$request->start_date, $request->end_date])
-                    ->orWhereBetween('t.datetime_created', [$request->start_date, $request->end_date]);
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = Carbon::parse($request->end_date)->endOfDay();
+
+            $listHisotry = $listHisotry->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('t.datetime_of_success', [$startDate, $endDate])
+                    ->orWhereBetween('t.datetime_created', [$startDate, $endDate]);
             });
         }
         $listHisotry = $listHisotry->get();
