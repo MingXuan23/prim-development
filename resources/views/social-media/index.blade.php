@@ -289,7 +289,7 @@
 
             function loadSharedPostData(sharedPost) {
                 $(".original-post-author-img").prop("src", sharedPost.user.profilePicture ?? "/assets/images/users/user-4.jpg");
-                $(".author-profile-link").prop("href", "/social-media/profile?user_id=" + sharedPost.user.id);
+                $(".original-post-author-profile-link").prop("href", "/social-media/profile?user_id=" + sharedPost.user.id);
                 $(".original-post-author-name").text(sharedPost.user.name);
                 $(".original-post-created-at").text(sharedPost.created_at.replace("T", " ").split(".")[0]);
                 $(".original-post-content").text(sharedPost.content);

@@ -5,19 +5,19 @@
             <div class="navbar-brand-box">
                 <a href="/" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ URL::asset('assets/images/logo/prim-logo.svg')}}" alt="" height="22">
+                        <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}" alt="" height="40">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png')}}" alt="" height="50">
+                        <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}" alt="" height="50">
                     </span>
                 </a>
 
                 <a href="/social-media" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ URL::asset('assets/images/logo/prim-logo.svg')}}" alt="" height="33">
+                        <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}" alt="" height="40">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ URL::asset('assets/images/logo/prim.svg')}}" alt="" height="47">
+                        <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}" alt="" height="47">
                     </span>
                 </a>
             </div>

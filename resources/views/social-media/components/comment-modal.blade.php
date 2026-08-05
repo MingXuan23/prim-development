@@ -145,7 +145,7 @@
 
                 <div class="post-card">
                     <div class="post-card-header">
-                        <a href="">
+                        <a href="" class="author-profile-link">
                             <img src="" class="profile-img" id="author-profile-image">
                             <div>
                                 <h5 class="fw-bold text-black" id="author-name"></h5>
@@ -166,7 +166,7 @@
 
                     <div class="original-post">
                         <div class="original-post-header">
-                            <a href="">
+                            <a href="" class="original-post-author-profile-link">
                                 <img src="" class="profile-img original-post-author-img">
                                 <div>
                                     <h5 class="fw-bold text-black original-post-author-name"></h5>

@@ -69,11 +69,11 @@
                         <!-- Original post of the post to be shared (if the post to be shared is also sharing another post) -->
                         <div class="original-post">
                             <div class="original-post-header">
-                                <a href="" class="author-profile-link">
+                                <a href="" class="original-post-author-profile-link">
                                     <img src="" class="profile-img shared-post-author-img">
                                     <div>
-                                        <h5 class="fw-bold text-black shared-post-author-name"></h5>
-                                        <p class="text-gray shared-post-created-at"></p>
+                                        <h5 class="fw-bold text-black original-post-author-name"></h5>
+                                        <p class="text-gray original-post-created-at"></p>
                                     </div>
                                 </a>
                             </div>

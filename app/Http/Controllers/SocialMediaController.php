@@ -366,6 +366,23 @@ class SocialMediaController extends Controller
         return response()->json(["html" => $html, "hasMorePages" => $posts->hasMorePages()]);
     }
 
+    private function getReferralCode($post)
+    {
+        $referralCode = app(PointController::class)->getReferralCode(true, $post->user->id);
+
+        if (!isset($referralCode)) {
+            return;
+        }
+
+        if (isset($post->source) && str_contains($post->source_name, 'Donation')) {
+            $post->donation_share_url = $post->source->url . "?referral_code=$referralCode->code";
+        }
+
+        if (isset($post->root_shared_post->source) && str_contains($post->root_shared_post->source_name, 'Donation')) {
+            $post->root_shared_post->donation_share_url = $post->root_shared_post->source->url . "?referral_code=$referralCode->code";
+        }
+    }
+
     public function getPostsByUserId($userId, $mediaType, $searchFilter)
     {
         $posts = Post::with([
@@ -408,19 +425,7 @@ class SocialMediaController extends Controller
             $post->is_liked = $post->is_liked > 0;
             $post->is_saved = $post->is_saved > 0;
 
-            $referralCode = app(PointController::class)->getReferralCode(true, $post->user->id);
-
-            if (!isset($referralCode)) {
-                return;
-            }
-
-            if (isset($post->source) && str_contains($post->source_name, 'Donation')) {
-                $post->donation_share_url = $post->source->url . "?referral_code=$referralCode->code";
-            }
-
-            if (isset($post->root_shared_post->source) && str_contains($post->root_shared_post->source_name, 'Donation')) {
-                $post->root_shared_post->donation_share_url = $post->root_shared_post->source->url . "?referral_code=$referralCode->code";
-            }
+            $this->getReferralCode($post);
         });
 
         return $posts;
@@ -472,6 +477,8 @@ class SocialMediaController extends Controller
 
         $post->is_liked = $post->is_liked > 0;
         $post->is_saved = $post->is_saved > 0;
+
+        $this->getReferralCode($post);
 
         return response()->json(["post" => $post]);
     }
