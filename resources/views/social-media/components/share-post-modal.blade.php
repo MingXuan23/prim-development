@@ -1,5 +1,6 @@
 <style>
-    .shared-post {
+    .shared-post,
+    .original-post {
         background-color: white;
         border-radius: 10px;
         padding: 25px 18px;
@@ -8,14 +9,20 @@
         width: 100%;
     }
 
-    .shared-post-header a {
+    .original-post {
+        border: 2px solid lightgray;
+    }
+
+    .shared-post-header a,
+    .original-post-header a {
         display: flex;
         gap: 10px;
         color: black;
         width: fit-content;
     }
 
-    .shared-post-header a:hover {
+    .shared-post-header a:hover,
+    .original-post-header a:hover {
         color: black;
     }
 </style>
@@ -57,6 +64,28 @@
                             <img src="" class="donation-poster">
                             <h5 id="donation-name" class="text-center"></h5>
                             <a class="btn btn-primary" href="" target="_blank" id="donate-now-btn">Derma Sekarang</a>
+                        </div>
+
+                        <!-- Original post of the post to be shared (if the post to be shared is also sharing another post) -->
+                        <div class="original-post">
+                            <div class="original-post-header">
+                                <a href="" class="author-profile-link">
+                                    <img src="" class="profile-img shared-post-author-img">
+                                    <div>
+                                        <h5 class="fw-bold text-black shared-post-author-name"></h5>
+                                        <p class="text-gray shared-post-created-at"></p>
+                                    </div>
+                                </a>
+                            </div>
+                            <p class="text-lg original-post-content"></p>
+
+                            <div class="original-post-media"></div>
+
+                            <div class="shared-donation-card">
+                                <img src="" class="donation-poster">
+                                <h5 id="donation-name" class="text-center"></h5>
+                                <a class="btn btn-primary" href="" target="_blank" id="donate-now-btn">Derma Sekarang</a>
+                            </div>
                         </div>
                     </div>
                 </div>
