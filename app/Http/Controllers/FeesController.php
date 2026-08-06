@@ -3032,7 +3032,13 @@ class FeesController extends AppBaseController
                     ->when(isset($year), function ($query) use ($year) {
                         return $this->checkClassStudentYear($year, $query);
                     })
-                    ->select('ou.user_id', 's.*', 'c.nama as class_name')
+                    ->select(
+                        'ou.user_id',
+                        's.*',
+                        'c.nama as class_name',
+                        'cs.status as class_student_status',
+                        'c.levelid as class_level'
+                    )
                     ->orderByDesc('cs.id')
                     ->get()
                     ->unique('nama')
@@ -3049,14 +3055,25 @@ class FeesController extends AppBaseController
                     ->unique('user_id')
                     ->keyBy('user_id');
 
-                $data = $student_user->map(function ($student) use ($feeA, $includeMasihBerhutang) {
+                $data = $student_user->map(function ($student) use ($feeA) {
                     $user_id = $student->user_id;
                     $fee_data = $feeA->get($user_id);
-                    $student->status = $fee_data->status ?? null; // Add the status from $feeA to $student_user
-                    $student->amount = $fee_data->amount ?? 0; // Add transaction amount from $feeA to $student_user
-                    $student->datetime_created = $fee_data->datetime_created ?? null; // Add transaction datetime_created from $feeA to $student_user
-                    return $student;
-                });
+
+                    if (!isset($fee_data)) {
+                        return null;
+                    }
+
+                    // if current fee is paid or the class_student status is active, return the student with the fee
+                    // does not return fee when fee is debt and student is in inactive class (invalid fee)
+                    if ($fee_data->status == 'Paid' || ($student->class_student_status == 1 && $student->class_level > 0)) {
+                        $student->status = $fee_data->status ?? null; // Add the status from $feeA to $student_user
+                        $student->amount = $fee_data->amount ?? 0; // Add transaction amount from $feeA to $student_user
+                        $student->datetime_created = $fee_data->datetime_created ?? null; // Add transaction datetime_created from $feeA to $student_user
+                        return $student;
+                    }
+
+                    return null;
+                })->filter();
 
                 if (!$includeMasihBerhutang) {
                     $data = $data->filter(function ($student) {
@@ -3064,65 +3081,75 @@ class FeesController extends AppBaseController
                     });
                 }
 
-            } else {
-                if ($fees->category != "Kategori Berulang") {
-                    $data = DB::table('students as s')
-                        ->join('class_student as cs', 'cs.student_id', 's.id')
-                        ->join('class_organization as co', 'co.id', 'cs.organclass_id')
-                        ->join('classes as c', 'c.id', '=', 'co.class_id')
-                        ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
-                        ->join('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
-                        ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
-                        ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
-                        ->where('sfn.fees_id', $fees->id)
-                        ->when(isset($classLevel), function ($query) use ($classLevel) {
-                            $query->where('c.nama', 'like', "$classLevel%");
-                        })
-                        ->when(isset($request->classid), function ($query) use ($request) {
-                            $query->where('co.class_id', '=', $request->classid);
-                        })
-                        ->when(isset($year), function ($query) use ($year) {
-                            return $this->checkClassStudentYear($year, $query);
-                        })
-                        ->when(!$includeMasihBerhutang, function ($query) {
-                            $query->where('sfn.status', '=', 'Paid');
-                        })
-                        ->select('s.*', 'sfn.status', 't.datetime_created', 'cs.id as class_student_id', 'fn.totalAmount as amount', 'c.nama as class_name')
-                        ->orderByDesc('class_student_id')
-                        ->orderByDesc('t.status')
-                        ->get()
-                        ->unique('nama')
-                        ->values();
-                } else {
-                    $data = DB::table('students as s')
-                        ->join('class_student as cs', 'cs.student_id', 's.id')
-                        ->join('class_organization as co', 'co.id', 'cs.organclass_id')
-                        ->join('classes as c', 'c.id', '=', 'co.class_id')
-                        ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
-                        ->join('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
-                        ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
-                        ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
-                        ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
-                        ->where('sfn.fees_id', $fees->id)
-                        ->when(isset($classLevel), function ($query) use ($classLevel) {
-                            $query->where('c.nama', 'like', "$classLevel%");
-                        })
-                        ->when(isset($request->classid), function ($query) use ($request) {
-                            $query->where('co.class_id', '=', $request->classid);
-                        })
-                        ->when(isset($year), function ($query) use ($year) {
-                            return $this->checkClassStudentYear($year, $query);
-                        })
-                        ->when(!$includeMasihBerhutang, function ($query) {
-                            $query->where('sfn.status', '=', 'Paid');
-                        })
-                        ->select('s.*', 'sfn.status', 'cs.id as class_student_id', 'fr.*', 't.datetime_created', 'fn.totalAmount as amount', 'c.nama as class_name')
-                        ->orderByDesc('class_student_id')
-                        ->orderByDesc('t.status')
-                        ->get()
-                        ->unique('nama')
-                        ->values();
-                }
+            } else if (in_array($fees->category, ["Kategori B", "Kategori C"])) {
+                $data = DB::table('students as s')
+                    ->join('class_student as cs', 'cs.student_id', 's.id')
+                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->join('classes as c', 'c.id', '=', 'co.class_id')
+                    ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                    ->join('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
+                    ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
+                    ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
+                    ->where('sfn.fees_id', $fees->id)
+                    ->where(function ($query) {
+                        // if current fee is paid or the class_student status is active, return the student with the fee
+                        // does not return result when fee is debt and class_student_status is inactive (invalid fee)
+                        $query->where('cs.status', 1)
+                            ->orWhere('sfn.status', 'Paid');
+                    })
+                    ->when(isset($classLevel), function ($query) use ($classLevel) {
+                        $query->where('c.nama', 'like', "$classLevel%");
+                    })
+                    ->when(isset($request->classid), function ($query) use ($request) {
+                        $query->where('co.class_id', '=', $request->classid);
+                    })
+                    ->when(isset($year), function ($query) use ($year) {
+                        return $this->checkClassStudentYear($year, $query);
+                    })
+                    ->when(!$includeMasihBerhutang, function ($query) {
+                        $query->where('sfn.status', '=', 'Paid');
+                    })
+                    ->select('s.*', 'sfn.status', 't.datetime_created', 'cs.id as class_student_id', 'fn.totalAmount as amount', 'c.nama as class_name')
+                    ->orderByDesc('class_student_id')
+                    ->orderByDesc('t.status')
+                    ->get()
+                    ->unique('nama')
+                    ->values();
+            } else if ($fees->category != "Kategori Berulang") {
+                $data = DB::table('students as s')
+                    ->join('class_student as cs', 'cs.student_id', 's.id')
+                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+                    ->join('classes as c', 'c.id', '=', 'co.class_id')
+                    ->join('student_fees_new as sfn', 'sfn.class_student_id', 'cs.id')
+                    ->join('fees_new as fn', 'fn.id', '=', 'sfn.fees_id')
+                    ->leftJoin('fees_recurring as fr', 'fr.student_fees_new_id', 'sfn.id')
+                    ->leftJoin('fees_transactions_new as ftn', 'ftn.student_fees_id', '=', 'sfn.id')
+                    ->leftJoin('transactions as t', 't.id', '=', 'ftn.transactions_id')
+                    ->where('sfn.fees_id', $fees->id)
+                    ->where(function ($query) {
+                        // if current fee is paid or the class_student status is active, return the student with the fee
+                        // does not return result when fee is debt and class_student_status is inactive (invalid fee)
+                        $query->where('cs.status', 1)
+                            ->orWhere('sfn.status', 'Paid');
+                    })
+                    ->when(isset($classLevel), function ($query) use ($classLevel) {
+                        $query->where('c.nama', 'like', "$classLevel%");
+                    })
+                    ->when(isset($request->classid), function ($query) use ($request) {
+                        $query->where('co.class_id', '=', $request->classid);
+                    })
+                    ->when(isset($year), function ($query) use ($year) {
+                        return $this->checkClassStudentYear($year, $query);
+                    })
+                    ->when(!$includeMasihBerhutang, function ($query) {
+                        $query->where('sfn.status', '=', 'Paid');
+                    })
+                    ->select('s.*', 'sfn.status', 'cs.id as class_student_id', 'fr.*', 't.datetime_created', 'fn.totalAmount as amount', 'c.nama as class_name')
+                    ->orderByDesc('class_student_id')
+                    ->orderByDesc('t.status')
+                    ->get()
+                    ->unique('nama')
+                    ->values();
             }
 
             $data = $data->sortBy(function ($item) {
