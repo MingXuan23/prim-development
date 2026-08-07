@@ -368,6 +368,65 @@
             border: 3px solid #5e2ced !important;
         }
 
+        #social-media-btn {
+            background-color: #9749f8 !important;
+            display: block;
+            margin: 25px auto;
+            width: fit-content;
+            border-radius: 10px;
+            color: white;
+            padding: 10px 20px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        #social-media-btn:hover {
+            background-color: #5e2ced !important;
+            transition: 0.3s;
+        }
+
+        .social-media-area {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+
+            .shape-1 {
+                position: absolute;
+                left: 5%;
+                top: 20%;
+                -webkit-animation: upndown 10s linear 2s infinite;
+                animation: upndown 10s linear 2s infinite;
+            }
+
+            .shape-2 {
+                position: absolute;
+                left: -2%;
+                top: 20%;
+                -webkit-animation: upndown 8s linear 2s infinite;
+                animation: upndown 8s linear 2s infinite;
+                opacity: .5;
+            }
+
+            .shape-3 {
+                position: absolute;
+                right: 5%;
+                bottom: 20%;
+                -webkit-animation: upndown 10s linear 2s infinite;
+                animation: upndown 10s linear 2s infinite;
+            }
+
+            .shape-4 {
+                position: absolute;
+                right: -2%;
+                bottom: 20%;
+                -webkit-animation: upndown 8s linear 2s infinite;
+                animation: upndown 8s linear 2s infinite;
+                opacity: .5;
+            }
+        }
+
         /* Display rules for different screen sizes */
         @media (max-width: 799px) {
             .leader-groups {
@@ -479,8 +538,14 @@
             <div class="collapse navbar-collapse" id="appside_main_menu">
                 <ul class="navbar-nav">
                     <li><a href="/">Utama</a></li>
-                    <li class="current-menu-item"><a href="#" style="font-size: 19px">Derma</a></li>
-                    <li><a href="/social-media">Sedekah Subuh</a></li>
+                    <!-- <li class="current-menu-item"><a href="#" style="font-size: 19px">Derma</a></li> -->
+                    <li class="menu-item-has-children current-menu-item">
+                        <a href="#">Derma</a>
+                        <ul class="sub-menu">
+                            <li><a href="#social-media">Social Media PRIM</a></li>
+                            <li><a href="#organization">Poster Derma</a></li>
+                        </ul>
+                    </li>
                     <li><a href="/yuran">Yuran</a></li>
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
@@ -595,7 +660,8 @@
                 @foreach ($donors as $index => $donor)
                         {{-- @if ($index % 10 == 0 && $index > 0)--}}
                         {{-- <!-- Close the previous row and open a new one -->--}}
-                        {{-- </div>
+                        {{--
+                    </div>
                     <div class="donors-container donors-container-2">--}}
                         {{-- @endif--}}
                         <div class="donor-container">
@@ -624,7 +690,7 @@
                 @foreach ($leaders as $index => $leader)
                                 <?php
                     $groupNumber = floor($index / 5) + 1;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
                                 <!-- Create the group divs dynamically based on the group number -->
                                 @if($index % 5 == 0)
                                     <div class="leader-group" id="group{{ $groupNumber }}">
@@ -908,6 +974,29 @@
         </div>
     </section>
     <!-- why choose area end -->
+
+    <!-- social media area start -->
+    <section class="social-media-area" id="social-media">
+        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
+        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+        <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
+        <div class="shape-4"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="section-title">
+                        <!-- section title -->
+                        <h3 class="title">Social Media PRIM</h3>
+                        <p>Lihat poster derma, video dan gambar aktiviti terkini yang dikongsi oleh komuniti PRIM.<br>Dapatkan maklumat, inspirasi dan sertai usaha kebaikan bersama.</p>
+                        <a class="btn" id="social-media-btn" target="_blank" href="{{ route('social-media.index') }}"><i class="fas fa-users"></i> &nbsp; Terokai Social Media PRIM &nbsp; <i
+                                class="fas fa-arrow-right"></i></a>
+                        <!-- <p class="text-center small">Komuniti dalaman PRIM • Kongsi, Berinteraksi, Berinspirasi</p> -->
+                    </div><!-- //. section title -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- social media area end -->
 
     <!-- how it works area start -->
     <section class="how-it-work-area" id="organization">
