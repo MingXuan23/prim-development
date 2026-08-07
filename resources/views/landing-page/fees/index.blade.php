@@ -66,7 +66,6 @@
                 <ul class="navbar-nav">
                     <li><a href="/">Utama</a></li>
                     <li><a href="/derma">Derma</a></li>
-                    <li><a href="/social-media">Sedekah Subuh</a></li>
                     <li class="current-menu-item"><a href="#" style="font-size: 19px">Yuran</a></li>
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
