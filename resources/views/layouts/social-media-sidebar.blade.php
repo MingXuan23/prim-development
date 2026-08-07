@@ -14,12 +14,12 @@
                         <span>Laman Utama</span>
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a class=" waves-effect">
                         <i class="fas fa-play-circle"></i>
                         <span>Terokai</span>
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <a href="{{ route('social-media.donationPostsIndex') }}" class=" waves-effect">
                         <i class="fas fa-hand-holding-heart"></i>
