@@ -133,8 +133,6 @@ class RegisterController extends Controller
             'password' => Hash::make($data['password']),
             'telno' => $data['telno'],
             'remember_token' => $data['_token'],
-            'purpose' => $data['registration_type'] ?? ''
-
         ]);
         // dd($user);
 
@@ -212,14 +210,7 @@ class RegisterController extends Controller
             return redirect()->back()->withErrors(["icno" => "The IC no. given has already been taken."])->withInput();
         }
 
-        // insert user data
-        $user = User::create([
-            "name" => $request->get("name"),
-            "email" => $request->get("email"),
-            "password" => Hash::make($request->get("password")),
-            "telno" => $request->get("telno"),
-            "remember_token" => $request->get("_token")
-        ]);
+        $user = $this->create($request->all());
 
         // insert icno and email verified (non mass-assignable)
         DB::table("users")->where("id", "=", $user->id)->update([
@@ -227,26 +218,9 @@ class RegisterController extends Controller
             "email_verified_at" => now()
         ]);
 
-        // get the roleId from roles table
-        $roleId = DB::table("roles")->where("name", "=", "Penjaga")->first()->id;
-
-        // create new model_has_roles
-        DB::table("model_has_roles")->insert([
-            "role_id" => $roleId,
-            "model_id" => $user->id,
-            "model_type" => "App\User"
-        ]);
-
         $this->guard()->login($user);
 
         event(new Registered($user));
-
-        // Otherwise, perform the usual registration.
-        $this->validator($request->all())->validate();
-
-        event(new Registered($user = $this->create($request->all())));
-
-        $this->guard()->login($user);
 
         return $this->registered($request, $user) ?: redirect($this->redirectPath());
     }
