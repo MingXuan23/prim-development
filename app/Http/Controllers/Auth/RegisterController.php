@@ -90,13 +90,6 @@ class RegisterController extends Controller
             if (!isset($data['referral_code'])) {
                 return;
             }
-            if (!isset($data['registration_type'])) {
-                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
-            } else if ($data['registration_type'] == '-') {
-                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
-            }
-
-
 
             $valid = PointController::validateReferralCode($data['referral_code']);
             if (!$valid) {
@@ -161,29 +154,9 @@ class RegisterController extends Controller
         return $user;
     }
 
-    public function register(Request $request)
+    private function validateIcno($icno)
     {
-        // validate input
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
-            'icno' => ['required', 'string', 'min:12', 'max:14'],
-            'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
-        ]);
-
-        // return error messages if validator fails
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        // check ic no seperately (some users might enter ic no with a '-' and some might won't)
-        $icEntered = str_replace("-", "", $request->get("icno"));
-        $icExisted = DB::table("users")
-            ->where("email", "LIKE", "%$icEntered%")
-            ->orWhere("telno", "LIKE", "%$icEntered%")
-            ->orWhere("icno", "=", $icEntered)
-            ->exists();
+        $icEntered = str_replace("-", "", $icno);
 
         // search for user accounts that have been registered by an organization admin
         $userRegisteredByAdmin = DB::table("users")
@@ -204,10 +177,45 @@ class RegisterController extends Controller
             return redirect()->back()->withErrors([
                 "icno_registered" => "Your IC no. has already been registered by " . $organization->nama . "'s admin. Please login using your IC no. and the password provided."
             ])->withInput();
-        } else if ($icExisted) {
+        }
+
+        $icExisted = DB::table("users")
+            ->where("email", "LIKE", "%$icEntered%")
+            ->orWhere("telno", "LIKE", "%$icEntered%")
+            ->orWhere("icno", "=", $icEntered)
+            ->exists();
+
+        if ($icExisted) {
             // this is for parents that already registered an account but forgot
             // when they register the second time with the same ic, this message pops up
             return redirect()->back()->withErrors(["icno" => "The IC no. given has already been taken."])->withInput();
+        }
+    }
+
+    public function register(Request $request)
+    {
+        // validate input
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+            'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
+        ]);
+
+        // only validate icno if user registered is not admin
+        $validator->sometimes('icno', ['required', 'string', 'min:12', 'max:14'], function ($input) {
+            return !$input->isAdmin;
+        });
+
+        // return error messages if validator fails
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // icno will be null for register admin
+        if ($request->get('icno')) {
+            // check ic no seperately (some users might enter ic no with a '-' and some might won't)
+            $this->validateIcno($request->get('icno'));
         }
 
         $user = $this->create($request->all());
