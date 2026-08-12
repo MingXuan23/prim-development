@@ -1862,7 +1862,7 @@ class StudentController extends Controller
                     ->join('class_student', 'class_student.student_id', '=', 'students.id')
                     ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                     ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                    ->select('students.*', 'class_student.fees_status', 'class_student.id as csid', 'class_student.start_date', 'class_student.end_date', 'class_student.status as class_status')
+                    ->select('students.*', 'class_student.fees_status', 'class_student.id as csid', 'class_student.start_date', 'class_student.end_date')
                     ->where([
                         ['classes.id', $classid],
                     ])
@@ -1882,16 +1882,15 @@ class StudentController extends Controller
                                     ->where('class_student.start_date', '<=', $end_date);
                             });
                     })
-                    ->orderBy('students.nama')
-                    ->get();
+                    ->orderBy('students.nama');
 
-                $update = $this->validateStatus($data);
+                $update = $this->validateStatus($data->get());
                 if ($update) {
                     $data = DB::table('students')
                         ->join('class_student', 'class_student.student_id', '=', 'students.id')
                         ->join('class_organization', 'class_organization.id', '=', 'class_student.organclass_id')
                         ->join('classes', 'classes.id', '=', 'class_organization.class_id')
-                        ->select('students.*', 'class_student.fees_status', 'class_student.id as csid', 'class_student.start_date', 'class_student.end_date', 'class_student.status as class_status')
+                        ->select('students.*', 'class_student.fees_status', 'class_student.id as csid', 'class_student.start_date', 'class_student.end_date')
                         ->where([
                             ['classes.id', $classid],
                         ])
@@ -1921,10 +1920,26 @@ class StudentController extends Controller
                             // })
     
                         })
-                        ->orderBy('students.nama')
-                        ->get();
+                        ->orderBy('students.nama');
                 }
-                $data = $data->filter(function ($row) use ($orgId, $start_date, $end_date, $request) {
+                // dd($data->get());
+                $table = Datatables::of($data);
+
+                $table->addColumn('gender', function ($row) {
+                    if ($row->gender == 'L') {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . 'Lelaki</div>';
+
+                        return $btn;
+                    } else {
+                        $btn = '<div class="d-flex justify-content-center">';
+                        $btn = $btn . 'Perempuan</div>';
+
+                        return $btn;
+                    }
+                });
+
+                $table->addColumn('status', function ($row) use ($orgId, $start_date, $end_date, $request) {
 
                     if ($row->end_date == null) {
                         $row_end_date = Carbon::tomorrow()->format('Y-m-d');
@@ -1971,36 +1986,12 @@ class StudentController extends Controller
 
                     $unique = $combined->unique('transaction_id');
 
+
                     if ($request->show_all_payments != "true") {
                         $unique = $unique->filter(function ($item) use ($start_date, $end_date) {
                             return $item->datetime_created >= $start_date && $item->datetime_created <= $end_date;
                         });
                     }
-
-                    $row->payments = $unique;
-
-                    return $unique->count() > 0 || $row->class_status == 1;
-                });
-
-                // dd($data->get());
-                $table = Datatables::of($data);
-
-                $table->addColumn('gender', function ($row) {
-                    if ($row->gender == 'L') {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . 'Lelaki</div>';
-
-                        return $btn;
-                    } else {
-                        $btn = '<div class="d-flex justify-content-center">';
-                        $btn = $btn . 'Perempuan</div>';
-
-                        return $btn;
-                    }
-                });
-
-                $table->addColumn('status', function ($row) {
-                    $unique = $row->payments;
 
                     if (count($unique) > 0) {
                         $btn = '<div class="d-flex  align-items-center flex-column">';
