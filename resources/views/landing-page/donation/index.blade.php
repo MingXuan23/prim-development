@@ -427,6 +427,27 @@
             }
         }
 
+        .perks i {
+            color: #5e2ced;
+        }
+
+        .sertai-sekarang-btn {
+            color: white !important;
+            margin: 10px 0;
+            width: 100%;
+            background-color: #5e2ced;
+            transition: 0.3s;
+            padding: 10px 0 !important;
+        }
+
+        .sertai-sekarang-btn:hover {
+            background-color: #500ade;
+        }
+
+        #sedekah-subuh-poster {
+            border-radius: 15px;
+        }
+
         /* Display rules for different screen sizes */
         @media (max-width: 799px) {
             .leader-groups {
@@ -675,6 +696,36 @@
         </div>
 
     </section>
+
+    <section>
+        <div class="container container-donation">
+            <div class="row">
+                <div class="col-md-8">
+                    <img src="{{ URL::asset('assets/landing-page/img/sedekah-subuh-promotion-img.png') }}" id="sedekah-subuh-poster">
+                </div>
+
+                <div class="col-md-4">
+                    <h3>Sedekah Subuh<br>Serendah RM 2</h3>
+                    <p>Sertai amalan Sedekah Subuh selama 40 hari dan rebut peluang memenangi hadiah penginapan homestay</p>
+                    <div class="d-flex align-items-center mb-3 perks">
+                        <i class="fas fa-donate mr-3"></i>
+                        <p class="m-0">Sumbang serendah RM2 sehari</p>
+                    </div>
+                    <div class="d-flex align-items-center mb-3 perks">
+                        <i class="fas fa-clock mr-3"></i>
+                        <p class="m-0">Kiraan 40 hari</p>
+                    </div>
+                    <div class="d-flex align-items-center mb-3 perks">
+                        <i class="fas fa-gift mr-3"></i>
+                        <p class="m-0">Hadiah menarik menanti anda</p>
+                    </div>
+
+                    <a class="btn sertai-sekarang-btn" href="#organization">Sertai Sekarang &nbsp; <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section aria-label="Top Ketua Ahli">
         <div class="leader-container">
             <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
@@ -690,7 +741,7 @@
                 @foreach ($leaders as $index => $leader)
                                 <?php
                     $groupNumber = floor($index / 5) + 1;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ?>
                                 <!-- Create the group divs dynamically based on the group number -->
                                 @if($index % 5 == 0)
                                     <div class="leader-group" id="group{{ $groupNumber }}">
@@ -1334,6 +1385,19 @@
             window.onload = function () {
                 document.getElementById("8").click();
             };
+
+            $('.sertai-sekarang-btn').click(function (e) {
+                e.preventDefault();
+                let href = $(this).attr('href');
+                let target = $(href);
+
+                if (target) {
+                    target[0].scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
 
             $.ajax({
                 url: "{{ route('landingpage.donation.header') }}",
