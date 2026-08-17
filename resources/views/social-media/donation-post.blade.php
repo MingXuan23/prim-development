@@ -9,16 +9,28 @@
 
         .donation-cards {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(1, 1fr);
             justify-content: center;
             gap: 10px;
+        }
+
+        @media screen and (min-width: 700px) {
+            .donation-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media screen and (min-width: 900px) {
+            .donation-cards {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 @endsection
 
 @section('content')
     <div class="p-4 d-flex flex-column align-items-center">
-        @include('social-media.components.search-bar', ['searchUrl' => route('social-media.donationPostsIndex')])
+        @include('social-media.components.search-bar', ['searchUrl' => route('social-media.donationPostsIndex'), 'type' => 'donation'])
 
         <div class="donation-cards" id="donations">
             @include('social-media.components.donation-posts-list', ['donations' => $donations])
@@ -31,7 +43,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Kongsi</h4>
+                        <h4 class="modal-title">Kongsi Untuk Sedekah Subuh</h4>
                     </div>
                     <form action="{{ route('social-media.addPost') }}" method="post">
                         {{ csrf_field() }}
@@ -51,6 +63,7 @@
 
                         <div id="modal-footer">
                             <div class="text-right p-2">
+                                <button class="btn btn-secondary" type="button" id="cancel-modal-btn">Batal</button>
                                 <button class="btn btn-primary" type="submit">Kongsi</button>
                             </div>
                         </div>
@@ -78,6 +91,12 @@
                 $("#share-donation-modal").modal("show");
             });
 
+            $(document).on('click', '#cancel-modal-btn', function (e) {
+                e.preventDefault();
+
+                $("#share-donation-modal").modal("hide");
+            });
+
             let currentPage = parseInt("{{ $donations->currentPage() }}");
             let isLoading = false;
             let hasMorePages = "{{ $donations->hasMorePages() ? 'true' : 'false' }}";
@@ -89,28 +108,43 @@
                     isLoading = true;
                     $("#loading").show();
 
-                    $.ajax({
-                        type: "GET",
-                        url: "{{ route('social-media.donationPostsIndex') }}",
-                        data: {
-                            "search": $("#search-bar").val(),
-                            "page": currentPage + 1,
-                        },
-                        success: function (response) {
-                            if (!response || response.error) {
-                                $(".errorMessage").text(response.error).show();
-                                return;
-                            }
-
-                            $("#donations").append(response.html);
-                            isLoading = false;
-                            currentPage++;
-                            hasMorePages = response.hasMorePages;
-                            $("#loading").hide();
-                        }
-                    })
+                    fetchDonations();
                 }
-            })
+            });
+
+            $("#donation-type").change(function (e) {
+                e.preventDefault();
+                currentPage = 0;
+                hasMorePages = true;
+
+                $('#donations').empty();
+
+                fetchDonations();
+            });
+
+            function fetchDonations() {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('social-media.donationPostsIndex') }}",
+                    data: {
+                        "search": $("#search-bar").val(),
+                        "page": currentPage + 1,
+                        "donation_type": $("#donation-type").val()
+                    },
+                    success: function (response) {
+                        if (!response || response.error) {
+                            $(".errorMessage").text(response.error).show();
+                            return;
+                        }
+
+                        $("#donations").append(response.html);
+                        isLoading = false;
+                        currentPage++;
+                        hasMorePages = response.hasMorePages;
+                        $("#loading").hide();
+                    }
+                })
+            }
         });
     </script>
 @endsection
