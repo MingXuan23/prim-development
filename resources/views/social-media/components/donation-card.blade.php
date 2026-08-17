@@ -38,7 +38,7 @@
     <img src="{{ URL::asset('donation-poster/' . $donation->donation_poster) }}" class="donation-poster" alt="{{ $donation->nama }}'s poster">
     <div class="donation-card-footer">
         <h5 class="mb-3" id="donation-name">{{ $donation->nama }}</h5>
-        <button class="btn btn-secondary share-donation-btn">Kongsi</button>
+        <button class="btn btn-secondary share-donation-btn">Kongsi Untuk Sedekah Subuh</button>
         <a href="/sumbangan_anonymous/{{ $donation->url }}" target="_blank" class="btn btn-primary">Derma Sekarang</a>
     </div>
 </div>

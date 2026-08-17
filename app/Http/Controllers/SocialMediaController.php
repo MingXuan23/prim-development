@@ -583,10 +583,14 @@ class SocialMediaController extends Controller
     public function donationPostsIndex(Request $request)
     {
         $search = $request->get('search');
+        $donationType = $request->get('donation_type');
 
         $donations = Donation::where("status", "=", 1)
             ->when(filled($search), function ($query) use ($search) {
                 $query->where("nama", "LIKE", "%$search%");
+            })
+            ->when(filled($donationType), function ($query) use ($donationType) {
+                $query->where('donation_type', $donationType);
             })
             ->orderByDesc("id")
             ->paginate($this->MAX_RESULT_LIMIT);
@@ -596,7 +600,7 @@ class SocialMediaController extends Controller
             return response()->json(["html" => $html, "hasMorePages" => $donations->hasMorePages()]);
         }
 
-        return view('social-media.donation-post', compact('donations'));
+        return view('social-media.donation-post', compact('donations', 'donationType'));
     }
 
     public function notificationsIndex(Request $request)
