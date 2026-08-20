@@ -417,10 +417,10 @@
 
                             </div>
 
-                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <!-- <div class="col-lg-4 p-3 text-sm-center align-self-center">
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt="" style="max-width:70%">
 
-                            </div>
+                            </div> -->
 
                         </div>
                     </div>
@@ -505,12 +505,12 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Alamat</h4>
-                            <p> Universiti Teknikal Malaysia Melaka, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
+                            <p> Kondominium Mutiara Melaka, Jalan Pantai Puteri, Tanjung Kling, 76400 Melaka
                             </p>
 
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <!-- <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget" style="text-align: center">
                             <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt="" style="max-width: 70%"></a>
 
@@ -525,7 +525,7 @@
                                 <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
