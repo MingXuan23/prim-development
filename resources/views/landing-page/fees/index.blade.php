@@ -412,8 +412,8 @@
                 <div id="collaborators">
                     <img class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/paynet_logo.png') }}" alt="Logo of Paynet Malaysia">
                     <img style="--transition-delay: 0.15s" class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/bank_islam_logo.png') }}" alt="Logo of Bank Islam">
-                    <img style="--transition-delay: 0.3s" class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/utem_logo.png') }}"
-                        alt="Logo of Universiti Teknikal Malaysia Melaka">
+                    <!-- <img style="--transition-delay: 0.3s" class="slide-from-bottom-element" src="{{ URL::asset('assets/landing-page/img/images/utem_logo.png') }}"
+                        alt="Logo of Universiti Teknikal Malaysia Melaka"> -->
                 </div>
             </div>
         </section>
@@ -555,12 +555,12 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Alamat</h4>
-                            <p> Universiti Teknikal Malaysia Melaka, Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
+                            <p> Kondominium Mutiara Melaka, Jalan Pantai Puteri, Tanjung Kling, 76400 Melaka
                             </p>
 
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-6">
+                    <!-- <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget" style="text-align: center">
                             <a href="#" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-utem-white.png') }}" alt="" style="max-width: 70%"></a>
 
@@ -575,7 +575,7 @@
                                 <li><a href="https://www.youtube.com/channel/UCmJKvkfmZf4pbXwDqo2sZZg"><i class="fab fa-youtube"></i></a></li>
                             </ul>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
