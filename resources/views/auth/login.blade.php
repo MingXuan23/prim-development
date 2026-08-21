@@ -105,9 +105,9 @@ Login
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt="" style="max-width:70%">
                             </div>
-                            <div class="col-lg-4 p-3 text-sm-center align-self-center">
+                            <!-- <div class="col-lg-4 p-3 text-sm-center align-self-center">
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt="" style="max-width:70%">
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
