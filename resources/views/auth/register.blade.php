@@ -10,8 +10,8 @@
 
         <style>
             /* #name {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        text-transform: uppercase;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                text-transform: uppercase;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
 
             ::-webkit-input-placeholder {
                 /* WebKit browsers */
@@ -84,24 +84,6 @@
                                             @enderror
                                         </div>
 
-                                        <!-- <div class="form-group">
-                                                    <label for="registration_type">Pilih Jenis Pendaftaran</label>
-                                                    <select name="registration_type" id="registration_type"
-                                                        class="form-control @error('registration_type') is-invalid @enderror">
-                                                        <option value="-">-- Sila Pilih --</option>
-                                                        <option value="bayar_yuran" {{ old('registration_type') == 'bayar_yuran' ? 'selected' : '' }}>Bayar Yuran</option>
-                                                        <option value="beli_barang" {{ old('registration_type') == 'beli_barang' ? 'selected' : '' }}>Beli Barang(Get &amp; Go)</option>
-                                                        <option value="sewa_homestay" {{ old('registration_type') == 'sewa_homestay' ? 'selected' : '' }}>Sewa Homestay</option>
-                                                        <option value="ganjaran_derma_prim" {{ old('registration_type') == 'ganjaran_derma_prim' ? 'selected' : '' }}>
-                                                            Ganjaran Derma PRiM</option>
-                                                    </select>
-                                                    @error('registration_type')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
-                                                </div> -->
-
                                         <div class="form-group">
                                             <label for="name">Nama Penuh</label>
                                             <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" required placeholder="Nama Penuh">
@@ -113,8 +95,8 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="useremail">Email</label>
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" value="{{old('email')}}" id="useremail" name="email" required placeholder="Email">
+                                            <label for="useremail">Email (Optional)</label>
+                                            <input type="email" class="form-control @error('email') is-invalid @enderror" value="{{old('email')}}" id="useremail" name="email" placeholder="Email">
                                             @error('email')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -143,12 +125,14 @@
                                             @enderror
                                         </div>
 
-                                        <!-- New combobox for registration type -->
-
-
                                         <div class="form-group">
                                             <label for="userpassword">Kata Laluan</label>
-                                            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" required id="userpassword" placeholder="Kata Laluan">
+                                            <div class="input-group">
+                                                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" required id="userpassword" placeholder="Kata Laluan">
+                                                <button type="button" class="btn btn-outline-primary" id="show-password-btn">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                            </div>
                                             @error('password')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -158,8 +142,13 @@
 
                                         <div class="form-group">
                                             <label for="password-confirm">Pengesahan Kata Laluan</label>
-                                            <input id="password-confirm" type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" required
-                                                placeholder="Sahkan Kata Laluan">
+                                            <div class="input-group">
+                                                <input id="password-confirm" type="password" name="password_confirmation" class="form-control @error('password_confirmation') is-invalid @enderror" required
+                                                    placeholder="Sahkan Kata Laluan">
+                                                <button type="button" class="btn btn-outline-primary" id="show-confirm-password-btn">
+                                                    <i class="fas fa-eye-slash"></i>
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div class="form-group row">
@@ -219,13 +208,31 @@
                 // hide the student's info section and reveal only if user chooses bayar_yuran
                 $('.hide-section').hide();
 
-                // $('#registration_type').on('change', function () {
-                //     if ($('#registration_type').val() === 'bayar_yuran') {
-                //         $('.hide-section').show();
-                //     } else {
-                //         $('.hide-section').hide();
-                //     }
-                // });
+                $("#show-password-btn").click(function (e) {
+                    e.preventDefault();
+                    let passwordInput = $('#userpassword');
+
+                    if (passwordInput.prop('type') == 'password') {
+                        passwordInput.prop('type', 'text');
+                    } else {
+                        passwordInput.prop('type', 'password');
+                    }
+
+                    $(this).find('i').toggleClass('fa-eye-slash').toggleClass('fa-eye');
+                });
+
+                $("#show-confirm-password-btn").click(function (e) {
+                    e.preventDefault();
+                    let passwordInput = $('#password-confirm');
+
+                    if (passwordInput.prop('type') == 'password') {
+                        passwordInput.prop('type', 'text');
+                    } else {
+                        passwordInput.prop('type', 'password');
+                    }
+
+                    $(this).find('i').toggleClass('fa-eye-slash').toggleClass('fa-eye');
+                });
             });
         </script>
     @endsection
