@@ -91,25 +91,21 @@
                     <div class="row mb-12 ">
                         @if($referral_code != null)
                             <div class="col-sm-6 text-secondary ">
-                                <input type="text" class="form-control" value="{{$referral_code->total_point}} Mata Ganjaran"
-                                    readonly>
+                                <input type="text" class="form-control" value="{{ (int) $referral_code->total_point}} Mata Ganjaran" readonly>
                             </div>
                             <div class="col-sm-3 text-secondary ">
-                                <a class="btn btn-primary w-md waves-effect waves-light form-control mb-3"
-                                    href="{{ route('point.index') }}">Butiran</a>
+                                <a class="btn btn-primary w-md waves-effect waves-light form-control mb-3" href="{{ route('point.index') }}">Butiran</a>
 
                             </div>
                             <div class="col-sm-3 text-secondary ">
-                                <a class="btn btn-success w-md waves-effect waves-light form-control mb-3" href="#"
-                                    data-toggle="modal" data-target="#itemModal">Dapat Link</a>
+                                <a class="btn btn-success w-md waves-effect waves-light form-control mb-3" href="#" data-toggle="modal" data-target="#itemModal">Dapat Link</a>
 
                             </div>
 
 
                         @else
 
-                            <button class="btn btn-primary waves-effect waves-light" style="margin-left:22px"
-                                onclick="copyReferralLink()">
+                            <button class="btn btn-primary waves-effect waves-light" style="margin-left:22px" onclick="copyReferralLink()">
                                 Aktifkan
                             </button>
 
@@ -126,13 +122,13 @@
                 <br>
                 <!-- button for edit -->
                 <!-- <div class="btn-group editBtnGrp" role="group" aria-label="">
-                        <a class="btn btn-light w-md waves-effect waves-light" href="{{ route('profile.resetPassword') }}">Tukar
-                            Kata Laluan</a>
-                        <a class="btn btn-primary w-md waves-effect waves-light"
-                            href="{{ route('profile.edit', $userData->id) }}">
-                            Edit Profil
-                        </a>
-                    </div> -->
+                            <a class="btn btn-light w-md waves-effect waves-light" href="{{ route('profile.resetPassword') }}">Tukar
+                                Kata Laluan</a>
+                            <a class="btn btn-primary w-md waves-effect waves-light"
+                                href="{{ route('profile.edit', $userData->id) }}">
+                                Edit Profil
+                            </a>
+                        </div> -->
             </div> <!-- end of card-body -->
 
         </div> <!-- end of card -->

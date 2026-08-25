@@ -122,7 +122,7 @@ class RegisterController extends Controller
         //dd($data,isset($data['isAdmin']));
         $user = User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            'email' => $data['email'] ?? null,
             'password' => Hash::make($data['password']),
             'telno' => $data['telno'],
             'remember_token' => $data['_token'],
@@ -159,7 +159,7 @@ class RegisterController extends Controller
         // validate input
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
             'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
         ]);
@@ -218,7 +218,6 @@ class RegisterController extends Controller
         // insert icno and email verified (non mass-assignable)
         DB::table("users")->where("id", "=", $user->id)->update([
             "icno" => str_replace("-", "", $request->get("icno")),
-            "email_verified_at" => now()
         ]);
 
         $this->guard()->login($user);
@@ -241,6 +240,10 @@ class RegisterController extends Controller
     // to redirect back to intended link
     protected function registered(Request $request, $user)
     {
+        // aktifkan derma
+        $pointController = app(PointController::class);
+        $pointController->generateReferralCode();
+
         if ($request->session()->has('url.intended')) {
             $redirectUrl = $request->session()->get('url.intended');
             $request->session()->forget('url.intended');
