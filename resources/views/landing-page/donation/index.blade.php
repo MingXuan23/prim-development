@@ -656,25 +656,29 @@
                         <h2 class="title wow fadeInDown white main-text" style="text-wrap: balance">Cara Sedekah Subuh
                         </h2>
 
-                        <a href="{{ route('register') }}" target="_blank"
-                            class="step mt-2 border p-2 d-inline-block w-100" style="background-color: white;">
+                        <a href="{{ route('register') }}">
+                            <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
+                                <h5 class="iconn mr-2 mb-0">1</h5>
+                                <div class="d-flex w-100 flex-column flex-sm-row">
+                                    <h6 class="mb-0 text-nowrap">Daftar Ahli</h6>
 
-                            <div class="d-flex align-items-center position-relative">
-                                <h4 class="iconn mr-2 mb-0">1</h4>
+                                    <div class="ml-auto">
+                                        <a href="{{ URL::asset('assets/landing-page/pdf/User Registration.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                            Lihat PDF
+                                        </a>
 
-                                <div class="d-flex flex-column align-items-start flex-grow-1 text-left">
-                                    <h5 class="mb-0">Daftar Akun</h5>
-                                    <p class="mb-0">Daftar akun di portal kami</p>
+                                        <a href="https://youtu.be/k4M-pFNNc90" rel="noopener" target="_blank" class="badge border">
+                                            Tonton Video
+                                        </a>
+                                    </div>
                                 </div>
-
-                                <h3 class="position-absolute" style="right: 0 !important;">&#10140;</h3>
                             </div>
-
                         </a>
+
                         <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
-                            <h4 class="iconn mr-2 mb-0">2</h4>
+                            <h5 class="iconn mr-2 mb-0">2</h5>
                             <div class="d-flex w-100 flex-column flex-sm-row">
-                                <h5 class="mb-0 text-nowrap">Muat Turun Aplikasi</h5>
+                                <h6 class="mb-0 text-nowrap">Muat Turun Aplikasi</h6>
 
                                 <div class="ml-auto">
                                     <a href="https://play.google.com/store/apps/details?id=com.prim.prim_derma_app&pcampaignid=web_share"
@@ -693,16 +697,50 @@
                         </div>
 
                         <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
-                            <h4 class="iconn mr-2 mb-0">3</h4>
+                            <h5 class="iconn mr-2 mb-0">3</h5>
                             <div class="d-flex w-100 flex-column flex-sm-row">
-                                <h5 class="mb-0 text-nowrap">Panduan Menderma</h5>
+                                <h6 class="mb-0 text-nowrap">Panduan Menderma</h6>
 
                                 <div class="ml-auto">
-                                    <a href="{{ URL::asset('assets/landing-page/pdf/User Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                    <a href="{{ URL::asset('assets/landing-page/pdf/Donation Steps Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
                                         Lihat PDF
                                     </a>
 
-                                    <a href="{{ URL::asset('assets/landing-page/video/user_manual_donations_compiled.mp4') }}" rel="noopener" target="_blank" class="badge border">
+                                    <a href="https://youtu.be/e0bqG6Mnbwk" rel="noopener" target="_blank" class="badge border">
+                                        Tonton Video
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
+                            <h5 class="iconn mr-2 mb-0">4</h5>
+                            <div class="d-flex w-100 flex-column flex-sm-row">
+                                <h6 class="mb-0 text-nowrap">Pantau Mata Ganjaran</h6>
+
+                                <div class="ml-auto">
+                                    <a href="{{ URL::asset('assets/landing-page/pdf/Check Points Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                        Lihat PDF
+                                    </a>
+
+                                    <a href="https://youtu.be/oj-kjFX-T7g" rel="noopener" target="_blank" class="badge border">
+                                        Tonton Video
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
+                            <h4 class="iconn mr-2 mb-0">5</h4>
+                            <div class="d-flex w-100 flex-column flex-sm-row">
+                                <h6 class="mb-0 text-nowrap">Jemput Ahli</h6>
+
+                                <div class="ml-auto">
+                                    <a href="{{ URL::asset('assets/landing-page/pdf/Invite Members Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                        Lihat PDF
+                                    </a>
+
+                                    <a href="https://youtu.be/1NQMlosoMjI" rel="noopener" target="_blank" class="badge border">
                                         Tonton Video
                                     </a>
                                 </div>
@@ -1144,7 +1182,7 @@
             </div>
         </a>
     </section>
-    
+
     @include('landing-page.footer-script')
     <script>
         var msg = '{{Session::get('alert')}}';
