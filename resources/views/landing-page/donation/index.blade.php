@@ -316,12 +316,6 @@
             background-image: -webkit-linear-gradient(50deg, #6104cc 0, #5e2ced 100%) !important;
         }
 
-
-        .leader-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateX(10px);
-        }
-
         .leader-name {
             font-weight: bold;
             /*color: var(--secondary-color);*/
@@ -447,8 +441,9 @@
             border-radius: 15px;
         }
 
-       .main-text {
+        .main-text {
             font-size: 3rem !important;
+            text-align: center;
         }
 
         /* Display rules for different screen sizes */
@@ -548,10 +543,6 @@
             transition: all 0.5s ease-in-out;
         }
 
-        .image-promotion:hover {
-            transform: scale(1.1);
-        }
-
         .iconn {
             background-color: #9749f8;
             min-width: 40px !important;
@@ -572,25 +563,45 @@
             transform: translateX(10px);
         }
 
-        .step .badge{
+        .step .badge {
             background-color: #9749f8 !important;
             color: #fff !important;
             padding: 0.5rem 0.75rem;
         }
 
-        .step .bg-black{
+        .step .bg-black {
             background-color: #000 !important;
         }
 
-        .step .badge:hover{
+        .step .badge:hover {
             background-color: #7d1bf5 !important;
         }
 
-        .step .bg-black:hover{
+        .step .bg-black:hover {
             background-color: #000000c9 !important;
         }
+
         .white {
             color: #fff !important;
+        }
+
+        #promotionCarousel {
+            width: 100%;
+        }
+
+        #promotionCarousel .item {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center;
+        }
+
+        #promotionCarousel .item img,
+        #promotionCarousel .item video {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
         }
     </style>
 </head>
@@ -606,7 +617,8 @@
                     </a>
                     {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
                 </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
+                    aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
@@ -625,8 +637,8 @@
                     <li class="menu-item-has-children">
                         <a href="#">Perniagaan</a>
                         <ul class="sub-menu">
-                            <li><a href="{{route('merchant-product.index')}}">Get&Go</a></li>
-                            <li><a href="{{route('homestay.homePage')}}">Homestay</a></li>
+                            <li><a href="{{ route('merchant-product.index') }}">Get&Go</a></li>
+                            <li><a href="{{ route('homestay.homePage') }}">Homestay</a></li>
                         </ul>
                     </li>
                     {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
@@ -643,18 +655,33 @@
     </nav>
 
     <!-- header area start  -->
-    <header class="breadcrumb-area breadcrumb-bg style-two" id="home" style="padding-top: 140px; padding-bottom: 140px;">
+    <header class="breadcrumb-area breadcrumb-bg style-two" id="home"
+        style="padding-top: 140px; padding-bottom: 140px;">
         <div class="container">
-            <div class="row d-flex align-items-center">
-                <div class="col-lg-6 align-items-center" style="text-align: center">
-                    <img class="image-promotion fadeInDown"
-                        src="{{ URL::asset('assets/landing-page/img/sedekah-subuh-promotion-img.png') }}"
-                        id="sedekah-subuh-poster">
+            <h2 class="title wow fadeInDown white main-text" style="text-wrap: balance">Cara Sedekah Subuh</h2>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div id="promotionCarousel" class="owl-carousel owl-theme">
+
+                        <div class="item">
+                            <img class="image-promotion fadeInDown"
+                                src="{{ URL::asset('assets/landing-page/img/sedekah-subuh-promotion-img.png') }}"
+                                id="sedekah-subuh-poster" alt="Sedekah Subuh">
+                        </div>
+
+                        <div class="item">
+                            <video class="image-promotion fadeInDown" controls muted loop playsinline>
+                                <source src="{{ URL::asset('assets/landing-page/video/homestay-mutiara-melaka.mp4') }}"
+                                    type="video/mp4">
+                                Browser anda tidak menyokong video.
+                            </video>
+                        </div>
+
+                    </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="header-inner">
-                        <h2 class="title wow fadeInDown white main-text" style="text-wrap: balance">Cara Sedekah Subuh
-                        </h2>
 
                         <a href="{{ route('register') }}">
                             <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
@@ -663,11 +690,13 @@
                                     <h6 class="mb-0 text-nowrap">Daftar Ahli</h6>
 
                                     <div class="ml-auto">
-                                        <a href="{{ URL::asset('assets/landing-page/pdf/User Registration.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                        <a href="{{ URL::asset('assets/landing-page/pdf/User Registration.pdf') }}"
+                                            target="_blank" rel="noopener" class="badge border">
                                             Lihat PDF
                                         </a>
 
-                                        <a href="https://youtu.be/k4M-pFNNc90" rel="noopener" target="_blank" class="badge border">
+                                        <a href="https://youtu.be/k4M-pFNNc90" rel="noopener" target="_blank"
+                                            class="badge border">
                                             Tonton Video
                                         </a>
                                     </div>
@@ -676,9 +705,9 @@
                         </a>
 
                         <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
-                            <h5 class="iconn mr-2 mb-0">2</h5>
+                            <h6 class="iconn mr-2 mb-0">2</h6>
                             <div class="d-flex w-100 flex-column flex-sm-row">
-                                <h6 class="mb-0 text-nowrap">Muat Turun Aplikasi</h6>
+                                <h5 class="mb-0 text-nowrap">Muat Turun Aplikasi</h5>
 
                                 <div class="ml-auto">
                                     <a href="https://play.google.com/store/apps/details?id=com.prim.prim_derma_app&pcampaignid=web_share"
@@ -702,11 +731,13 @@
                                 <h6 class="mb-0 text-nowrap">Panduan Menderma</h6>
 
                                 <div class="ml-auto">
-                                    <a href="{{ URL::asset('assets/landing-page/pdf/Donation Steps Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                    <a href="{{ URL::asset('assets/landing-page/pdf/Donation Steps Manual.pdf') }}"
+                                        target="_blank" rel="noopener" class="badge border">
                                         Lihat PDF
                                     </a>
 
-                                    <a href="https://youtu.be/e0bqG6Mnbwk" rel="noopener" target="_blank" class="badge border">
+                                    <a href="https://youtu.be/e0bqG6Mnbwk" rel="noopener" target="_blank"
+                                        class="badge border">
                                         Tonton Video
                                     </a>
                                 </div>
@@ -719,11 +750,13 @@
                                 <h6 class="mb-0 text-nowrap">Pantau Mata Ganjaran</h6>
 
                                 <div class="ml-auto">
-                                    <a href="{{ URL::asset('assets/landing-page/pdf/Check Points Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                    <a href="{{ URL::asset('assets/landing-page/pdf/Check Points Manual.pdf') }}"
+                                        target="_blank" rel="noopener" class="badge border">
                                         Lihat PDF
                                     </a>
 
-                                    <a href="https://youtu.be/oj-kjFX-T7g" rel="noopener" target="_blank" class="badge border">
+                                    <a href="https://youtu.be/oj-kjFX-T7g" rel="noopener" target="_blank"
+                                        class="badge border">
                                         Tonton Video
                                     </a>
                                 </div>
@@ -731,16 +764,18 @@
                         </div>
 
                         <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
-                            <h4 class="iconn mr-2 mb-0">5</h4>
+                            <h5 class="iconn mr-2 mb-0">5</h5>
                             <div class="d-flex w-100 flex-column flex-sm-row">
                                 <h6 class="mb-0 text-nowrap">Jemput Ahli</h6>
 
                                 <div class="ml-auto">
-                                    <a href="{{ URL::asset('assets/landing-page/pdf/Invite Members Manual.pdf') }}" target="_blank" rel="noopener" class="badge border" >
+                                    <a href="{{ URL::asset('assets/landing-page/pdf/Invite Members Manual.pdf') }}"
+                                        target="_blank" rel="noopener" class="badge border">
                                         Lihat PDF
                                     </a>
 
-                                    <a href="https://youtu.be/1NQMlosoMjI" rel="noopener" target="_blank" class="badge border">
+                                    <a href="https://youtu.be/1NQMlosoMjI" rel="noopener" target="_blank"
+                                        class="badge border">
                                         Tonton Video
                                     </a>
                                 </div>
@@ -772,7 +807,8 @@
                         <p>Antara organisasi derma yang berdaftar bersama PRiM.</p>
                     </div>
                     <div class="section-search mb-3">
-                        <input type="text" class="form-control" id="donation-search-bar" placeholder="🔍 Cari derma">
+                        <input type="text" class="form-control" id="donation-search-bar"
+                            placeholder="🔍 Cari derma">
                     </div>
                 </div>
             </div>
@@ -781,49 +817,57 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="8" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="lain" aria-selected="false"><i
+                                <a class="nav-link btn-terkini" data-toggle="tab" href="#organisasi" role="tab"
+                                    aria-controls="lain" aria-selected="false"><i class="fas fa-newspaper"></i>
+                                    Terkini </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn-organization" id="8" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="lain" aria-selected="false"><i
                                         class="fas fa-building"></i>
                                     Derma Khas </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="3" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
-                                        class="fas fa-university"></i>
+                                <a class="nav-link btn-organization" id="3" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="tabung-covid"
+                                    aria-selected="false"><i class="fas fa-university"></i>
                                     IPTA / Universiti</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="2" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
-                                        class="fas fa-hammer"></i>
+                                <a class="nav-link btn-organization" id="2" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="tabung-covid"
+                                    aria-selected="false"><i class="fas fa-hammer"></i>
                                     Masjid/Surau Baru </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="1" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="tabung-covid" aria-selected="false"><i
-                                        class="fas fa-school"></i>
+                                <a class="nav-link btn-organization" id="1" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="tabung-covid"
+                                    aria-selected="false"><i class="fas fa-school"></i>
                                     PIBG Sekolah </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="4" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="masjid" aria-selected="false"><i class="fas fa-quran"></i>
+                                <a class="nav-link btn-organization" id="4" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="masjid"
+                                    aria-selected="false"><i class="fas fa-quran"></i>
                                     Pusat Tahfiz </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="5" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="masjid" aria-selected="true"><i class="fas fa-mosque"></i>
+                                <a class="nav-link btn-organization" id="5" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="masjid" aria-selected="true"><i
+                                        class="fas fa-mosque"></i>
                                     Imarah Masjid </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="6" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false">
+                                <a class="nav-link btn-organization" id="6" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="ngo" aria-selected="false">
                                     <img src="{{ URL::asset('assets/landing-page/img/sedekahsubuh_logo.png') }}"
                                         alt="Sedekah Subuh Logo" class="d-inline" width="45">
                                     Sedekah Subuh</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn-organization" id="7" data-toggle="tab" href="#organisasi"
-                                    role="tab" aria-controls="ngo" aria-selected="false"><i class="fas fa-globe"></i>
+                                <a class="nav-link btn-organization" id="7" data-toggle="tab"
+                                    href="#organisasi" role="tab" aria-controls="ngo" aria-selected="false"><i
+                                        class="fas fa-globe"></i>
                                     NGO </a>
                             </li>
                         </ul>
@@ -847,8 +891,8 @@
                         <h3 class="title">Aktiviti Sedekah Subuh</h3>
                         <p>Lihat poster derma, video dan gambar aktiviti terkini yang dikongsi oleh komuniti
                             PRIM.<br>Dapatkan maklumat, inspirasi dan sertai usaha kebaikan bersama.</p>
-                        <a class="btn" id="social-media-btn" target="_blank" href="{{ route('social-media.index') }}"><i
-                                class="fas fa-users"></i> &nbsp; Terokai
+                        <a class="btn" id="social-media-btn" target="_blank"
+                            href="{{ route('social-media.index') }}"><i class="fas fa-users"></i> &nbsp; Terokai
                             Aktiviti Sedekah Subuh &nbsp; <i class="fas fa-arrow-right"></i></a>
                         <!-- <p class="text-center small">Komuniti dalaman PRIM • Kongsi, Berinteraksi, Berinspirasi</p> -->
                     </div><!-- //. section title -->
@@ -921,17 +965,17 @@
             <div class="mb-3 text-center">Paparan penderma-penderma yang terkini</div>
             <div class="donors-container donors-container-1">
                 @foreach ($donors as $index => $donor)
-                {{-- @if ($index % 10 == 0 && $index > 0) --}}
-                {{-- <!-- Close the previous row and open a new one --> --}}
-                {{--
+                    {{-- @if ($index % 10 == 0 && $index > 0) --}}
+                    {{-- <!-- Close the previous row and open a new one --> --}}
+                    {{--
             </div>
             <div class="donors-container donors-container-2"> --}}
-                {{-- @endif --}}
-                <div class="donor-container">
-                    <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
-                    <div class="donor-amount">RM{{ $donor->amount }}</div>
-                    <small>{{ date('d/m/Y h:i A', strtotime($donor->datetime_created)) }}</small>
-                </div>
+                    {{-- @endif --}}
+                    <div class="donor-container">
+                        <div class="donor-name" title="{{ $donor->username }}">{{ $donor->username }}</div>
+                        <div class="donor-amount">RM{{ $donor->amount }}</div>
+                        <small>{{ date('d/m/Y h:i A', strtotime($donor->datetime_created)) }}</small>
+                    </div>
                 @endforeach
             </div>
 
@@ -1042,10 +1086,11 @@
             <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">
         </div> -->
         <div class="bg-shape-2">
-            <img style="width: 100vw !important;" src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
+            <img style="width: 100vw !important;"
+                src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
         </div>
         <!-- <div class="bg-shape-3"> -->
-            <!-- {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}} -->
+        <!-- {{-- <img src="{{ URL::asset('assets/landing-page/img/bg/contact-mobile-bg.png') }}" alt=""> --}} -->
         <!-- </div> -->
         <div class="container">
             <div class="container" style="margin-bottom: 10rem">
@@ -1061,10 +1106,12 @@
                     <div class="col-lg-12">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt="" style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt=""
+                                    style="max-width:70%">
                             </div>
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt="" style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}"
+                                    alt="" style="max-width:70%">
                             </div>
                             <!-- <div class="col-lg-4 p-3 text-sm-center align-self-center">
                                 <img src="{{ URL::asset('assets/landing-page/img/logo-utem-blue.png') }}" alt="" style="max-width:70%">
@@ -1084,7 +1131,9 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}"
+                                    alt=""></a>
                             <p>People Relationship Information Management (PRiM) adalah sebuah sistem untuk
                                 menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
                         </div>
@@ -1185,8 +1234,8 @@
 
     @include('landing-page.footer-script')
     <script>
-        var msg = '{{Session::get('alert')}}';
-        var exist = '{{Session::has('alert')}}';
+        var msg = '{{ Session::get('alert') }}';
+        var exist = '{{ Session::has('alert') }}';
 
         if (exist) {
             Swal.fire({
@@ -1198,12 +1247,67 @@
             });
         }
 
-        $(document).ready(function () {
-            window.onload = function () {
-                document.getElementById("8").click();
+        $(document).ready(function() {
+
+            function terkini() {
+                $.ajax({
+                    url: "{{ route('landingpage.donation.header') }}",
+                    type: 'GET',
+                    success: function(result) {
+                        var posterExist = true;
+
+                        if (result === '') {
+                            result =
+                                `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
+                            posterExist = false;
+                        }
+
+                        $('#donationPoster').html(result);
+                        $('#donationPoster').trigger('destroy.owl.carousel').removeClass(
+                            'owl-carousel owl-loaded');
+                        $('#donationPoster').find('.owl-stage-outer').children().unwrap();
+                        $('#donationPoster').owlCarousel({
+                            loop: true,
+                            autoplay: true,
+                            autoplayTimeout: 5000,
+                            responsiveClass: true,
+                            responsive: {
+                                0: {
+                                    items: 1,
+                                    nav: false
+                                },
+                                414: {
+                                    items: 1,
+                                    nav: false
+                                },
+                                520: {
+                                    items: 2,
+                                    nav: false
+                                },
+                                767: {
+                                    items: 2,
+                                    nav: false
+                                },
+                                768: {
+                                    items: 2,
+                                    nav: false
+                                },
+                                960: {
+                                    items: 3,
+                                    nav: false
+                                },
+                            }
+                        });
+                    }
+                });
+            }
+
+            window.onload = function() {
+                $(".btn-terkini").addClass("active")
+                terkini()
             };
 
-            $('.sertai-sekarang-btn').click(function (e) {
+            $('.sertai-sekarang-btn').click(function(e) {
                 e.preventDefault();
                 let href = $(this).attr('href');
                 let target = $(href);
@@ -1216,37 +1320,15 @@
                 }
             });
 
-            $.ajax({
-                url: "{{ route('landingpage.donation.header') }}",
-                type: 'GET',
-                success: function (result) {
-
-                    $('#headerPoster').html(result);
-                    $('#headerPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
-                    $('#headerPoster').find('.owl-stage-outer').children().unwrap();
-                    $('#headerPoster').owlCarousel({
-                        loop: true,
-                        autoplay: true,
-                        autoplayTimeout: 5000,
-                        responsiveClass: true,
-                        responsive: {
-                            0: {
-                                items: 1,
-                                nav: false
-                            },
-                            600: {
-                                items: 1,
-                                nav: false
-                            },
-                            1000: {
-                                items: 1,
-                                nav: false,
-                            }
-                        },
-                    });
-                }
+            $('#promotionCarousel').owlCarousel({
+                items: 1,
+                loop: true,
+                autoplay: true,
+                autoplayTimeout: 2000,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: false
             });
-
             $('#feedback').owlCarousel({
                 loop: true,
                 autoplay: true, //true if you want enable autoplay
@@ -1302,16 +1384,18 @@
                         type: type,
                         searchQuery: searchQuery
                     },
-                    success: function (result) {
+                    success: function(result) {
 
                         var posterExist = true;
                         if (result === '') {
-                            result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
+                            result =
+                                `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
                             posterExist = false;
                         }
 
                         $('#donationPoster').html(result);
-                        $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                        $('#donationPoster').trigger('destroy.owl.carousel').removeClass(
+                            'owl-carousel owl-loaded');
                         $('#donationPoster').find('.owl-stage-outer').children().unwrap();
                         $('#donationPoster').owlCarousel({
                             // loop:true,
@@ -1341,17 +1425,22 @@
             var typedonation;
             var searchQuery = '';
             var searchDelay;
-            $(document).on('click', '.btn-organization', function () {
+            $(document).on('click', '.btn-organization', function() {
                 var type = $(this).attr("id");
                 typedonation = type;
                 loadDonationCarousel(typedonation, searchQuery);
             });
 
-            $('#donation-search-bar').on('input', function () {
+            $(document).on('click', '.btn-terkini', function() {
+                $(this).addClass("active")
+                terkini()
+            })
+
+            $('#donation-search-bar').on('input', function() {
                 searchQuery = $(this).val().trim().toLowerCase();
                 clearTimeout(searchDelay);
 
-                searchDelay = setTimeout(function () {
+                searchDelay = setTimeout(function() {
                     loadDonationCarousel(typedonation, searchQuery);
                 }, 300);
             });
