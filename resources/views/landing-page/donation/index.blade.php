@@ -608,51 +608,7 @@
 
 <body>
 
-    <nav class="navbar navbar-area navbar-expand-lg nav-absolute white nav-style-01">
-        <div class="container nav-container">
-            <div class="responsive-mobile-menu">
-                <div class="logo-wrapper">
-                    <a class="navbar-brand" href="/">
-                        <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
-                    </a>
-                    {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
-                </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="appside_main_menu">
-                <ul class="navbar-nav">
-                    <li><a href="/">Utama</a></li>
-                    <!-- <li class="current-menu-item"><a href="#" style="font-size: 19px">Derma</a></li> -->
-                    <li class="menu-item-has-children current-menu-item">
-                        <a href="#">Derma</a>
-                        <ul class="sub-menu">
-                            <li><a href="#organization">Poster Derma</a></li>
-                            <li><a href="#social-media">Sedekah Subuh</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="/yuran">Yuran</a></li>
-                    <li class="menu-item-has-children">
-                        <a href="#">Perniagaan</a>
-                        <ul class="sub-menu">
-                            <li><a href="{{ route('merchant-product.index') }}">Get&Go</a></li>
-                            <li><a href="{{ route('homestay.homePage') }}">Homestay</a></li>
-                        </ul>
-                    </li>
-                    {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
-                </ul>
-            </div>
-            <div class="nav-right-content">
-                <ul>
-                    <li class="button-wrapper">
-                        <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    @include('landing-page.components.navlinks')
 
     <!-- header area start  -->
     <header class="breadcrumb-area breadcrumb-bg style-two" id="home"
@@ -705,9 +661,9 @@
                         </a>
 
                         <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
-                            <h6 class="iconn mr-2 mb-0">2</h6>
+                            <h5 class="iconn mr-2 mb-0">2</h5>
                             <div class="d-flex w-100 flex-column flex-sm-row">
-                                <h5 class="mb-0 text-nowrap">Muat Turun Aplikasi</h5>
+                                <h6 class="mb-0 text-nowrap">Muat Turun Aplikasi</h6>
 
                                 <div class="ml-auto">
                                     <a href="https://play.google.com/store/apps/details?id=com.prim.prim_derma_app&pcampaignid=web_share"
