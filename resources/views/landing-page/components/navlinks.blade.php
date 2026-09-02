@@ -14,7 +14,7 @@
         </div>
         <div class="collapse navbar-collapse" id="appside_main_menu">
             <ul class="navbar-nav">
-                <li class="{{ Request::is('*') ? 'current-menu-item' : '' }}">
+                <li class="{{ Request::is('/') ? 'current-menu-item' : '' }}">
                     <a href="/">Utama</a>
                 </li>
                 <!-- <li class="current-menu-item"><a href="#" style="font-size: 19px">Derma</a></li> -->
