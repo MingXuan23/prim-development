@@ -142,64 +142,7 @@
 
 <body>
 
-    <nav class="navbar navbar-area navbar-expand-lg nav-absolute white nav-style-01">
-        <div class="container nav-container">
-            <div class="responsive-mobile-menu">
-                <div class="logo-wrapper">
-                    <a class="navbar-brand" href="/">
-                        <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
-                    </a>
-                    {{-- <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo"> --}}
-                </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="appside_main_menu">
-                <ul class="navbar-nav">
-                    <li class="current-menu-item"><a href="#" style="font-size: 19px">Utama</a></li>
-                    <li><a href="/derma">Derma</a></li>
-                    <li><a href="/yuran">Yuran</a></li>
-                    <li class="menu-item-has-children">
-                        <a href="#">Perniagaan</a>
-                        <ul class="sub-menu">
-                            <li><a href="{{route('merchant-product.index')}}">Get&Go</a></li>
-                            <li><a href="{{route('homestay.homePage')}}">Homestay</a></li>
-                        </ul>
-                    </li>
-                    {{-- <li class="menu-item-has-children">
-                        <a href="#">Yuran</a>
-                        <ul class="sub-menu">
-                            <li class="menu-item-has-children">
-                                <a href="#">Sekolah</a>
-                                <ul class="sub-menu">
-                                    @foreach ($schools as $school)
-                                    <li><a href="/{{ $school->url_name }}">{{ $school->title }}</a></li>
-                                    @endforeach
-                                </ul>
-                            </li>
-                            <li class="menu-item-has-children">
-                                <a href="#">Politeknik</a>
-                                <ul class="sub-menu">
-                                    @foreach ($politeknik as $poli)
-                                    <li><a href="/{{ $poli->url_name }}">{{ $poli->title }}</a></li>
-                                    @endforeach
-                                </ul>
-                            </li>
-                        </ul>
-                    </li> --}}
-                    {{-- <li><a href="/merchant/product">Get&Go</a></li> --}}
-                </ul>
-            </div>
-            <div class="nav-right-content">
-                <ul>
-                    <li class="button-wrapper">
-                        <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    @include('landing-page.components.navlinks')
 
     <!-- header area start  -->
     <header class="header-area header-bg-2 style-two img-fluid" id="home"
@@ -211,7 +154,8 @@
                     {{-- <div id="headerPoster" class="row d-flex justify-content-center carousel owl-theme"></div> --}}
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown white">PRiM</h1>
-                        <p class="white" style="font-size: 20px;">Sebuah sistem yang menyediakan perkhidmatan pembayaran
+                        <p class="white" style="font-size: 20px;">Sebuah sistem yang menyediakan perkhidmatan
+                            pembayaran
                             dalam talian untuk pelbagai organisasi
                             berdaftar. Antara perkhidmatan yang telah kami sediakan ialah Derma, Yuran, Get&Go dan
                             sebagainya.</p>
@@ -222,7 +166,8 @@
                     </div>
                 </div>
                 <div class="col-lg-6 align-items-center d-none d-lg-block" style="text-align: right">
-                    <img src="{{ URL::asset('assets/landing-page/img/header-mockup-yuran-2.png') }}" alt="header right image" style="max-width: 110%;" id="headerhover">
+                    <img src="{{ URL::asset('assets/landing-page/img/header-mockup-yuran-2.png') }}"
+                        alt="header right image" style="max-width: 110%;" id="headerhover">
                 </div>
             </div>
             {{-- <div class="row justify-content-center" style="padding-top: 120px">
@@ -287,7 +232,8 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="feature-area">
-                        <ul class="feature-list wow fadeInUp d-flex justify-content-center" style="visibility: visible; animation-name: fadeInUp;">
+                        <ul class="feature-list wow fadeInUp d-flex justify-content-center"
+                            style="visibility: visible; animation-name: fadeInUp;">
                             <li class="single-feature-list col-md-9 col-lg-4">
                                 <div class="icon icon-bg-2">
                                     <i class="flaticon-checked"></i>
@@ -337,7 +283,8 @@
     <section class="team-member-area" id="ourteam">
 
         <div class="bg-shape-3 fa-rotate-180" style="top: 0px !important;right:0px;">
-            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt="" style="max-width:45%">
+            <img src="{{ URL::asset('assets/landing-page/img/bg/team-shape.png') }}" alt=""
+                style="max-width:45%">
         </div>
         <div class="bg-shape-2">
             <img src="{{ URL::asset('assets/landing-page/img/bg/contact-map-bg-min.jpg') }}" alt="">
@@ -347,52 +294,52 @@
         </div>
         <div class="container">
             <div class="container">
-                {{-- <div class="row justify-content-center">--}}
-                    {{-- <div class="col-lg-10">--}}
-                        {{-- <div class="section-title">--}}
-                            {{-- <!-- section title -->--}}
-                            {{-- --}}{{-- <span class="subtitle">Screenshots</span> --}}
-                            {{-- <h3 class="title extra">Pasukan Kami</h3>--}}
-                            {{-- </div><!-- //. section title -->--}}
-                        {{-- </div>--}}
-                    {{-- </div>--}}
+                {{-- <div class="row justify-content-center"> --}}
+                {{-- <div class="col-lg-10"> --}}
+                {{-- <div class="section-title"> --}}
+                {{-- <!-- section title --> --}}
+                {{-- --}}{{-- <span class="subtitle">Screenshots</span> --}}
+                {{-- <h3 class="title extra">Pasukan Kami</h3> --}}
+                {{-- </div><!-- //. section title --> --}}
+                {{-- </div> --}}
+                {{-- </div> --}}
             </div>
-            {{-- <div class="row text-center">--}}
-                {{-- <div class="col-lg-12 mb-200">--}}
-                    {{-- <div class="row justify-content-center">--}}
-                        {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
-                            {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
-                                {{-- </div>--}}
-                            {{-- <div class="pt-3">--}}
-                                {{-- <h4>Yahya Bin Ibrahim</h4>--}}
-                                {{-- <p>Chief Executive Officer</p>--}}
-                                {{-- </div>--}}
-                            {{-- </div>--}}
+            {{-- <div class="row text-center"> --}}
+            {{-- <div class="col-lg-12 mb-200"> --}}
+            {{-- <div class="row justify-content-center"> --}}
+            {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center"> --}}
+            {{-- <div class="p-3"> --}}
+            {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CEO.png') }}" alt="" style="max-width:70%; width: 250px"> --}}
+            {{-- </div> --}}
+            {{-- <div class="pt-3"> --}}
+            {{-- <h4>Yahya Bin Ibrahim</h4> --}}
+            {{-- <p>Chief Executive Officer</p> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
 
-                        {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
-                            {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
-                                {{-- </div>--}}
-                            {{-- <div class="pt-3">--}}
-                                {{-- <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4>--}}
-                                {{-- <p>Chief Operating Officer</p>--}}
-                                {{-- </div>--}}
-                            {{-- </div>--}}
+            {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center"> --}}
+            {{-- <div class="p-3"> --}}
+            {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/COO.png') }}" alt="" style="max-width:70%; width: 250px"> --}}
+            {{-- </div> --}}
+            {{-- <div class="pt-3"> --}}
+            {{-- <h4>Ts. Dr. Muhammad Haziq Lim Bin Abdullah</h4> --}}
+            {{-- <p>Chief Operating Officer</p> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
 
-                        {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center">--}}
-                            {{-- <div class="p-3">--}}
-                                {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px">--}}
-                                {{-- </div>--}}
-                            {{-- <div class="pt-3">--}}
-                                {{-- <h4>Chuan Chuan You</h4>--}}
-                                {{-- <p>Chief Technology Officer</p>--}}
-                                {{-- </div>--}}
-                            {{-- </div>--}}
+            {{-- <div class="col-lg-4 p-3 text-sm-center align-self-center"> --}}
+            {{-- <div class="p-3"> --}}
+            {{-- <img src="{{ URL::asset('assets/landing-page/img/team-member/CTO.png') }}" alt="" style="max-width:70%; width: 250px"> --}}
+            {{-- </div> --}}
+            {{-- <div class="pt-3"> --}}
+            {{-- <h4>Chuan Chuan You</h4> --}}
+            {{-- <p>Chief Technology Officer</p> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
 
-                        {{-- </div>--}}
-                    {{-- </div>--}}
-                {{-- </div>--}}
+            {{-- </div> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
 
             <div class="container" style="margin-bottom: 10rem">
                 <div class="row justify-content-center">
@@ -409,11 +356,13 @@
                     <div class="col-lg-12">
                         <div class="row justify-content-center">
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt="" style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-paynet.png') }}" alt=""
+                                    style="max-width:70%">
                             </div>
 
                             <div class="col-lg-4 p-3 text-sm-center align-self-center">
-                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}" alt="" style="max-width:70%">
+                                <img src="{{ URL::asset('assets/landing-page/img/logo-bank-islam.png') }}"
+                                    alt="" style="max-width:70%">
 
                             </div>
 
@@ -427,57 +376,57 @@
                 </div>
             </div>
 
-            {{-- <div class="row">--}}
-                {{-- <div class="col-lg-6">--}}
-                    {{-- <div class="contact-area-wrapper" id="contact">--}}
-                        {{-- <!-- contact area wrapper -->--}}
-                        {{-- --}}{{-- <span class="subtitle">Contact us</span> --}}
-                        {{-- <h3 class="title">Hubungi Kami</h3>--}}
-                        {{-- <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p>--}}
-                        {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin" --}} {{-- enctype="multipart/form-data">--}}
+            {{-- <div class="row"> --}}
+            {{-- <div class="col-lg-6"> --}}
+            {{-- <div class="contact-area-wrapper" id="contact"> --}}
+            {{-- <!-- contact area wrapper --> --}}
+            {{-- --}}{{-- <span class="subtitle">Contact us</span> --}}
+            {{-- <h3 class="title">Hubungi Kami</h3> --}}
+            {{-- <p>Untuk sebarang pertanyaan dan maklumbalas, sila isi borang ini.</p> --}}
+            {{-- <form method="post" action="{{ route('feedback.store') }}" class="contact-form sec-margin" --}} {{-- enctype="multipart/form-data"> --}}
 
-                            {{-- @csrf--}}
-                            {{-- <div class="row">--}}
-                                {{-- <div class="col-lg-12">--}}
-                                    {{-- <div class="form-group">--}}
-                                        {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{-- placeholder="Nama Penuh" required>--}}
-                                        {{-- </div>--}}
-                                    {{-- </div>--}}
-                                {{-- <div class="col-lg-6">--}}
-                                    {{-- <div class="form-group">--}}
-                                        {{-- <input type="email" class="form-control" id="email" name="email" --}} {{-- placeholder="Email" required>--}}
-                                        {{-- </div>--}}
-                                    {{-- </div>--}}
+            {{-- @csrf --}}
+            {{-- <div class="row"> --}}
+            {{-- <div class="col-lg-12"> --}}
+            {{-- <div class="form-group"> --}}
+            {{-- <input type="text" class="form-control" id="uname" name="uname" --}} {{-- placeholder="Nama Penuh" required> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
+            {{-- <div class="col-lg-6"> --}}
+            {{-- <div class="form-group"> --}}
+            {{-- <input type="email" class="form-control" id="email" name="email" --}} {{-- placeholder="Email" required> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
 
-                                {{-- <div class="col-lg-6">--}}
-                                    {{-- <div class="form-group">--}}
-                                        {{-- <input type="text" class="form-control phone_no" id="telno" name="telno" --}} {{-- placeholder="Nombor Telefon" required>--}}
-                                        {{-- </div>--}}
-                                    {{-- </div>--}}
+            {{-- <div class="col-lg-6"> --}}
+            {{-- <div class="form-group"> --}}
+            {{-- <input type="text" class="form-control phone_no" id="telno" name="telno" --}} {{-- placeholder="Nombor Telefon" required> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
 
-                                {{-- <div class="col-lg-12">--}}
-                                    {{-- <div class="form-group textarea">--}}
-                                        {{-- <textarea name="message" id="message" class="form-control" cols="30" rows="10" --}} {{-- placeholder="Mesej" required></textarea>--}}
-                                        {{-- </div>--}}
-                                    {{-- <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button>--}}
-                                    {{-- </div>--}}
-                                {{-- </div>--}}
-                            {{-- </form>--}}
-                        {{-- </div><!-- //. contact area wrapper -->--}}
-                    {{-- </div>--}}
-                {{-- <div class="col-lg-6">--}}
-                    {{-- <div class="contact-area-wrapper" id="contact">--}}
-                        {{-- <div class="map-responsive">--}}
-                            {{-- <iframe--}} {{-- src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed" --}} {{-- width="600" height="450" frameborder="0"
-                                style="border:0;" allowfullscreen="" --}} {{-- aria-hidden="false" tabindex="0">--}}
-                                {{-- </iframe>--}}
+            {{-- <div class="col-lg-12"> --}}
+            {{-- <div class="form-group textarea"> --}}
+            {{-- <textarea name="message" id="message" class="form-control" cols="30" rows="10" --}} {{-- placeholder="Mesej" required></textarea> --}}
+            {{-- </div> --}}
+            {{-- <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Hantar</button> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
+            {{-- </form> --}}
+            {{-- </div><!-- //. contact area wrapper --> --}}
+            {{-- </div> --}}
+            {{-- <div class="col-lg-6"> --}}
+            {{-- <div class="contact-area-wrapper" id="contact"> --}}
+            {{-- <div class="map-responsive"> --}}
+            {{-- <iframe --}} {{-- src="https://maps.google.com/maps?q=utem%20melaka&t=&z=13&ie=UTF8&iwloc=&output=embed" --}} {{-- width="600" height="450" frameborder="0"
+                                style="border:0;" allowfullscreen="" --}} {{-- aria-hidden="false" tabindex="0"> --}}
+            {{-- </iframe> --}}
 
-                                {{-- <br>--}}
+            {{-- <br> --}}
 
-                                {{-- </div>--}}
-                        {{-- </div><!-- //. contact area wrapper -->--}}
-                    {{-- </div>--}}
-                {{-- </div>--}}
+            {{-- </div> --}}
+            {{-- </div><!-- //. contact area wrapper --> --}}
+            {{-- </div> --}}
+            {{-- </div> --}}
         </div>
     </section>
     <!-- team member area end -->
@@ -489,7 +438,9 @@
                 <div class="row justify-content-md-center">
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
-                            <a href="" style="pointer-events: none;" class="footer-logo"><img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                            <a href="" style="pointer-events: none;" class="footer-logo"><img
+                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}"
+                                    alt=""></a>
                             <p>People Relationship Information Management (PRiM) adalah sebuah sistem untuk
                                 menghubungkan ibu bapa serta penjaga dengan pihak sekolah.</p>
 
@@ -575,15 +526,15 @@
     <!-- preloader area end -->
 
     <!-- back to top area start -->
-    {{-- <div class="back-to-top">--}}
-        {{-- <i class="fas fa-angle-up"></i>--}}
-        {{-- </div>--}}
+    {{-- <div class="back-to-top"> --}}
+    {{-- <i class="fas fa-angle-up"></i> --}}
+    {{-- </div> --}}
     <!-- back to top area end -->
     @include('landing-page.footer-script')
 
     <script>
-        var msg = '{{Session::get('alert')}}';
-        var exist = '{{Session::has('alert')}}';
+        var msg = '{{ Session::get('alert') }}';
+        var exist = '{{ Session::has('alert') }}';
 
         if (exist) {
             Swal.fire({
@@ -595,8 +546,8 @@
             });
         }
 
-        $(document).ready(function () {
-            window.onload = function () {
+        $(document).ready(function() {
+            window.onload = function() {
                 document.getElementById("8").click();
             };
 
@@ -679,7 +630,7 @@
             $('.phone_no').mask('00000000000');
 
             var typedonation;
-            $(document).on('click', '.btn-organization', function () {
+            $(document).on('click', '.btn-organization', function() {
                 var type = $(this).attr("id");
                 typedonation = type;
                 $.ajax({
@@ -688,16 +639,18 @@
                     data: {
                         type: type,
                     },
-                    success: function (result) {
+                    success: function(result) {
 
                         var posterExist = true;
                         if (result === '') {
-                            result = `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
+                            result =
+                                `<div class="d-flex justify-content-center">Tiada Maklumat Dipaparkan</div>`;
                             posterExist = false;
                         }
 
                         $('#donationPoster').html(result);
-                        $('#donationPoster').trigger('destroy.owl.carousel').removeClass('owl-carousel owl-loaded');
+                        $('#donationPoster').trigger('destroy.owl.carousel').removeClass(
+                            'owl-carousel owl-loaded');
                         $('#donationPoster').find('.owl-stage-outer').children().unwrap();
                         $('#donationPoster').owlCarousel({
                             // loop:true,

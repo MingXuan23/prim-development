@@ -14,60 +14,13 @@
 
 <body>
 
-    <nav class="navbar navbar-area navbar-expand-lg nav-absolute white nav-style-01">
-        <div class="container nav-container">
-            <div class="responsive-mobile-menu">
-                <div class="logo-wrapper">
-                    <a href="index.html" class="logo">
-                        <img src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt="logo">
-                    </a>
-                </div>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#appside_main_menu"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="appside_main_menu">
-                <ul class="navbar-nav">
-                    <li class="current-menu-item">
-                        <a href="/">Utama</a>
-                    </li>
-                    <li class="menu-item-has-children">
-                        <a href="#">Organisasi</a>
-                        <ul class="sub-menu">
-                            <li><a href="/organization-list">Masjid</a></li>
-                            <li><a href="blog-details.html">Sekolah JAIM</a></li>
-                        </ul>
-                    </li>
-                    {{-- <li><a href="/organization-list">Derma</a></li> --}}
-                    <li class="menu-item-has-children">
-                        <a href="#">Derma</a>
-                        <ul class="sub-menu">
-                            <li><a href="/organization-list">Derma Tahfiz UTeM</a></li>
-                            {{-- <li><a href="blog-details.html">Sekolah JAIM</a></li> --}}
-                        </ul>
-                    </li>
-                    {{-- <li><a href="#pricing">Pricing</a></li> --}}
-                    {{-- <li><a href="#sekolah">Sekolah</a></li> --}}
-                    {{-- <li><a href="#team">Modul</a></li> --}}
-                    
-                    <li><a href="#contact">Hubungi Kami</a></li>
-                </ul>
-            </div>
-            <div class="nav-right-content">
-                <ul>
-                    <li class="button-wrapper">
-                        <a href="/login" class="boxed-btn btn-rounded">Log Masuk</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    @include('landing-page.components.navlinks')
 
     <!-- header area start  -->
     <header class="header-area header-bg-2 style-two" id="home">
         <div class="header-right-image  wow zoomIn" style="text-align: right">
-            <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image" style="padding-bottom: 358px;
+            <img src="{{ URL::asset('assets/landing-page/img/masjid-utem.png') }}" alt="header right image"
+                style="padding-bottom: 358px;
             max-width: 63%;">
         </div>
         <div class="container">
@@ -75,7 +28,8 @@
                 <div class="col-lg-7">
                     <div class="header-inner">
                         <h1 class="title wow fadeInDown">PRiM</h1>
-                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi dan pengguna berdaftar.</p>
+                        <p>Sebuah sistem yang menyediakan perkhidmatan pembayaran dalam talian untuk pelbagai organisasi
+                            dan pengguna berdaftar.</p>
                         <div class="btn-wrapper wow fadeInUp">
                             <a href="/register" class="boxed-btn btn-rounded">Daftar Sekarang</a>
                             <a href="/login" class="boxed-btn btn-rounded blank">Log Masuk</a>
@@ -169,7 +123,7 @@
                     <div class="portfolio-menu text-center mt-50">
                         <ul>
                             <li class="active"> Semua Organisasi </li>
-                            <li data-filter=".branding-4" >Masjid An-Najihah </li>
+                            <li data-filter=".branding-4">Masjid An-Najihah </li>
                             <li data-filter=".marketing-4">Masjid Al-Alami</li>
                             <li data-filter=".planning-4">Tahfiz Iman</li>
                             <li data-filter=".research-4">Pusat Islam UTeM</li>
@@ -185,18 +139,24 @@
                                     <div class="branding-4">
                                         <div class="carousel slide" data-ride="carousel" data-interval="3000">
                                             <div class="carousel-inner" role="listbox">
-                                                <div style="max-width:100%; height:auto; !important;" >
+                                                <div style="max-width:100%; height:auto; !important;">
                                                     <div class="carousel-item active">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1-min.jpg') }}" alt="First slide">
+                                                        <img class="d-block w-100"
+                                                            src="{{ URL::asset('assets/landing-page/img/blog/1-min.jpg') }}"
+                                                            alt="First slide">
                                                     </div>
                                                     <div class="carousel-item">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5-min.jpg') }}" alt="Second slide">
+                                                        <img class="d-block w-100"
+                                                            src="{{ URL::asset('assets/landing-page/img/blog/5-min.jpg') }}"
+                                                            alt="Second slide">
                                                     </div>
                                                     <div class="carousel-item">
-                                                        <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3-min.jpeg') }}" alt="Third slide">
+                                                        <img class="d-block w-100"
+                                                            src="{{ URL::asset('assets/landing-page/img/blog/3-min.jpeg') }}"
+                                                            alt="Third slide">
                                                     </div>
                                                 </div>
-                                                
+
                                             </div>
                                         </div>
                                     </div>
@@ -207,15 +167,21 @@
                             <div class="marketing-4">
                                 <div class="carousel slide" data-ride="carousel" data-interval="3000">
                                     <div class="carousel-inner" role="listbox">
-                                        <div style="max-width:100%; height:auto; !important;" >
+                                        <div style="max-width:100%; height:auto; !important;">
                                             <div class="carousel-item active">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}"
+                                                    alt="First slide">
                                             </div>
                                             <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}"
+                                                    alt="Second slide">
                                             </div>
                                             <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}"
+                                                    alt="Third slide">
                                             </div>
                                         </div>
                                     </div>
@@ -225,38 +191,50 @@
                     </div>
                     <div class="row">
                         <div class="col no-gutters grid mt-50">
-                        <div class="planning-4">
-                            <div class="carousel slide" data-ride="carousel" data-interval="3000">
-                                <div class="carousel-inner" role="listbox">
-                                    <div style="max-width:100%; height:auto; !important;" >
-                                        <div class="carousel-item active">
-                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                            <div class="planning-4">
+                                <div class="carousel slide" data-ride="carousel" data-interval="3000">
+                                    <div class="carousel-inner" role="listbox">
+                                        <div style="max-width:100%; height:auto; !important;">
+                                            <div class="carousel-item active">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}"
+                                                    alt="First slide">
+                                            </div>
+                                            <div class="carousel-item">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}"
+                                                    alt="Second slide">
+                                            </div>
+                                            <div class="carousel-item">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}"
+                                                    alt="Third slide">
+                                            </div>
                                         </div>
-                                        <div class="carousel-item">
-                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
-                                        </div>
-                                        <div class="carousel-item">
-                                            <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
-                                        </div>
+
                                     </div>
-                                    
                                 </div>
                             </div>
-                        </div>
                         </div> <!-- row -->
                         <div class="col no-gutters grid mt-50">
                             <div class="research-4">
                                 <div class="carousel slide" data-ride="carousel" data-interval="3000">
                                     <div class="carousel-inner" role="listbox">
-                                        <div style="max-width:100%; height:auto; !important;" >
+                                        <div style="max-width:100%; height:auto; !important;">
                                             <div class="carousel-item active">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}" alt="First slide">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/1.jpg') }}"
+                                                    alt="First slide">
                                             </div>
                                             <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}" alt="Second slide">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/5.jpg') }}"
+                                                    alt="Second slide">
                                             </div>
                                             <div class="carousel-item">
-                                                <img class="d-block w-100" src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}" alt="Third slide">
+                                                <img class="d-block w-100"
+                                                    src="{{ URL::asset('assets/landing-page/img/blog/3.jpeg') }}"
+                                                    alt="Third slide">
                                             </div>
                                         </div>
                                     </div>
@@ -264,8 +242,8 @@
                             </div>
                         </div>
                     </div>
-                    
-                        {{-- <div class="col-lg-4 col-sm-6 marketing-4 research-4">
+
+                    {{-- <div class="col-lg-4 col-sm-6 marketing-4 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
                                     <img src="{{ URL::asset('assets/landing-page/img/blog/2.jpg') }}" alt="blog image"
@@ -372,8 +350,8 @@
                         </div> --}}
 
 
-                        <!-- portfolio menu -->
-                        {{-- <div class="col-lg-4 col-sm-6 research-4">
+                    <!-- portfolio menu -->
+                    {{-- <div class="col-lg-4 col-sm-6 research-4">
                             <div class="single-portfolio">
                                 <div class="portfolio-image">
                                     <img src="{{ URL::asset('assets/images/portfolio/7.png') }}" alt="">
@@ -433,8 +411,8 @@
                     </div>
                 </div> <!-- single portfolio -->
             </div> --}}
-        </div>
-        </div> <!-- row -->
+                </div>
+            </div> <!-- row -->
         </div>
     </section>
     <!-- video area end -->
@@ -562,10 +540,14 @@
 
     <!-- how it works area start -->
     <section class="how-it-work-area">
-        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
-        <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-        <div class="shape-4"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt="">
+        </div>
+        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt="">
+        </div>
+        <div class="shape-3"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt="">
+        </div>
+        <div class="shape-4"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt="">
+        </div>
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
@@ -583,13 +565,15 @@
                     <div class="how-it-work-tab-nav">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
-                                <a class="nav-link active" id="account-tab" data-toggle="tab" href="#account" role="tab"
-                                    aria-controls="account" aria-selected="true"><i class="flaticon-checked"></i> Daftar
+                                <a class="nav-link active" id="account-tab" data-toggle="tab" href="#account"
+                                    role="tab" aria-controls="account" aria-selected="true"><i
+                                        class="flaticon-checked"></i> Daftar
                                     Akaun <span class="number">1</span></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings" role="tab"
-                                    aria-controls="settings" aria-selected="false"><i class="flaticon-settings-1"></i>
+                                <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings"
+                                    role="tab" aria-controls="settings" aria-selected="false"><i
+                                        class="flaticon-settings-1"></i>
                                     Log Masuk <span class="number">2</span></a>
                             </li>
                             <li class="nav-item">
@@ -706,8 +690,10 @@
 
     <!-- screenshort area start -->
     <section class="screenshort-area">
-        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt=""></div>
-        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt=""></div>
+        <div class="shape-1"><img src="{{ URL::asset('assets/landing-page/img/shape/08.png') }}" alt="">
+        </div>
+        <div class="shape-2"><img src="{{ URL::asset('assets/landing-page/img/shape/09.png') }}" alt="">
+        </div>
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-10">
@@ -726,19 +712,23 @@
                         <!-- screenshort carousel -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-1-min.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-1-min.jpg') }}"
+                                alt="">
                         </div><!-- //.single screenshort item -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-2-min.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-2-min.jpg') }}"
+                                alt="">
                         </div><!-- //.single screenshort item -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-3-min.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-3-min.jpg') }}"
+                                alt="">
                         </div><!-- //.single screenshort item -->
                         <div class="single-screenshort-item">
                             <!-- single screenshort item -->
-                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-4-min.jpg') }}" alt="">
+                            <img src="{{ URL::asset('assets/landing-page/img/screenshort/screen-4-min.jpg') }}"
+                                alt="">
                         </div><!-- //.single screenshort item -->
                     </div><!-- //. screenshort carousel -->
                 </div>
@@ -845,7 +835,8 @@
                         <div class="testimonial-author d-sm-flex justify-content-between">
                             <div class="author-info d-flex align-items-center">
                                 <div class="author-image">
-                                    <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}" alt="author">
+                                    <img src="{{ URL::asset('assets/images/testimonial/author-1.jpg') }}"
+                                        alt="author">
                                 </div>
                                 <div class="author-name media-body">
                                     <h5 class="name">Mr. Jems Bond</h5>
@@ -875,7 +866,8 @@
                         <div class="testimonial-author d-sm-flex justify-content-between">
                             <div class="author-info d-flex align-items-center">
                                 <div class="author-image">
-                                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}" alt="author">
+                                    <img src="{{ URL::asset('assets/images/testimonial/author-3.jpg') }}"
+                                        alt="author">
                                 </div>
                                 <div class="author-name media-body">
                                     <h5 class="name">Mr. Jems Bond</h5>
@@ -904,7 +896,7 @@
 
     {{-- <section id="testimonial" class="testimonial-area">
         <div class="container">
-            
+
             <div class="row">
                 <div class="col-lg-6">
                     <div class="contact-area-wrapper" id="contact">
@@ -912,7 +904,7 @@
                         <span class="subtitle">Contact us</span>
                         <h3 class="title">Testimonial</h3>
                         <p>Apa kata pelanggan kami...</p>
-                       
+
                     </div><!-- //. contact area wrapper -->
                 </div>
                 <div class="col-lg-6">
@@ -1141,9 +1133,11 @@
                         <p>Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolor tempor
                             incididunt ut labore dolore magna.</p>
                         <div class="btn-wrapper">
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-1"><i class="flaticon-apple-1"></i> App
+                            <a href="#" class="boxed-btn btn-rounded gd-bg-1"><i class="flaticon-apple-1"></i>
+                                App
                                 Store</a>
-                            <a href="#" class="boxed-btn btn-rounded gd-bg-2"><i class="flaticon-android-logo"></i> Play
+                            <a href="#" class="boxed-btn btn-rounded gd-bg-2"><i
+                                    class="flaticon-android-logo"></i> Play
                                 Store</a>
                             <a href="#" class="boxed-btn btn-rounded gd-bg-3"><i class="flaticon-windows"></i>
                                 Windows</a>
@@ -1162,18 +1156,19 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="uname" placeholder="Your Name">
+                                        <input type="text" class="form-control" id="uname"
+                                            placeholder="Your Name">
                                     </div>
                                 </div>
                                 <div class="col-lg-6">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" id="email" placeholder="Your Email">
+                                        <input type="text" class="form-control" id="email"
+                                            placeholder="Your Email">
                                     </div>
                                 </div>
                                 <div class="col-lg-12">
                                     <div class="form-group textarea">
-                                        <textarea name="message" id="message" class="form-control" cols="30" rows="10"
-                                            placeholder="Message"></textarea>
+                                        <textarea name="message" id="message" class="form-control" cols="30" rows="10" placeholder="Message"></textarea>
                                     </div>
                                     <button class="submit-btn  btn-rounded gd-bg-1" type="submit">Submit Now</button>
                                 </div>
@@ -1221,7 +1216,8 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}" alt=""></a>
+                                    src="{{ URL::asset('assets/landing-page/img/logo-header.png') }}"
+                                    alt=""></a>
                             <p>Sebuah sistem yang menyediakan perkhidmatan untuk kutipan derma sesebuah organisasi
                                 berdaftar. </p>
                             <ul class="social-icon">
@@ -1246,17 +1242,20 @@
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <h4 class="widget-title">Alamat</h4>
-                            <p> Universiti Teknikal Malaysia Melaka, Jalan Hang Tuah Jaya, 76100 Durian Tunggal, Melaka</p>
+                            <p> Universiti Teknikal Malaysia Melaka, Jalan Hang Tuah Jaya, 76100 Durian Tunggal, Melaka
+                            </p>
 
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-6">
                         <div class="footer-widget about_widget">
                             <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-utem.png') }}" alt=""></a>
+                                    src="{{ URL::asset('assets/landing-page/img/logo-utem.png') }}"
+                                    alt=""></a>
 
                             <a href="index.html" class="footer-logo"><img
-                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}" alt=""></a>
+                                    src="{{ URL::asset('assets/landing-page/img/logo-ftmk.png') }}"
+                                    alt=""></a>
                             <ul class="social-icon">
                                 <li><a href="#"><i class="fab fa-facebook-f"></i></a></li>
                                 <li><a href="#"><i class="fab fa-twitter"></i></a></li>
