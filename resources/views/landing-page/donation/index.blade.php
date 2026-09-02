@@ -603,6 +603,10 @@
             max-width: 500px;
             height: auto;
         }
+
+        .text-underline {
+            text-decoration: underline !important;
+        }
     </style>
 </head>
 
@@ -627,7 +631,7 @@
                         </div>
 
                         <div class="item">
-                            <video class="image-promotion fadeInDown" controls muted loop playsinline>
+                            <video class="image-promotion fadeInDown bg-white" controls muted loop playsinline>
                                 <source src="{{ URL::asset('assets/landing-page/video/homestay-mutiara-melaka.mp4') }}"
                                     type="video/mp4">
                                 Browser anda tidak menyokong video.
@@ -643,7 +647,8 @@
                             <div class="step d-flex align-items-center mt-2 border p-2" style="background-color: #fff;">
                                 <h5 class="iconn mr-2 mb-0">1</h5>
                                 <div class="d-flex w-100 flex-column flex-sm-row">
-                                    <h6 class="mb-0 text-nowrap">Daftar Ahli</h6>
+                                    <h6 class="mb-0 text-nowrap text-primary text-underline">Daftar Ahli Di
+                                        Sini</h6>
 
                                     <div class="ml-auto">
                                         <a href="{{ URL::asset('assets/landing-page/pdf/User Registration.pdf') }}"
