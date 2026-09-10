@@ -33,6 +33,15 @@
 
                 </li>
                 @endrole
+
+                <!-- <li>
+                    <a href="/social-media" class="waves-effect" target="_blank">
+                        <i class="fas fa-users"></i>
+                        <span>Media Sosial</span>
+                    </a>
+
+                </li> -->
+
                 @role('Admin|Pentadbir')
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
@@ -442,22 +451,21 @@
                     </a>
                     <ul class="sub-menu mm-collapse" aria-expanded="false">
                         @role('Superadmin|Pentadbir|Pentadbir Swasta|Guru|Guru Swasta')
-                        <li>
-                            <a href="{{ route('student.parentRegisterStudents.index') }}" class=" waves-effect"
-                                aria-expanded="true">
+                        <!-- <li>
+                            <a href="{{ route('student.parentRegisterStudents.index') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-user-graduate"></i>
                                 <span>Pendaftaran Pelajar</span>
                             </a>
-                        </li>
+                        </li> -->
                         @endrole
 
                         @role('Superadmin|Penjaga')
-                        <li>
+                        <!-- <li>
                             <a href="{{ route('student.parentRegisterStudents.create') }}" class=" waves-effect">
                                 <i class="fas fa-user-graduate"></i>
                                 <span>Daftar Pelajar</span>
                             </a>
-                        </li>
+                        </li> -->
 
                         <li>
                             <a href="{{ route('dependent_fees') }}" class=" waves-effect">
@@ -466,12 +474,12 @@
                             </a>
                         </li>
 
-                        <li>
+                        <!-- <li>
                             <a href="{{ route('fees.updateShirtSize.buyer.index') }}" class=" waves-effect">
                                 <i class="fas fa-tshirt"></i>
                                 <span>Kemaskini Saiz Baju</span>
                             </a>
-                        </li>
+                        </li> -->
 
                         {{-- <li>
                             <a href="{{ route('parent.dependent') }}" class=" waves-effect">
@@ -575,15 +583,13 @@
 
                         @role('Superadmin|Pentadbir|Pentadbir Swasta')
                         <li>
-                            <a href="{{ route('fees.assignFeesToStudentIndex') }}" class=" waves-effect"
-                                aria-expanded="true">
+                            <a href="{{ route('fees.assignFeesToStudentIndex') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-edit"></i>
                                 <span>Ubah Yuran</span>
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('fees.assignStudentsToFeeIndex') }}" class=" waves-effect"
-                                aria-expanded="true">
+                            <a href="{{ route('fees.assignStudentsToFeeIndex') }}" class=" waves-effect" aria-expanded="true">
                                 <i class="fas fa-edit"></i>
                                 <span>Ubah Pembayar</span>
                             </a>
@@ -734,7 +740,7 @@
             @endrole --> --}}
 
                 @role('Superadmin|Penjaga|Buyer') <!--haziq nye-->
-                <li>
+                <!-- <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="mdi mdi-border-color"></i>
                         <span>Koperasi</span>
@@ -759,7 +765,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
                 @endrole
 
                 {{-- @role('Superadmin|Pentadbir|Guru')

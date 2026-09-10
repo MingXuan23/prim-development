@@ -75,7 +75,7 @@
                             <div class="col-12 pt-3">
                                 <table style="width:100%" class="infotbl">
                                     <tr style="background-color:#e9ecef">
-                                        <th colspan="9" class="text-center">Maklumat Penjaga</th>
+                                        <th colspan="9" class="text-center">Maklumat Pembayar</th>
                                     </tr>
                                     <tr>
                                         <td class="py-3">Nama</td>

@@ -23,8 +23,8 @@ class User extends Authenticatable
      *
      * @var array
      */
-    
-    protected $fillable = ['name', 'email', 'password', 'telno', 'remember_token','device_token','purpose'];
+
+    protected $fillable = ['name', 'email', 'password', 'telno', 'remember_token', 'device_token', 'purpose'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -32,7 +32,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'password',
+        'remember_token',
     ];
 
     /**
@@ -53,7 +54,7 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(OrganizationRole::class, 'organization_user', '', 'role_id');
     }
-    
+
     public function donation()
     {
         return $this->belongsToMany(Donation::class, 'donation_user');
@@ -69,7 +70,7 @@ class User extends Authenticatable
         $id = Auth::id();
         // dd($id);
         $user = auth()->user();
-        
+
         return $user;
     }
 
@@ -81,7 +82,22 @@ class User extends Authenticatable
 
     public function bookings()
     {
-        return $this->hasMany(Booking::class, 'id' ,'customerid');
+        return $this->hasMany(Booking::class, 'id', 'customerid');
     }
 
+    // methods for social media
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function followers()
+    {
+        return $this->hasMany(Follow::class, "followed_user_id", "id");
+    }
+
+    public function followed_users()
+    {
+        return $this->hasMany(Follow::class, "follower_user_id", "id");
+    }
 }

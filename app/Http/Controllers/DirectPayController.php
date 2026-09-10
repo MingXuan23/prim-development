@@ -97,7 +97,7 @@ class DirectPayController extends Controller
                 } else {
                     $fpx_buyerEmail = NULL;
                     $telno = NULL;
-                    $fpx_buyerName = "Penderma Tanpa Nama";
+                    $fpx_buyerName = "PENDERMA TANPA NAMA";
                 }
 
                 $fpx_sellerExOrderNo = $request->desc . "_" . $request->d_code . "_" . date('YmdHis') . "_" . $organization->id;
@@ -613,7 +613,7 @@ class DirectPayController extends Controller
                 } else {
                     $fpx_buyerEmail = NULL;
                     $telno = NULL;
-                    $fpx_buyerName = "Penderma Tanpa Nama";
+                    $fpx_buyerName = "PENDERMA TANPA NAMA";
                 }
 
                 $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');

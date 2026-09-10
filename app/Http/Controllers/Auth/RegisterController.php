@@ -90,13 +90,6 @@ class RegisterController extends Controller
             if (!isset($data['referral_code'])) {
                 return;
             }
-            if (!isset($data['registration_type'])) {
-                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
-            } else if ($data['registration_type'] == '-') {
-                $validator->errors()->add('registration_type', 'Sila Pilih Tujuan Pendaftaran Anda');
-            }
-
-
 
             $valid = PointController::validateReferralCode($data['referral_code']);
             if (!$valid) {
@@ -129,12 +122,10 @@ class RegisterController extends Controller
         //dd($data,isset($data['isAdmin']));
         $user = User::create([
             'name' => $data['name'],
-            'email' => $data['email'],
+            'email' => $data['email'] ?? null,
             'password' => Hash::make($data['password']),
             'telno' => $data['telno'],
             'remember_token' => $data['_token'],
-            'purpose' => $data['registration_type'] ?? ''
-
         ]);
         // dd($user);
 
@@ -165,29 +156,28 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-        // If the registration type is "bayar_yuran", redirect without validation or user creation.
-        if ($request->input('registration_type') === 'bayar_yuran') {
-            // validate input
-            $validator = Validator::make($request->all(), [
-                'name' => ['required', 'string', 'max:255'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-                'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
-                'icno' => ['required', 'string', 'min:12', 'max:14'],
-                'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
-            ]);
+        // validate input
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+            'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
+        ]);
 
-            // return error messages if validator fails
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
+        // only validate icno if user registered is not admin
+        $validator->sometimes('icno', ['required', 'string', 'min:12', 'max:14'], function ($input) {
+            return !$input->isAdmin;
+        });
 
+        // return error messages if validator fails
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // icno will be null for register admin
+        if ($request->get('icno')) {
             // check ic no seperately (some users might enter ic no with a '-' and some might won't)
-            $icEntered = str_replace("-", "", $request->get("icno"));
-            $icExisted = DB::table("users")
-                ->where("email", "LIKE", "%$icEntered%")
-                ->orWhere("telno", "LIKE", "%$icEntered%")
-                ->orWhere("icno", "=", $icEntered)
-                ->get();
+            $icEntered = str_replace("-", "", $request->get('icno'));
 
             // search for user accounts that have been registered by an organization admin
             $userRegisteredByAdmin = DB::table("users")
@@ -208,53 +198,31 @@ class RegisterController extends Controller
                 return redirect()->back()->withErrors([
                     "icno_registered" => "Your IC no. has already been registered by " . $organization->nama . "'s admin. Please login using your IC no. and the password provided."
                 ])->withInput();
-            } else if ($icExisted->count() > 0) {
+            }
+
+            $icExisted = DB::table("users")
+                ->where("email", "LIKE", "%$icEntered%")
+                ->orWhere("telno", "LIKE", "%$icEntered%")
+                ->orWhere("icno", "=", $icEntered)
+                ->exists();
+
+            if ($icExisted) {
                 // this is for parents that already registered an account but forgot
                 // when they register the second time with the same ic, this message pops up
                 return redirect()->back()->withErrors(["icno" => "The IC no. given has already been taken."])->withInput();
             }
-
-
-
-            // insert user data
-            $user = User::create([
-                "name" => $request->get("name"),
-                "email" => $request->get("email"),
-                "password" => Hash::make($request->get("password")),
-                "telno" => $request->get("telno"),
-                "remember_token" => $request->get("_token"),
-                "purpose" => $request->get("registration_type"),
-            ]);
-
-            // insert icno and email verified (non mass-assignable)
-            DB::table("users")->where("id", "=", $user->id)->update([
-                "icno" => str_replace("-", "", $request->get("icno")),
-                "email_verified_at" => now()
-            ]);
-
-            // get the roleId from roles table
-            $roleId = DB::table("roles")->where("name", "=", "Penjaga")->first()->id;
-
-            // create new model_has_roles
-            DB::table("model_has_roles")->insert([
-                "role_id" => $roleId,
-                "model_id" => $user->id,
-                "model_type" => "App\User"
-            ]);
-
-            $this->guard()->login($user);
-
-            event(new Registered($user));
-
-            return redirect('/home');
         }
 
-        // Otherwise, perform the usual registration.
-        $this->validator($request->all())->validate();
+        $user = $this->create($request->all());
 
-        event(new Registered($user = $this->create($request->all())));
+        // insert icno and email verified (non mass-assignable)
+        DB::table("users")->where("id", "=", $user->id)->update([
+            "icno" => str_replace("-", "", $request->get("icno")),
+        ]);
 
         $this->guard()->login($user);
+
+        event(new Registered($user));
 
         return $this->registered($request, $user) ?: redirect($this->redirectPath());
     }
@@ -272,6 +240,10 @@ class RegisterController extends Controller
     // to redirect back to intended link
     protected function registered(Request $request, $user)
     {
+        // aktifkan derma
+        $pointController = app(PointController::class);
+        $pointController->generateReferralCode();
+
         if ($request->session()->has('url.intended')) {
             $redirectUrl = $request->session()->get('url.intended');
             $request->session()->forget('url.intended');
