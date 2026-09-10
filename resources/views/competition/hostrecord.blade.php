@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <title>Urus Pendaftaran - Host</title>
+    <title>PRiM | Competition</title>
 
     <style>        
         body {
@@ -173,7 +173,7 @@
 </head>
 
 <body>
-    @include('competition.nav')
+    @include('competition.component.nav')
 
     <div class="container mt-5">
         <div class="d-flex align-items-center gap-2">

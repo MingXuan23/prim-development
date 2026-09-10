@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Document</title>
+    <title>PRiM | Competition</title>
 
     <style>
         body {
@@ -18,48 +18,6 @@
             margin-bottom: 50px;
             background-color: #f8fafc;
             overflow-x: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 25%, #e11d48 100%);
-            /* background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);    */
-            padding: 20px 20px;
-            width: 100%;
-            height: auto;
-        }
-
-        .breadcrumb-item, .breadcrumb-item a {
-            color: rgba(255, 255, 255, 0.75) !important;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb-item a:hover {
-            color: #ffffff !important;
-            text-decoration: underline !important;
-        }
-
-        .breadcrumb-item.active {
-            color: rgba(255, 255, 255, 0.9) !important;
-        }
-
-        .breadcrumb-item::before {
-            color: rgba(255, 255, 255, 0.9) !important;
-        }
-        
-        .breadcrumb-item.active::before {
-            color: rgba(255, 255, 255, 0.9) !important;
-        }
-
-        .category-label {
-            background-color: #f59e0b;
-            color: #0f172a !important;
-            font-size: 0.75rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            padding: 4px 14px;
-            border-radius: 50px;
-            display: inline-block;
         }
         
         h5 {
@@ -136,10 +94,6 @@
         }
         
         @media (min-width: 992px) {
-            .header {
-                padding: 30px 0 30px 100px;
-            }
-
             #personal, #member, #academic, #academicSupervise, #pay, #button {
                 width: 60%;
                 margin: 0 auto;
@@ -148,40 +102,9 @@
     </style>
 </head>
 <body>
-    @include('competition.nav')
+    @include('competition.component.nav')
 
-    <div class="header">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('competition.user') }}" class="text-decoration-none">Senarai Pertandingan</a>    
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('competition.info', $competition->id) }}" class="text-decoration-none">{{ $competition->competitionTitle }}</a>    
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    Daftar
-                </li>
-            </ol>
-        </nav>
-        <p class="mb-0 mt-4 category-label text-uppercase">{{ $competition->category }}</p>
-        <h1 class="mb-3 fw-bold text-white">{{ $competition->competitionTitle }}</h1>
-        @if($competition->competitionStart > today()->toDateString())
-            <p class="badge bg-warning text-dark z-3">UPCOMING</p>
-        @elseif($competition->competitionStart <= today()->toDateString() || $competition->competitionEnd >= today()->toDateString())
-            <p class="badge bg-success z-3">ONGOING</p>
-        @endif
-
-        @if($competition->participateType === 'Team')
-            @if($competition->minimumParticipate === $competition->maximumParticipate)
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->maximumParticipate}} pax)</span>
-            @else
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minimumParticipate}} - {{$competition->maximumParticipate}} pax)</span>
-            @endif
-        @else
-            <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-person-fill me-1"></i> {{ $competition->participateType }}</span>
-        @endif
-    </div>
+    @include('competition.component.headercompetition')
 
     <form id="registerForm" novalidate>
         @csrf

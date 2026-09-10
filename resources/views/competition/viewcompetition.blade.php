@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Document</title>
+    <title>PRiM | Competition</title>
 
     <style>
         body {
@@ -149,7 +149,7 @@
     </style>
 </head>
 <body>
-    @include('competition.nav')
+    @include('competition.component.nav')
 
     <div class="header d-flex flex-column flex-lg-row gap-3 justify-content-between align-items-center">
         <div class="col-12 col-lg-7">

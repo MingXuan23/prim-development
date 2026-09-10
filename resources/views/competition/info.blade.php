@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <title>Document</title>
+    <title>PRiM | Competition</title>
     
     <style>
         body {
@@ -203,6 +203,62 @@
             border-color: #cbd5e1;
         }
 
+        .click-image {
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .click-image:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .image-container {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.3);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-wrap {
+            position: relative;
+            display: inline-block;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 85vh;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: #c6c6c6;
+        }
+
         @media (min-width: 992px) {
             .header {
                 padding: 30px 0 30px 100px;
@@ -211,7 +267,7 @@
     </style>
 </head>
 <body>
-    @include('competition.nav')
+    @include('competition.component.nav')
 
     <div class="header">
         <nav aria-label="breadcrumb">
@@ -323,8 +379,16 @@
 
         <div class="col-lg-4 order-1 order-lg-2">
             <div class="mb-3 mb-lg-4">
-                <img src="{{ asset('competition-image/' . $competition->imagePoster) }}" alt="{{ $competition->competitionTitle }}">
+                <img src="{{ asset('competition-image/' . $competition->imagePoster) }}" alt="{{ $competition->competitionTitle }}" class="click-image" onclick="openImage(this.src)">
             </div>
+
+            <div class="image-container" id="imageContainer" onclick="closeImage()">
+                <div class="modal-wrap">
+                    <span class="close-btn">&times;</span>
+                    <img id="modalImage" class="modal-image" onclick="event.stopPropagation()">
+                </div>
+            </div>
+
             <div class="fees d-none d-lg-block">
                 <div class="fees2 d-flex align-items-center">
                     <div class="badge bg-light-subtle badge-color p-2 rounded-3 me-3">
@@ -473,11 +537,26 @@
     {
         document.getElementById('daftarOption').style.display = 'none';
     }
+
     document.getElementById('daftarOption').addEventListener('click', function (e) {
-    if (e.target === this) {
-        hideRegister();
+        if (e.target === this) {
+            hideRegister();
+        }
+    });
+
+    function openImage(imageSrc)
+    {
+        const modal = document.getElementById('imageContainer');
+        const modalImg = document.getElementById('modalImage');
+
+        modalImg.src = imageSrc;
+        modal.style.display = 'flex';
     }
-});
+
+    function closeImage()
+    {
+        document.getElementById('imageContainer').style.display = 'none';
+    }
 </script>
 </body>
 </html>
