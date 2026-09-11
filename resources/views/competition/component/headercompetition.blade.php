@@ -126,9 +126,9 @@
         </nav>
         <p class="mb-0 mt-4 category-label text-uppercase">{{ $competition->category }}</p>
         <h1 class="mb-3 fw-bold text-white">{{ $competition->competitionTitle }}</h1>
-        @if($competition->competitionStart > today()->toDateString())
+        @if($competition->competitionStart > now())
             <p class="badge bg-warning text-dark z-3">UPCOMING</p>
-        @elseif($competition->competitionStart <= today()->toDateString() || $competition->competitionEnd >= today()->toDateString())
+        @elseif($competition->competitionStart <= now() || $competition->competitionEnd >= now())
             <p class="badge bg-success z-3">ONGOING</p>
         @endif
 
@@ -165,10 +165,12 @@
 
         modalImg.src = imageSrc;
         modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     function closeImage()
     {
         document.getElementById('imageContainer').style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
 </script>

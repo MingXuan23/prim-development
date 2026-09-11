@@ -53,7 +53,7 @@
             </div>
             
             <div class="text-end">
-                @if($competition->pivot->statusPayment == 'Paid')
+                @if($competition->pivot->statusPayment == 'Paid' || $competition->pivot->statusPayment == 'Free')
                     <span class="badge bg-success fs-6 px-3 py-2 mb-2">Pendaftaran Berjaya</span> 
                 @else
                     <span class="badge bg-warning text-dark fs-6 px-3 py-2 mb-2">Pembayaran Belum Selesai</span> 

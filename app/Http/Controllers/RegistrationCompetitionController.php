@@ -280,9 +280,14 @@ class RegistrationCompetitionController extends Controller
                         'institutionId' => $selectId
                     ]);
                 }
-
-                $team->team_registration()->attach($data['competitionId'], [
-                    'statusPayment' => 'Pending',
+                    $competition = Competition::findOrFail($req->input('competitionId'));
+                    
+                    $IcCheck = $isTeam ? ($list[0]['icNo'] ?? '') : $data['icNo'];
+                    $cleanIc = str_replace('-', '', $IcCheck ?? '');
+                    $isMalaysia = ctype_digit($cleanIc) && strlen($cleanIc) === 12;
+                    
+                    $team->team_registration()->attach($data['competitionId'], [
+                    'statusPayment' => (($isMalaysia ? $competition->nationalFees : $competition->internationalFees) == 0) ? 'Free' : 'Pending',
                     'registeredDate' => Carbon::now(),
                 ]);
             

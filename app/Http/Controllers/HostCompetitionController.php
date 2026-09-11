@@ -49,7 +49,7 @@ class HostCompetitionController extends Controller
             }
         }
 
-        $competitions = $query->where('userId', Auth::id())->with(['user', 'participant_registration'])->withCount('participant_registration')->latest('id')->get()
+        $competitions = $query->where('userId', Auth::id())->with(['user', 'participant_registration'])->withCount('participant_registration')->orderBy('status', 'desc')->get()
             ->map(function ($competition)
             {
                 $competition->totalFees = $competition->participant_registration->sum(function ($q) use ($competition)
@@ -154,19 +154,7 @@ class HostCompetitionController extends Controller
             $data['imagePoster'] = $fileName;
         }
 
-        if (Carbon::parse($req->registerOpen)->isToday())
-        {
-            $data['registerOpen'] = Carbon::parse($req->registerOpen)->now();
-        }
-        else
-        {
-            $data['registerOpen'] = Carbon::parse($req->registerOpen)->startOfDay();
-        }
 
-        if ($req->input('registerClose'))
-        {
-            $data['registerClose'] = Carbon::parse($req->registerClose)->endOfDay();
-        }
 
         $data['status'] = $isPublish ? 'Published' : 'Draft';
         $data['userId'] = Auth::id();

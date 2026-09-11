@@ -37,7 +37,7 @@
             opacity: 1;
         }
 
-        label:not(.small, .form-check-label)::after {
+        label:not(.small, .form-check-label, .no-required)::after {
             content: " *";
             color: red;
         }
@@ -105,14 +105,14 @@
             
             <div class="col-12">
                 <label for="registerOpen" class="form-label fw-semibold">Pendaftaran Dibuka</label>
-                <input type="date" name="registerOpen" id="registerOpen" class="form-control @error('registerOpen') is-invalid @enderror" value="{{ old('registerOpen') }}">
+                <input type="datetime-local" name="registerOpen" id="registerOpen" class="form-control @error('registerOpen') is-invalid @enderror" value="{{ old('registerOpen') }}">
 
                 <div class="invalid-feedback"></div>
             </div>
             
             <div class="col-12">
                 <label for="registerClose" class="form-label fw-semibold">Pendaftaran Ditutup</label>
-                <input type="date" name="registerClose" id="registerClose" class="form-control @error('registerClose') is-invalid @enderror" value="{{ old('registerClose') }}">
+                <input type="datetime-local" name="registerClose" id="registerClose" class="form-control @error('registerClose') is-invalid @enderror" value="{{ old('registerClose') }}">
 
                 <div class="invalid-feedback"></div>
             </div>
@@ -137,7 +137,7 @@
             </div>
 
             <div class="col-12">
-                <label class="form-label fw-semibold">Had Umur</label>
+                <label class="form-label fw-semibold no-required">Had Umur</label>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="minimumAge" class="form-label text-muted small">Minimum Umur</label>
@@ -156,7 +156,7 @@
             </div>
 
             <div class="col-12">
-                <label class="form-label fw-semibold">Yuran (per individu)</label>
+                <label class="form-label fw-semibold no-required">Yuran (per individu)</label>
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="nationalFees" class="form-label text-muted small">Warganegara</label>

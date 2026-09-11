@@ -284,11 +284,11 @@
 
         <h1 class="fw-bold mb-3 text-white">{{ $competition->competitionTitle }}</h1>
         
-        @if($competition->competitionStart > today()->toDateString())
+        @if($competition->competitionStart > now())
             <p class="badge bg-warning text-dark z-3 status">UPCOMING</p>
-        @elseif($competition->competitionStart <= today()->toDateString() && $competition->competitionEnd >= today()->toDateString())
+        @elseif($competition->competitionStart <= now() && $competition->competitionEnd >= now())
             <p class="badge bg-success z-3 status">ONGOING</p>
-        @elseif($competition->competitionEnd < today()->toDateString())
+        @elseif($competition->competitionEnd < now())
             <p class="badge bg-secondary z-3 status">COMPLETED</p>
         @endif
 
@@ -319,7 +319,7 @@
 
                     <div>
                         <div class="fw-bold mt-3 info-label">Tarikh Pendaftaran</div>
-                        <p class="text-muted mt-1">{{ \Carbon\Carbon::parse($competition->registerOpen)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->registerClose)->format('d M Y') }}</p>
+                        <p class="text-muted mt-1">{{ \Carbon\Carbon::parse($competition->registerOpen)->format('d M Y, H:i A') }} - {{ \Carbon\Carbon::parse($competition->registerClose)->format('d M Y, H:i A') }}</p>
                     </div>
                 </div>
                     <hr>
@@ -551,11 +551,13 @@
 
         modalImg.src = imageSrc;
         modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
     }
 
     function closeImage()
     {
         document.getElementById('imageContainer').style.display = 'none';
+        document.body.style.overflow = 'auto';
     }
 </script>
 </body>

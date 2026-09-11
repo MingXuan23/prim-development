@@ -167,11 +167,11 @@
             <h1 class="mb-3 fw-bold text-white">{{ $competition->competitionTitle }}</h1>
             @if(is_null($competition->competitionStart) || $competition->status == 'Draft')
                 <p class="badge bg-danger z-3">DRAFT</p>
-            @elseif($competition->competitionStart > today()->toDateString())
+            @elseif($competition->competitionStart > now())
                 <p class="badge bg-warning text-dark z-3">UPCOMING</p>
-            @elseif($competition->competitionStart <= today()->toDateString() && $competition->competitionEnd >= today()->toDateString())
+            @elseif($competition->competitionStart <= now() && $competition->competitionEnd >= now())
                 <p class="badge bg-success z-3">ONGOING</p>
-            @elseif($competition->competitionEnd < today()->toDateString())
+            @elseif($competition->competitionEnd < now())
                 <p class="badge bg-secondary z-3">COMPLETED</p>
             @endif        
             
@@ -289,7 +289,7 @@
                     <div>
                         <h6 class="fw-bold mt-3 info-label">Tarikh Pendaftaran</h6>
                         @if($competition->registerOpen && $competition->registerClose)
-                            <p class="text-muted">{{ \Carbon\Carbon::parse($competition->registerOpen)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->registerClose)->format('d M Y') }}</p>
+                            <p class="text-muted">{{ \Carbon\Carbon::parse($competition->registerOpen)->format('d M Y, H:i A') }} - {{ \Carbon\Carbon::parse($competition->registerClose)->format('d M Y, H:i A') }}</p>
                         @else
                             <p class="text-muted">Tarikh belum ditetapkan</p>
                         @endif

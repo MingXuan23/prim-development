@@ -304,11 +304,11 @@
                 @foreach($competitions as $competition)
                     <div class="col">
                         <div class="card h-100 position-relative overflow-hidden">                    
-                            @if($competition->competitionStart > today()->toDateString())
+                            @if($competition->competitionStart > now())
                                 <p class="position-absolute end-0 m-2 badge bg-warning text-dark z-3">UPCOMING</p>
-                            @elseif($competition->competitionStart <= today()->toDateString() && $competition->competitionEnd >= today()->toDateString())
+                            @elseif($competition->competitionStart <= now() && $competition->competitionEnd >= now())
                                 <p class="position-absolute end-0 m-2 badge bg-success z-3">ONGOING</p>
-                            @elseif($competition->competitionEnd < today()->toDateString())
+                            @elseif($competition->competitionEnd < now())
                                 <p class="position-absolute end-0 m-2 badge bg-secondary z-3">COMPLETED</p>
                             @endif
                             <div class="image-container">
