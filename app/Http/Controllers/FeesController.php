@@ -2645,91 +2645,41 @@ class FeesController extends AppBaseController
             return redirect("/login");
         }
 
-        if (Auth::user()->hasRole('Superadmin')) {
-            if ($request->oid === NULL) {
-                $listHisotry = DB::table('transactions as t')
-                    ->where(function ($query) {
-                        $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', '%Scho%');
-                    })
-                    ->where('t.status', 'success')
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no');
-            } else {
-                $listHisotry = DB::table('transactions as t')
-                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
-                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
-                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
-                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
-                    ->where(function ($query) {
-                        $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', '%Scho%');
-                    })
-                    ->where('t.status', 'success')
-                    ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no')
-                    ->distinct('name');
-            }
-        } else {
-            if ($request->oid === NULL) {
-                $listHisotry = DB::table('transactions as t')
-                    ->where('t.user_id', Auth::id())
-                    ->where(function ($query) {
-                        $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', '%Scho%');
-                    })
-                    ->where('t.status', 'success')
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no');
-            } else if (Auth::user()->hasRole('Pentadbir') || Auth::user()->hasRole('Koop Admin') || Auth::user()->hasRole('Pentadbir Swasta')) {
-                $listHisotry = DB::table('transactions as t')
-                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
-                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
-                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
-                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
-                    ->where(function ($query) {
-                        $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', '%Scho%');
-                    })
-                    ->where('t.status', 'success')
-                    ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no')
-                    ->distinct('name');
-            } else if (Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Pentadbir Swasta') || Auth::user()->hasRole('Guru Swasta')) {
-                $listHisotry = DB::table('transactions as t')
-                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
-                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
-                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
-                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->join('organization_user', 'co.organ_user_id', 'organization_user.id')
-                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
-                    ->where(function ($query) {
-                        $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', '%Scho%');
-                    })
-                    ->where('t.status', 'success')
-                    ->where('organization_user.user_id', Auth::id())
-                    ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no')
-                    ->distinct('name');
-            } else {
-                $listHisotry = DB::table('transactions as t')
-                    ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
-                    ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
-                    ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
-                    ->join('class_organization as co', 'co.id', 'cs.organclass_id')
-                    ->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
-                    ->where('t.user_id', Auth::id())
-                    ->where(function ($query) {
-                        $query->where('t.description', 'like', 'YS%')
-                            ->orWhere('t.nama', 'like', '%Scho%');
-                    })
-                    ->where('t.status', 'success')
-                    ->where('fn.organization_id', $request->oid)
-                    ->select('t.id as id', 't.nama as name', 't.description as desc', 't.amount as amount', 't.datetime_created as date', 't.datetime_of_success as success_date', 't.username as username', 't.transac_no as transac_no')
-                    ->distinct('name');
-            }
-        }
+        $listHisotry = DB::table('transactions as t')
+            ->join('users as u', 'u.id', 't.user_id')
+            ->join('fees_transactions_new as ftn', 'ftn.transactions_id', 't.id')
+            ->join('student_fees_new as sfn', 'sfn.id', 'ftn.student_fees_id')
+            ->join('class_student as cs', 'cs.id', 'sfn.class_student_id')
+            ->join('class_organization as co', 'co.id', 'cs.organclass_id')
+            ->join('classes as c', 'c.id', 'co.class_id')
+            ->where(function ($query) {
+                $query->where('t.description', 'like', 'YS%')
+                    ->orWhere('t.nama', 'like', '%Scho%');
+            })
+            ->where('t.status', 'success')
+            ->when(isset($request->oid), function ($query) use ($request) {
+                $query->join('fees_new as fn', 'fn.id', 'sfn.fees_id')
+                    ->where('fn.organization_id', $request->oid);
+            })
+            ->when(Auth::user()->hasRole('Guru') || Auth::user()->hasRole('Guru Swasta'), function ($query) {
+                $query->join('organization_user', 'co.organ_user_id', 'organization_user.id')
+                    ->where('organization_user.user_id', Auth::id());
+            })
+            ->when(Auth::user()->hasRole('Penjaga') || (!isset($request->oid) && !Auth::user()->hasRole('Superadmin')), function ($query) {
+                $query->where('t.user_id', Auth::id());
+            })
+            ->select(
+                't.id as id',
+                't.nama as name',
+                't.description as desc',
+                't.amount as amount',
+                't.datetime_created as date',
+                't.datetime_of_success as success_date',
+                't.username as username',
+                't.transac_no as transac_no',
+                'c.nama as class_name',
+                'u.telno as user_icno',
+            );
 
         if ($request->start_date != null && $request->end_date != null) {
             $startDate = Carbon::parse($request->start_date)->startOfDay();

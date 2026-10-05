@@ -14,26 +14,26 @@ class ExportTransaction implements FromCollection, ShouldAutoSize, WithHeadings
 {
     // For use in the AfterSheet event (static because the event callback is static)
     private static $organizationName;
-  
 
-    
+
+
     protected $org;
     protected $list;
-  
-    
+
+
 
     public function __construct($org, $list)
     {
-      
-        $this->org              = $org;
-        $this->list       = $list;
-      
-      
-        
+
+        $this->org = $org;
+        $this->list = $list;
+
+
+
         // Save extra info for use in the event
         self::$organizationName = $org->nama;
-        
-      
+
+
     }
 
     /**
@@ -48,27 +48,26 @@ class ExportTransaction implements FromCollection, ShouldAutoSize, WithHeadings
         foreach ($datas as $data) {
 
             $link = route('receipttest', $data->id);
-           
-            
 
             $temp = new stdClass();
-           
-            $temp->name              = $data->name;
-            
-            $temp->fpx_id           = "'".$data->transac_no;
 
-            $temp->date              = $data->date ;
-            $temp->amount            = 'RM ' . number_format($data->amount, 2, '.', '');
-            $temp->username         = $data->username;
-            $temp->link             =$link;
+            $temp->name = $data->name;
 
+            $temp->fpx_id = "'" . $data->transac_no;
+
+            $temp->date = $data->date;
+            $temp->amount = 'RM ' . number_format($data->amount, 2, '.', '');
+            $temp->username = $data->username;
+            $temp->icno = $data->user_icno;
+            $temp->class = $data->class_name;
+            $temp->link = $link;
 
             $results[] = $temp;
         }
         return collect($results);
     }
 
-   
+
 
     /**
      * Define the column headings for the export.
@@ -83,9 +82,11 @@ class ExportTransaction implements FromCollection, ShouldAutoSize, WithHeadings
             'Tarikh Pembayaran',
             'Jumlah Pembayaran',
             'Nama Pembayar',
-            "Receipt"
+            'No IC Pembayar',
+            'Kelas/Program Pengajian',
+            "Receipt",
         ];
     }
 
-   
+
 }
