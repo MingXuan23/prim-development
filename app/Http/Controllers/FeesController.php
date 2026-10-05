@@ -2679,7 +2679,8 @@ class FeesController extends AppBaseController
                 't.transac_no as transac_no',
                 'c.nama as class_name',
                 'u.telno as user_icno',
-            );
+            )
+            ->distinct('nama');
 
         if ($request->start_date != null && $request->end_date != null) {
             $startDate = Carbon::parse($request->start_date)->startOfDay();
