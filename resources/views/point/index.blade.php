@@ -13,8 +13,8 @@
                 <h4 class="font-size-18">Pemilik Kod: {{$referral_code->username}}</h4>
                 <h4 class="font-size-18">Kod Anda: {{$referral_code->code}}</h4>
                 <!-- <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
-                </ol> -->
+                                    <li class="breadcrumb-item active">Welcome to Veltrix Dashboard</li>
+                                </ol> -->
             </div>
         </div>
     </div>
@@ -50,7 +50,7 @@
                     </div>
 
 
-                    <label class="col-form-label">Capaian Hari Ini</label>
+                    <label class="col-form-label">Capaian Hari Ini ({{ now()->format('d M Y') }})</label>
                     {!!$progressToday!!}
                     <br>
 
@@ -81,8 +81,8 @@
 
                         </div>
                         <!-- @if(isset($streakData['streak_startdate']))
-                        (Mulai {{$streakData['streak_startdate']}})
-                        @endif -->
+                                        (Mulai {{$streakData['streak_startdate']}})
+                                        @endif -->
 
 
 
@@ -113,8 +113,8 @@
 
                         </div>
                         <!-- @if(isset($streakData['streak_startdate']))
-                        (Mulai {{$streakData['streak_startdate']}})
-                        @endif -->
+                                        (Mulai {{$streakData['streak_startdate']}})
+                                        @endif -->
 
 
 
@@ -123,12 +123,12 @@
 
                     <a href="/derma" class="btn btn-primary col-sm-12">Derma Sekarang</a>
                     <!-- <div id="progressBars">
-                        <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
-                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" style="width:100%" aria-valuemin="0" aria-valuemax="40">
-                                <h4 class="text-white">Anda sudah capai peringkat 2</h4>
-                            </div>
-                        </div>
-                    </div> -->
+                                        <div class="progress mb-3" style="height: calc(1.5em + 0.75rem + 2px);">
+                                            <div class="progress-bar bg-success" role="progressbar" aria-valuenow="40" style="width:100%" aria-valuemin="0" aria-valuemax="40">
+                                                <h4 class="text-white">Anda sudah capai peringkat 2</h4>
+                                            </div>
+                                        </div>
+                                    </div> -->
 
 
                 </div>
@@ -262,54 +262,54 @@
         </div>
     </div>
     <!--
-        <div class="col-md-12">
-            <div class="card">
+                        <div class="col-md-12">
+                            <div class="card">
 
-                <div class="card-body">
+                                <div class="card-body">
 
-                    @if(count($errors) > 0)
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach($errors->all() as $error)
-                            <li>{{$error}}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                    @endif
-                    @if(\Session::has('success'))
-                    <div class="alert alert-success">
-                        <p>{{ \Session::get('success') }}</p>
-                    </div>
-                    @endif
+                                    @if(count($errors) > 0)
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            @foreach($errors->all() as $error)
+                                            <li>{{$error}}</li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                    @endif
+                                    @if(\Session::has('success'))
+                                    <div class="alert alert-success">
+                                        <p>{{ \Session::get('success') }}</p>
+                                    </div>
+                                    @endif
 
-                    <div class="table-responsive">
-                        <table id="pointHistoryTable" class="table table-bordered table-striped dt-responsive nowrap"
-                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
-                            <thead>
-                                <tr style="text-align:center">
-                                    <th> No. </th>
-                                    <th>Nama</th>
-                                    <th>Mata Ganjaran</th>
-                                    <th>Tarikh</th>
-                                    <th>Nota</th>
-                                </tr>
-                            </thead>
+                                    <div class="table-responsive">
+                                        <table id="pointHistoryTable" class="table table-bordered table-striped dt-responsive nowrap"
+                                            style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                                            <thead>
+                                                <tr style="text-align:center">
+                                                    <th> No. </th>
+                                                    <th>Nama</th>
+                                                    <th>Mata Ganjaran</th>
+                                                    <th>Tarikh</th>
+                                                    <th>Nota</th>
+                                                </tr>
+                                            </thead>
 
-                            <tfoot>
-                                <tr>
-                                    <th colspan="5" ></th>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="5" ></th>
 
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
 
 
-        </div> -->
+
+
+                        </div> -->
     </div>
 @endsection
 
