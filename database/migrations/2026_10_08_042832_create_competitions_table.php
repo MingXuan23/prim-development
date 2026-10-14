@@ -27,12 +27,15 @@ class CreateCompetitionsTable extends Migration
             $table->decimal('nationalFees', 10, 2)->nullable()->default(0.00);
             $table->decimal('internationalFees', 10, 2)->nullable()->default(0.00);
             $table->enum('participateType', ['Individual', 'Team'])->nullable();
-            $table->integer('minimumParticipate')->nullable();
-            $table->integer('maximumParticipate')->nullable();
+            $table->enum('winnerType', ['Medal', 'Number'])->nullable();
+            $table->integer('minParticipateGroup')->nullable();
+            $table->integer('maxParticipateGroup')->nullable();
+            $table->integer('totalParticipate')->nullable();
             $table->longText('description')->nullable();
             $table->string('imagePoster', 255)->nullable();
-            $table->enum('status', ['Published', 'Draft']);
-            $table->foreignId('userId')->constrained('users', 'id')->onDelete('cascade');
+            $table->enum('statusCompetition', ['Published', 'Draft']);
+            $table->enum('statusResult', ['Published', 'Draft', 'Not Set'])->default('Not Set');
+            $table->foreignId('organizationId')->constrained('organizations', 'id')->onDelete('cascade');
         });
     }
 

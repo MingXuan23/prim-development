@@ -15,41 +15,28 @@ class HostCompetitionController extends Controller
     {
         $query = Competition::query();
 
-        if ($req->filled('search'))
-        {
-            $query->where('competitionTitle', 'like', '%' . $req->search . '%');
-        }
+        $query->when($req->filled('search'), fn($q) =>
+            $q->where('competitionTitle', 'like', '%' . $req->search . '%'));
 
-        if ($req->filled('category'))
-        {
-            $query->where('category', $req->category);
-        }
+        $query->when($req->filled('category'), fn($q) =>
+            $q->where('category', $req->category));
 
         if ($req->filled('status'))
         {
             $today = now()->toDateString();
 
-            if ($req->status === 'Draft')
-            {
-                $query->where(function ($e) {
-                    $e->whereNull('competitionStart')->orWhere('status', 'Draft');
-                });
-            }
-            else if ($req->status === 'Upcoming')
-            {
-                $query->where('competitionStart', '>', $today);
-            }
-            else if ($req->status === 'Ongoing')
-            {
-                $query->where('competitionStart', '<=', $today)->where('competitionEnd', '>=', $today);
-            }
-            else if ($req->status === 'Completed')
-            {
-                $query->where('competitionEnd', '<', $today);
-            }
+            $query->when($req->status === 'Draft', fn ($q) =>
+                $q->whereNull('competitionStart')->orWhere('statusCompetition', 'Draft'))
+            ->when($req->status === 'Upcoming', fn ($q) =>
+                $q->where('competitionStart', '>', $today))
+            ->when($req->status === 'Ongoing', fn ($q) =>
+                $q->where('competitionStart', '<=', $today)->where('competitionEnd', '>=', $today))
+            ->when($req->status === 'Completed', fn ($q) =>
+                $q->where('competitionEnd', '<', $today));
         }
 
-        $competitions = $query->where('userId', Auth::id())->with(['user', 'participant_registration'])->withCount('participant_registration')->orderBy('status', 'desc')->get()
+        $competitions = $query->where('organizationId', Auth::user()->organization->first()->competition->first()->organizationId)
+        ->with(['organization', 'participant_registration'])->withCount('participant_registration')->orderBy('statusCompetition', 'desc')->get()
             ->map(function ($competition)
             {
                 $competition->totalFees = $competition->participant_registration->sum(function ($q) use ($competition)
@@ -85,7 +72,25 @@ class HostCompetitionController extends Controller
             'competitionTitle' => 'required|string|max:255',
             'category' => $isPublish ?  'required|string|max:255' : 'nullable|string|max:255',
             'venue' => $isPublish ? 'required|string|max:255' : 'nullable|string|max:255',
-            'registerOpen' => $isPublish ? 'required|date|after_or_equal:today' : 'nullable|date|after_or_equal:today',
+            'registerOpen' => [ $isPublish ? 'required' : 'nullable', 'date', 
+                                function ($attribute, $value, $fail) use($req) {
+                                    $competitionId = $req->route('id'); 
+                                    $competition = Competition::find($competitionId);
+
+                                    if ($competition && $competition->registerOpen) 
+                                    {
+                                        $existingDate = Carbon::parse($competition->registerOpen)->format('Y-m-d H:i');
+                                        $submittedDate = Carbon::parse($value)->format('Y-m-d H:i');
+
+                                        if ($existingDate === $submittedDate) return; 
+                                    }
+
+                                    if ($value && Carbon::parse($value)->lt(Carbon::today())) 
+                                    {
+                                        $fail('Tarikh buka pendaftaran tidak boleh sebelum tarikh hari ini.');
+                                    }
+                                },
+                            ],
             'registerClose' => $isPublish ? 'required|date|after_or_equal:registerOpen' : 'nullable|date|after_or_equal:registerOpen',
             'competitionStart' => $isPublish ? 'required|date|after_or_equal:registerClose' : 'nullable|date|after_or_equal:registerClose',
             'competitionEnd' => $isPublish ? 'required|date|after_or_equal:competitionStart' : 'nullable|date|after_or_equal:competitionStart',
@@ -94,8 +99,10 @@ class HostCompetitionController extends Controller
             'nationalFees' =>'nullable|numeric|min:0',
             'internationalFees' => 'nullable|numeric|min:0',
             'participateType' => $isPublish ? 'required|in:Individual,Team' : 'nullable|in:Individual,Team',
-            'minimumParticipate' => $isTeam && $isPublish ? 'required|integer|min:2' : 'nullable|integer|min:2',
-            'maximumParticipate' => $isTeam && $isPublish ? 'required|integer|gte:minimumParticipate' : 'nullable|integer|gte:minimumParticipate',
+            'winnerType' => $isPublish ? 'required|in:Medal,Number' : 'nullable|in:Medal,Number',
+            'minParticipateGroup' => $isTeam && $isPublish ? 'required|integer|min:2' : 'nullable|integer|min:2',
+            'maxParticipateGroup' => $isTeam && $isPublish ? 'required|integer|gte:minParticipateGroup' : 'nullable|integer|gte:minParticipateGroup',
+            'totalParticipate' => 'nullable|integer|min:2',
             'description' => $isPublish ? 'required' : 'nullable',
             'imagePoster' => ($isPublish && !$isEdit) ? 'required|image|mimes:jpeg,png,jpg|max:2048' : 'nullable|image|mimes:jpeg,png,jpg|max:2048', 
         ];
@@ -113,8 +120,9 @@ class HostCompetitionController extends Controller
             // 'nationalFees.required' => 'Sila masukkan yuran untuk warganegara.',
             // 'internationalFees.required' => 'Sila masukkan yuran untuk bukan warganegara.',
             'participateType.required' => 'Sila pilih jenis penyertaan (Individu atau Berkumpulan).',
-            'minimumParticipate.required' => 'Sila masukkan minimum penyertaan.',
-            'maximumParticipate.required' => 'Sila masukkan maksimum penyertaan.',
+            'winnerType.required' => 'Sila pilih jenis pencapaian (Medal atau Nombor).',
+            'minParticipateGroup.required' => 'Sila masukkan minimum penyertaan.',
+            'maxParticipateGroup.required' => 'Sila masukkan maksimum penyertaan.',
             'description.required' => 'Sila tulis penerangan mengenai pertandingan.',
             'imagePoster.required' => "Sila muat naik poster pertandingan.",
 
@@ -123,7 +131,7 @@ class HostCompetitionController extends Controller
             'competitionStart.after_or_equal' => 'Tarikh mula pertandingan tidak boleh sebelum tarikh tutup pendaftaran.',
             'competitionEnd.after_or_equal' => 'Tarikh akhir pertandingan tidak boleh sebelum tarikh mula pertandingan.',
             'maximumAge.gte' => 'Umur maksimum tidak boleh kurang daripada umur minimum.',
-            'maximumParticipate.gte' => 'Penyertaan maksimum tidak boleh kurang daripada penyertaan minimum.',
+            'maxParticipateGroup.gte' => 'Penyertaan maksimum tidak boleh kurang daripada penyertaan minimum.',
             'imagePoster.image' => 'Fail poster mestilah dalam bentuk gambar.',
             'imagePoster.mimes' => 'Format gambar yang dibenarkan ialah JPEG, PNG, JPG, atau GIF.',
             'imagePoster.max' => 'Saiz gambar poster tidak boleh melebihi 2MB.',
@@ -154,13 +162,11 @@ class HostCompetitionController extends Controller
             $data['imagePoster'] = $fileName;
         }
 
-
-
-        $data['status'] = $isPublish ? 'Published' : 'Draft';
-        $data['userId'] = Auth::id();
+        $data['statusCompetition'] = $isPublish ? 'Published' : 'Draft';
+        $data['organizationId'] = Auth::user()->organization->first()->id;
         Competition::create($data);
 
-        $message = $data['status'] == 'Published' ? 'Pertandingan berjaya disimpan!' : 'Draf berjaya disimpan!';
+        $message = $data['statusCompetition'] == 'Published' ? 'Pertandingan berjaya disimpan!' : 'Draf berjaya disimpan!';
         return response()->json(['status' => true, 'message' => $message]);
     }
 
@@ -168,7 +174,7 @@ class HostCompetitionController extends Controller
     {
         $isPublish = $req->input('submit') === 'publish' || $req->input('action') === 'publish';
 
-        $competition = Competition::with('user')->findOrFail($id);
+        $competition = Competition::with('organization')->findOrFail($id);
         [$validate, $message] = $this->validator($req, $id);
         $validator = Validator::make($req->all(), $validate, $message);
 
@@ -196,7 +202,7 @@ class HostCompetitionController extends Controller
             unset($data['imagePoster']);
         }
 
-        $data['status'] = $isPublish ? 'Published' : 'Draft';
+        $data['statusCompetition'] = $isPublish ? 'Published' : 'Draft';
         $competition->update($data);
 
         $message = $isPublish ? 'Pertandingan berjaya disimpan!' : 'Draf berjaya disimpan!';
@@ -205,7 +211,7 @@ class HostCompetitionController extends Controller
 
     public function viewCompetition(int $id)
     {
-        $competition = Competition::with('user', 'participant_registration')->findOrFail($id);
+        $competition = Competition::with('organization', 'participant_registration')->findOrFail($id);
         $pendingCount = $competition->participant_registration()
             ->wherePivot('statusPayment', 'Pending')
             ->count();
@@ -215,9 +221,9 @@ class HostCompetitionController extends Controller
         return view('competition.viewcompetition', compact('competition', 'pendingCount', 'paidCount'));
     }
 
-    public function editCompetition(int $id)
+    public function editCompetition($id)
     {
-        $competition = Competition::with('user', 'participant_registration')->findOrFail($id);
+        $competition = Competition::with('organization', 'participant_registration')->findOrFail($id);
         return view('competition.editcompetition', compact('competition'));
     }
 

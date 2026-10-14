@@ -319,7 +319,7 @@
                                     <p class="card-text text-muted" style="font-size: 0.85rem;">{{ $competition->category }}</p>
                                     @if($competition->registerOpen >= now())
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-semibold"><i class="bi bi-clock-history"></i>&nbsp Open Soon</span>
-                                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now())
+                                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
                                         <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold"><i class="bi bi-check-circle-fill"></i>&nbsp Open</span>
                                     @elseif($competition->registerClose <= now())
                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold"><i class="bi bi-x-circle-fill"></i>&nbsp Closed</span>
@@ -329,7 +329,7 @@
                                 
                                 <div class="d-flex gap-2 mb-3 mt-1">
                                     @if($competition->participateType === 'Team')
-                                        <span class="badge bg-light text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minimumParticipate}} - {{$competition->maximumParticipate}} pax)</span>
+                                        <span class="badge bg-light text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{ $competition->minParticipateGroup }} - {{ $competition->maxParticipateGroup }} pax)</span>
                                     @else
                                         <span class="badge bg-light text-dark border fw-normal"><i class="bi bi-person-fill me-1"></i> {{ $competition->participateType }}</span>
                                     @endif
@@ -346,17 +346,24 @@
                                         $open = \Carbon\Carbon::parse($competition->registerOpen);
                                         $daysLeft = $now->diffInDays($close, false);
                                         $hoursLeft = $now->diffInHours($close, false);
+                                        $minutesLeft = $now->diffInMinutes($close, false);
+                                        $maxRegister = !empty($competition->totalParticipate) && $competition->participant_registration->count() == $competition->totalParticipate;
                                     @endphp
-                                    
-                                    @if($daysLeft >= 1 && $open < now())
-                                        <span class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>{{ $daysLeft }} Hari Lagi</span>
-                                    @elseif($hoursLeft > 0 && $open < now())
-                                        <span class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>{{ $hoursLeft }} Jam Lagi</span>
-                                    @elseif($open > now())
+
+                                    @if($open > $now)
                                         <span class="text-warning fw-semibold small">Pendaftaran belum dibuka</span>
-                                    @else
+                                    @elseif($close < $now)
                                         <span class="text-danger fw-semibold small">Pendaftaran tutup</span>
+                                    @elseif($maxRegister)
+                                        <span class="text-danger fw-semibold small"><i class="bi bi-x-circle me-1"></i>Pendaftaran Penuh</span>
+                                    @elseif($daysLeft >= 1)
+                                        <span class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>{{ $daysLeft }} Hari Lagi</span>                                    
+                                    @elseif($hoursLeft >= 1)
+                                        <span class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>{{ $hoursLeft }} Jam Lagi</span>
+                                    @elseif($minutesLeft > 0)
+                                        <span class="text-muted small"><i class="bi bi-hourglass-split me-1"></i>{{ $minutesLeft }} Minit Lagi</span>
                                     @endif
+
                                     <a href="{{ route('competition.info', [$competition->id, 'mode' => 'user']) }}" class="btn btn-card px-3 py-2 btn-sm fw-semibold">Lihat Detail <i class="bi bi-arrow-right ms-1"></i></a>
                                 </div>
                             </div>

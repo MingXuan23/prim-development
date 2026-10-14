@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <title>PRiM | Competition</title>
@@ -98,6 +99,18 @@
                                     <label class="text-muted small d-block">No IC / No Pasport</label>
                                     <span class="fw-semibold text-dark">{{ $participant->icNo }}</span>
                                 </div>
+
+                                <div class="col-sm-6">
+                                    <label class="text-muted small d-block">Tarikh Lahir</label>
+                                    <span class="fw-semibold text-dark">{{ \Carbon\Carbon::parse($participant->birthOfDate)->format('d M Y') }}</span>
+                                </div>
+
+                                @if(!empty($participant->shirtSize))
+                                    <div class="col-sm-6">
+                                        <label class="text-muted small d-block">Saiz Baju</label>
+                                        <span class="fw-semibold text-dark">{{ $participant->shirtSize }}</span>
+                                    </div>
+                                @endif
                             </div>
                         @else
                             <h6 class="fw-bold text-uppercase border-bottom pb-2 mb-3">1. Senarai Ahli Kumpulan - <span class="badge bg-primary group">{{ $participant->team->groupName }}</span></h6>
@@ -109,9 +122,11 @@
                                                 <th style="width: auto;">No</th>
                                                 <th style="width: 30%;">Nama Penuh</th>
                                                 <th style="width: auto;">No IC / No Pasport</th>
+                                                <th style="width: auto;">Tarikh Lahir</th>
                                                 <th style="width: auto;">Jantina</th>
                                                 <th style="width: auto;">Alamat Email</th>
                                                 <th style="width: auto;">No. Telefon</th>
+                                                <th style="width: auto;">Saiz Baju</th>
                                             </tr>
                                         </thead>
 
@@ -126,11 +141,13 @@
                                                         @endif
                                                     </td>
                                                     <td class="text-center text-dark">{{ $participants->icNo }}</td>
+                                                    <td class="text-center text-dark">{{ \Carbon\Carbon::parse($participants->birthOfDate)->format('d M Y') }}</td>
                                                     <td>
                                                         <span class="badge bg-light text-dark border fw-normal">{{ $participants->gender }}</span>
                                                     </td>
                                                     <td class="text-dark">{{ $participants->email }}</td>
                                                     <td class="text-center text-dark">{{ $participants->noTel }}</td>
+                                                    <td class="text-center text-dark">{{ $participants->shirtSize }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

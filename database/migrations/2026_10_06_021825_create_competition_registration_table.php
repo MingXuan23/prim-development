@@ -14,12 +14,14 @@ class CreateCompetitionRegistrationTable extends Migration
     public function up()
     {
         Schema::create('competition_registration', function (Blueprint $table) {
+            $table->id('id');
             $table->foreignId('competitionId')->constrained('competitions', 'id')->onDelete('cascade');
             $table->foreignId('teamId')->constrained('teams', 'id')->onDelete('cascade');
-            $table->primary(['competitionId', 'teamId']);
 
             $table->enum('statusPayment', ['Paid', 'Free', 'Pending'])->default('Pending');
             $table->timestamp('registeredDate')->useCurrent()->useCurrentOnUpdate();
+            $table->string('winnerPlacement')->nullable();
+            $table->string('certificateSelected')->nullable();
         });
     }
 

@@ -10,7 +10,7 @@ use App\User;
 class Participant extends Model
 {
     public $timestamps = false;
-    protected $fillable = ['name', 'icNo', 'email', 'noTel', 'gender', 'currentGrade','supervisorName', 
+    protected $fillable = ['name', 'icNo', 'birthOfDate', 'email', 'noTel', 'gender', 'shirtSize', 'currentGrade','supervisorName', 
                            'supervisorEmail', 'supervisorNoTel', 'isLeader', 'teamId', 'userId', 'institutionId'];
 
     public function user()

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -84,6 +85,12 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
         }
+
+        @media (max-width: 992px) {
+            .space-btn {
+                margin-bottom: 35px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -95,14 +102,15 @@
                     <p class="lead mb-4 px-md-4 desc">Platform yang membolehkan organisasi menerbitkan pertandingan dan
                         calon menyertai pertandingan dengan mudah, telus serta terbuka kepada semua.
                     </p> <br>
-                    <div class="d-flex justify-content-center gap-md-3 gap-5 flex-wrap">
-                        <div class="position-relative d-inline-block">
+                    <div class="d-flex justify-content-center gap-md-3 flex-wrap">
+                        <div class="position-relative d-inline-block space-btn">
                             <a href="{{ route('competition.user', ['mode' => 'user']) }}" class="btn btn-warning btn-lg ps-4 pe-5 py-3 btn-custom rounded-pill {{ request()->get('mode', 'user') }}"><i class="bi bi-search me-2"></i> Cari Pertandingan</a>
-                            <img src="{{ asset('competition-image/sertai.png') }}" alt="" class="btn-img">
+                            <img src="{{ asset('assets/landing-page/img/competition-logo/sertai.png') }}" alt="" class="btn-img">
                         </div>
+
                         <div class="position-relative d-inline-block">
                             <a href="{{ route('competition.host', ['mode' => 'host']) }}" class="btn btn-outline-light btn-lg ps-4 pe-5 py-3 btn-custom btn-anjur rounded-pill {{ request()->get('mode', 'host') }}"><i class="bi bi-plus-circle me-1"></i> Anjur Pertandingan</a>
-                            <img src="{{ asset('competition-image/anjur.png') }}" alt="" class="btn-img btn-img-anjur">
+                            <img src="{{ asset('assets/landing-page/img/competition-logo/anjur.png') }}" alt="" class="btn-img btn-img-anjur">
                         </div>
                     </div>
                 </div>

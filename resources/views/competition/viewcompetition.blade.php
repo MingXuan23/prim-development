@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>PRiM | Competition</title>
 
@@ -165,7 +166,7 @@
             </nav>
             <p class="mb-0 mt-4 category-label text-uppercase">{{ $competition->category ?? '...' }}</p>
             <h1 class="mb-3 fw-bold text-white">{{ $competition->competitionTitle }}</h1>
-            @if(is_null($competition->competitionStart) || $competition->status == 'Draft')
+            @if(is_null($competition->competitionStart) || $competition->statusCompetition == 'Draft')
                 <p class="badge bg-danger z-3">DRAFT</p>
             @elseif($competition->competitionStart > now())
                 <p class="badge bg-warning text-dark z-3">UPCOMING</p>
@@ -176,7 +177,7 @@
             @endif        
             
             @if($competition->participateType === 'Team')
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minimumParticipate}} - {{$competition->maximumParticipate}} pax)</span>
+                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minParticipateGroup}} - {{$competition->maxParticipateGroup}} pax)</span>
             @elseif($competition->participateType === 'Individual')
                 <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-person-fill me-1"></i> {{ $competition->participateType }}</span>
             @else
@@ -184,7 +185,7 @@
             @endif
         </div>
 
-        @if($competition->status === 'Published' && $competition->competitionEnd < now())
+        @if($competition->statusCompetition === 'Published' && $competition->competitionEnd < now())
             <div class="card border-0 shadow-sm rounded-3 me-0 me-md-5 p-3 bg-white">
                 <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
                     <div class="badge bg-success-subtle text-success p-2 rounded-2">
@@ -430,71 +431,74 @@
     </div>
 
     <script>
-        document.getElementById('deleteCompetition').addEventListener('submit', function (e) {
-            e.preventDefault();
+        if (document.getElementById('deleteCompetition'))
+        {
+            document.getElementById('deleteCompetition').addEventListener('submit', function (e) {
+                e.preventDefault();
 
-            let form = this;
-            let formData = new FormData(form);
+                let form = this;
+                let formData = new FormData(form);
 
-            let name = "{{ $competition->competitionTitle }}";
+                let name = "{{ $competition->competitionTitle }}";
 
-            Swal.fire({
-                icon:'warning',
-                title: 'Adakah anda pasti?',
-                text: `Adakah anda pasti ingin memadam pertandingan ${name}?`,
-                showCancelButton: true,
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Padam',
-                cancelButtonText: 'Batal'
-            }).then ((result) => {
-                if (result.isConfirmed)
-                {
-                    fetch("{{ route('competition.deletecompetition', $competition->id) }}", {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                            "Accept": "application/json",
-                            "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                        }
-                    })
-                    .then (response => response.json())
-                    .then(data => {
-                        if (data.status === 'success')
-                        {
+                Swal.fire({
+                    icon:'warning',
+                    title: 'Adakah anda pasti?',
+                    text: `Adakah anda pasti ingin memadam pertandingan ${name}?`,
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Padam',
+                    cancelButtonText: 'Batal'
+                }).then ((result) => {
+                    if (result.isConfirmed)
+                    {
+                        fetch("{{ route('competition.deletecompetition', $competition->id) }}", {
+                            method: "POST",
+                            body: formData,
+                            headers: {
+                                "Accept": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            }
+                        })
+                        .then (response => response.json())
+                        .then(data => {
+                            if (data.status === 'success')
+                            {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berjaya dipadam',
+                                    text: `Pertandingan ${name} berjaya dipadam.`,
+                                    confirmButtonColor: '#4f46e5'
+                                }).then (() => {
+                                    if (data.redirect)
+                                    {
+                                        window.location.href = data.redirect;
+                                    }
+                                    else
+                                    {
+                                        location.reload();
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                throw new Error(data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error: ", error);
                             Swal.fire({
-                                icon: 'success',
-                                title: 'Berjaya dipadam',
-                                text: `Pertandingan ${name} berjaya dipadam.`,
+                                icon: 'error',
+                                title: 'Ralat',
+                                text: 'Terdapat ralat semasa memadam pendaftaran.',
                                 confirmButtonColor: '#4f46e5'
-                            }).then (() => {
-                                if (data.redirect)
-                                {
-                                    window.location.href = data.redirect;
-                                }
-                                else
-                                {
-                                    location.reload();
-                                }
                             });
-                        }
-                        else
-                        {
-                            throw new Error(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error: ", error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Ralat',
-                            text: 'Terdapat ralat semasa memadam pendaftaran.',
-                            confirmButtonColor: '#4f46e5'
                         });
-                    });
-                }
+                    }
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>

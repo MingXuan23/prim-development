@@ -2,14 +2,14 @@
 
 <style>
     .navigate {
-        padding: 0.75rem 1.5rem;
+        padding: 1rem 1.5rem;
         border-bottom: 1px solid #e2e8f0;
         box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
     }
 
     .link {
         display: flex;
-        gap: 2rem;
+        gap: 0.5rem;
         align-items: center;
     }
 
@@ -58,9 +58,19 @@
         font-size: 0.75rem;
     }
 
+    .logo a img {
+        width: 160px;
+        border: none;
+    }
+
     @media (max-width: 992px) {
         .navigate {
             padding: 1.2rem 0rem;
+        }
+
+        .logo a img {
+            width: 40px;
+            border: none;
         }
 
         .link {
@@ -101,11 +111,23 @@
 <div class="navigate navbar navbar-expand-lg bg-white sticky-top">
     <div class="container-fluid d-flex justify-content-between">
         
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMobile" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+            <div class="d-flex">
+                <span class="logo d-block d-lg-none">
+                    <a href="{{ route('competition.index') }}">
+                        <img src="{{ asset('assets/landing-page/img/competition-logo/logo-competition-mobile.png') }}" alt="ContestPro">
+                    </a>
+                </span>
 
-            <!-- <span class="logo"></span> -->
+                <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMobile" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+
+            <span class="logo d-none d-lg-block">
+                <a href="{{ route('competition.index') }}">
+                    <img src="{{ asset('assets/landing-page/img/competition-logo/logo-competition.png') }}" alt="ContestPro">
+                </a>
+            </span>
 
             <div class="user-box ms-lg-auto d-lg-none">
                 <div class="user-icon">
@@ -119,7 +141,8 @@
                 @if(request()->get('mode') === 'user' || request()->routeIs('competition.user*'))
                     <div class="link">
                         <a href="{{ route('competition.index') }}" class="link-custom {{ request()->routeIs('competition.index') ? 'active' : '' }}">Dashboard</a>
-                        <a href="{{ route('competition.user') }} " class="link-custom {{ request()->routeIs('competition.user') ? 'active' : '' }}">Senarai Pertandingan</a>
+                        <a href="{{ route('competition.user') }}" class="link-custom {{ request()->routeIs('competition.user') ? 'active' : '' }}">Senarai Pertandingan</a>
+                        <!-- <a href="{{ route('competition.user.displayresult') }}" class="link-custom {{ request()->routeIs('competition.user.displayresult') ? 'active' : '' }}">Keputusan Pertandingan</a> -->
                         <a href="{{ route('competition.userrecord') }}" class="link-custom {{ request()->routeIs('competition.userrecord') ? 'active' : '' }}">Rekod Pendaftaran</a>
                     </div>
                 @else

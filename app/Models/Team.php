@@ -13,7 +13,7 @@ class Team extends Model
 
     public function team_registration()
     {
-        return $this->belongsToMany(Competition::class, 'competition_registration', 'teamId', 'competitionId')->withPivot('statusPayment', 'registeredDate');
+        return $this->belongsToMany(Competition::class, 'competition_registration', 'teamId', 'competitionId')->withPivot('id', 'statusPayment', 'registeredDate', 'winnerPlacement', 'certificateSelected');
     }
 
     public function participant()

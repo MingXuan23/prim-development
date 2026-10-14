@@ -8,10 +8,12 @@ use App\Imports\ParticipantImport;
 use App\Models\Institution;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Team;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class RegistrationCompetitionController extends Controller
@@ -23,17 +25,19 @@ class RegistrationCompetitionController extends Controller
         if ($isTeam)
         {
             $competition = Competition::findOrFail($req->input('competitionId'));
-            $min = $competition->minimumParticipate;
-            $max = $competition->maximumParticipate;
+            $min = $competition->minParticipateGroup;
+            $max = $competition->maxParticipateGroup;
 
             $validate = [
                 'groupName' => 'required|string|max:255',
                 'members' => "required|array|min:{$min}|max:{$max}",
                 'members.*.name' => 'required|string|max:255',
                 'members.*.icNo' => 'required|string|max:25',
+                'members.*.birthOfDate' => 'required|date|before:today',
                 'members.*.gender' => 'required|in:Lelaki,Perempuan',
                 'members.*.email' => 'required|email',
-                'members.*.noTel' => 'required|string|max:20',  
+                'members.*.noTel' => 'required|string|max:20',
+                'members.*.shirtSize' => 'nullable|string|max:10',
             ];
 
             $message = [
@@ -43,6 +47,8 @@ class RegistrationCompetitionController extends Controller
                 'members.min' => "Sila masukkan sekurang-kurangnya {$min} ahli kumpulan.",
                 'members.max' => "Sila masukkan tidak melebihi {$max} ahli kumpulan.",
                 'members.*.icNo.required' => 'Sila masukkan no ic / no pasport.',
+                'members.*.birthOfDate.required' => 'Sila masukkan tarikh lahir anda.',
+                'members.*.birthOfDate.before' => 'Sila masukkan tarikh lahir sebelum hari ini.',
                 'members.*.gender.required' => 'Sila pilih jantina anda (Lelaki atau Perempuan).',
                 'members.*.email.required' => 'Sila masukkan alamat email.',
                 'members.*.email.email' => 'Sila masukkan format email yang sah.',
@@ -54,13 +60,18 @@ class RegistrationCompetitionController extends Controller
             $validate = [
                 'name' => 'required|string|max:255',
                 'icNo' => 'required|string|max:25',
+                'birthOfDate' => 'required|date|before:today',
                 'gender' => 'required|in:Lelaki,Perempuan',
                 'email' => 'required|email',
-                'noTel' => 'required|string|max:20',  
+                'noTel' => 'required|string|max:20',
+                'shirtSize' => 'nullable|string|max:10',
             ];
 
             $message = [
+                'name.required' => 'Sila masukkan nama penuh.',
                 'icNo.required' => 'Sila masukkan no ic / no pasport.',
+                'birthOfDate.required' => 'Sila masukkan tarikh lahir anda.',
+                'birthOfDate.before' => 'Sila masukkan tarikh lahir sebelum hari ini.',
                 'gender.required' => 'Sila pilih jantina anda (Lelaki atau Perempuan).',
                 'email.required' => 'Sila masukkan alamat email.',
                 'email.email' => 'Sila masukkan format email yang sah.',
@@ -71,33 +82,34 @@ class RegistrationCompetitionController extends Controller
         $validate += [
             'competitionId' => 'required|exists:competitions,id',
             'instituteName' => 'required|string',
-            'add-institute-name' => ['required_if:instituteName,Lain-Lain', 'nullable', 'string', 'max:255', function ($attribute, $value, $fail) use ($req) {
-                if ($req->input('instituteName') === 'Lain-Lain' && !empty($value)) 
-                {
-                    $cleanInput = strtolower(trim($value));
-                    $type = $req->input('instituteType');
+            'add-institute-name' => ['required_if:instituteName,Lain-Lain', 'nullable', 'string', 'max:255', 
+                                    function ($attribute, $value, $fail) use ($req) {
+                                        if ($req->input('instituteName') === 'Lain-Lain' && !empty($value)) 
+                                        {
+                                            $cleanInput = strtolower(trim($value));
+                                            $type = $req->input('instituteType');
 
-                    $IsExist = Institution::where(function ($q) use ($cleanInput) {
-                        $q->whereRaw('LOWER(instituteName) = ?', [$cleanInput])
-                                ->orWhereRaw('LOWER(instituteName) LIKE ?', ['%(' . $cleanInput . ')%'])
-                                ->orWhereRaw('LOWER(instituteName) LIKE ?', ['%' . $cleanInput . '%']);
-                    })
-                    ->when($type, function ($query) use ($type) {
-                        return $query->where('instituteType', $type);
-                    })
-                    ->exists();
+                                            $IsExist = Institution::where(function ($q) use ($cleanInput) {
+                                                $q->whereRaw('LOWER(instituteName) = ?', [$cleanInput])
+                                                        ->orWhereRaw('LOWER(instituteName) LIKE ?', ['%(' . $cleanInput . ')%'])
+                                                        ->orWhereRaw('LOWER(instituteName) LIKE ?', ['%' . $cleanInput . '%']);
+                                            })
+                                            ->when($type, function ($query) use ($type) {
+                                                return $query->where('instituteType', $type);
+                                            })
+                                            ->exists();
 
-                    if ($IsExist) 
-                    {
-                        $fail('Nama institusi ini sudah wujud dalam sistem. Sila pilih dari senarai sedia ada.');
-                    }
-                }
-            }],
+                                            if ($IsExist) 
+                                            {
+                                                $fail('Nama institusi ini sudah wujud dalam sistem. Sila pilih dari senarai sedia ada.');
+                                            }
+                                        }
+                                    }],
             'instituteType' => 'required|string',
             'currentGrade' => 'required|string',    
-            'supervisorName' => 'required|string|max:255',
-            'supervisorEmail' => 'required|email',
-            'supervisorNoTel' => 'required|string',
+            'supervisorName' => 'nullable|string|max:255',
+            'supervisorEmail' => 'nullable|email',
+            'supervisorNoTel' => 'nullable|string',
         ];
 
         $message += [
@@ -106,10 +118,10 @@ class RegistrationCompetitionController extends Controller
             'add-institute-name.required_if' => 'Sila masukkan nama institusi.',
             'add-institute-name.unique' => 'Nama institusi ini sudah wujud dalam sistem. Sila pilih dari senarai sedia ada.',
             'currentGrade.required' => 'Sila pilih pengajian semasa.',
-            'supervisorName.required' => 'Sila masukkan nama penyelia.',
-            'supervisorEmail.required' => 'Sila masukkan alamat email penyelia.',
+            // 'supervisorName.required' => 'Sila masukkan nama penyelia.',
+            // 'supervisorEmail.required' => 'Sila masukkan alamat email penyelia.',
             'supervisorEmail.email' => 'Sila masukkan format email penyelia yang sah.',
-            'supervisorNoTel.required' => 'Sila masukkan nombor telefon penyelia.',
+            // 'supervisorNoTel.required' => 'Sila masukkan nombor telefon penyelia.',
         ];
 
         return[$validate, $message];
@@ -185,6 +197,7 @@ class RegistrationCompetitionController extends Controller
             }
 
             $data = $validator->validated();
+            $competition = Competition::findOrFail($req->input('competitionId'));
             DB::beginTransaction();
 
             try {
@@ -196,10 +209,12 @@ class RegistrationCompetitionController extends Controller
                 {
                     $list = [
                         ['name' => $data['name'], 
-                         'icNo' => $data['icNo'], 
+                         'icNo' => $data['icNo'],
+                         'birthOfDate' => $data['birthOfDate'],
                          'gender' => $data['gender'], 
                          'email' => $data['email'], 
-                         'noTel' => $data['noTel']]
+                         'noTel' => $data['noTel'],
+                         'shirtSize' => $data['shirtSize'],]
                     ];
                 }
 
@@ -218,6 +233,32 @@ class RegistrationCompetitionController extends Controller
                     {
                         DB::rollBack();
                         return response()->json(['status' => false, 'message' => "({$p['name']}) telah mendaftar untuk pertandingan ini!"]);
+                    }
+
+                    if (!empty($competition->minimumAge) || !empty($competition->maximumAge))
+                    {
+                        $dob = $p['birthOfDate'] ?? null;
+
+                        if (!empty($dob))
+                        {
+                            $age = Carbon::parse($dob)->age;
+
+                            if (!empty($competition->maximumAge) && $age > $competition->maximumAge)
+                            {
+                                $errorMessage = $isTeam > 1 ? "{$p['name']} telah melepasi syarat umur maksimum." : 'Umur anda telah melepasi syarat umur maksimum.';
+
+                                DB::rollBack();
+                                return response()->json(['status' => false, 'message' => $errorMessage], 422);
+                            }
+
+                            if (!empty($competition->minimumAge) && $age < $competition->minimumAge)
+                            {
+                                $errorMessage = $isTeam ? "{$p['name']} tidak melepasi syarat umur minimum." : 'Umur anda tidak melepasi syarat umur minimum.';
+
+                                DB::rollBack();
+                                return response()->json(['status' => false, 'message' => $errorMessage], 422);
+                            }
+                        }
                     }
                 }
 
@@ -247,10 +288,12 @@ class RegistrationCompetitionController extends Controller
 
                         Participant::create([
                             'name' => $p['name'], 
-                            'icNo' => $p['icNo'], 
+                            'icNo' => $p['icNo'],
+                            'birthOfDate' => $p['birthOfDate'],
                             'gender' => $p['gender'], 
                             'email' => $p['email'], 
                             'noTel' => $p['noTel'],
+                            'shirtSize' => $p['shirtSize'],
                             'currentGrade' => $data['currentGrade'],
                             'supervisorName' => $data['supervisorName'],
                             'supervisorEmail' => $data['supervisorEmail'],
@@ -267,9 +310,11 @@ class RegistrationCompetitionController extends Controller
                     Participant::create([
                         'name' => $data['name'], 
                         'icNo' => $data['icNo'], 
+                        'birthOfDate' => $data['birthOfDate'],
                         'gender' => $data['gender'], 
                         'email' => $data['email'], 
                         'noTel' => $data['noTel'],
+                        'shirtSize' => $data['shirtSize'],
                         'currentGrade' => $data['currentGrade'],
                         'supervisorName' => $data['supervisorName'],
                         'supervisorEmail' => $data['supervisorEmail'],
@@ -317,6 +362,7 @@ class RegistrationCompetitionController extends Controller
         }
 
         $data = $validator->validated();
+        $competition = Competition::findOrFail($req->input('competitionId'));
 
         if ($isTeam)
         {
@@ -327,9 +373,11 @@ class RegistrationCompetitionController extends Controller
             $list = ['id' => $participant->id, 
                      'name' => $data['name'], 
                      'icNo' => $data['icNo'], 
+                     'birthOfDate' => $data['birthOfDate'], 
                      'gender' => $data['gender'], 
                      'email' => $data['email'], 
-                     'noTel' => $data['noTel']
+                     'noTel' => $data['noTel'],
+                     'shirtSize' => $data['shirtSize']
                 ];
         }
 
@@ -348,6 +396,32 @@ class RegistrationCompetitionController extends Controller
             {
                 return response()->json(['status' => false, 'message' => "({$p['name']}) telah mendaftar untuk pertandingan ini!"], 422);
             }
+
+            if (!empty($competition->minimumAge) || !empty($competition->maximumAge))
+            {
+                $dob = $p['birthOfDate'] ?? null;
+
+                if (!empty($dob))
+                {
+                    $age = Carbon::parse($dob)->age;
+
+                    if (!empty($competition->maximumAge) && $age > $competition->maximumAge)
+                    {
+                        $errorMessage = $isTeam > 1 ? "{$p['name']} telah melepasi syarat umur maksimum." : 'Umur anda telah melepasi syarat umur maksimum.';
+
+                        DB::rollBack();
+                        return response()->json(['status' => false, 'message' => $errorMessage], 422);
+                    }
+
+                    if (!empty($competition->minimumAge) && $age < $competition->minimumAge)
+                    {
+                        $errorMessage = $isTeam ? "{$p['name']} tidak melepasi syarat umur minimum." : 'Umur anda tidak melepasi syarat umur minimum.';
+
+                        DB::rollBack();
+                        return response()->json(['status' => false, 'message' => $errorMessage], 422);
+                    }
+                }
+            }
         }
 
         DB::beginTransaction();
@@ -356,6 +430,23 @@ class RegistrationCompetitionController extends Controller
             if ($participant->team)
             {
                 $participant->team->update(['groupName' => $isTeam ? $data['groupName'] : '---Individu---']);
+            }
+
+            $selectId = null;
+
+            if ($req->input('instituteName') === 'Lain-Lain')
+            {
+                $institution = Institution::create([
+                    'instituteType' => $data['instituteType'],
+                    'instituteName' => trim($data['add-institute-name']),
+                    'instituteLogo' => ''
+                ]);
+
+                $selectId = $institution->id;
+            }
+            else
+            {
+                $selectId = $req->input('instituteName');
             }
 
             $participantId = [];
@@ -368,10 +459,12 @@ class RegistrationCompetitionController extends Controller
 
                     $data = [
                         'name' => $p['name'], 
-                        'icNo' => $p['icNo'], 
+                        'icNo' => $p['icNo'],
+                        'birthOfDate' => $p['birthOfDate'], 
                         'gender' => $p['gender'], 
                         'email' => $p['email'], 
                         'noTel' => $p['noTel'],
+                        'shirtSize' => $p['shirtSize'], 
                         'currentGrade' => $data['currentGrade'],
                         'supervisorName' => $data['supervisorName'],
                         'supervisorEmail' => $data['supervisorEmail'],
@@ -379,7 +472,7 @@ class RegistrationCompetitionController extends Controller
                         'isLeader' => ($isTeam && $index === 0) ? 'Leader' : 'Member',
                         'teamId' => $participant->teamId,
                         'userId' => Auth::id(),
-                        'institutionId' => $data['instituteName']
+                        'institutionId' => $selectId
                     ];
 
                     if (!empty($p['id']))
@@ -408,16 +501,18 @@ class RegistrationCompetitionController extends Controller
                 $participant->update([
                     'name' => $data['name'], 
                     'icNo' => $data['icNo'], 
+                    'birthOfDate' => $data['birthOfDate'], 
                     'gender' => $data['gender'], 
                     'email' => $data['email'], 
                     'noTel' => $data['noTel'],
+                    'shirtSize' => $data['shirtSize'], 
                     'currentGrade' => $data['currentGrade'],
                     'supervisorName' => $data['supervisorName'],
                     'supervisorEmail' => $data['supervisorEmail'],
                     'supervisorNoTel' => $data['supervisorNoTel'],
                     'isLeader' => null,
                     'userId' => Auth::id(),
-                    'institutionId' => $data['instituteName']
+                    'institutionId' => $selectId
                 ]);
             }
     
@@ -467,6 +562,10 @@ class RegistrationCompetitionController extends Controller
                 {
                     $q->where('statusPayment', 'Paid');
                 }
+                else if ($status === 'free')
+                {
+                    $q->where('statusPayment', 'Free');
+                }
             });
         }
 
@@ -483,6 +582,37 @@ class RegistrationCompetitionController extends Controller
         })->values();
         
         return view('competition.userrecord', compact('participants'));
+    }
+
+    public function GenerateSijil(Request $req)
+    {
+        $req->validate([
+            'participantId' => 'required|exists:participants,id',
+            'templateId' => 'required|in:Template1,Template2,Template3,Template4'
+        ]);
+
+        $participantId = $req->input('participantId');
+        $templateId = $req->input('templateId');
+
+        $participant = Participant::with('team.team_registration')->findOrFail($participantId);
+
+        $orientation = ($req->input('templateId') > 'Template2') ? 'portrait' : 'landscape';
+
+        $data = [
+            'participant' => $participant,
+            'templateId' => $templateId,
+            'orientation' => $orientation,
+        ];
+
+        $pdf = Pdf::loadView('competition.pdftemplate', $data)->setPaper('a4', $orientation)->setOption([
+            'isRemoteEnabled' => true,
+            'isHtml5ParserEnabled' => true,
+            'dpi' => 150,
+        ]);
+
+        $fileName = 'Sijil_' . str_replace(' ', '_', $participant->name) . '.pdf';
+        
+        return $pdf->stream($fileName);
     }
      
     public function viewRegister(int $id)

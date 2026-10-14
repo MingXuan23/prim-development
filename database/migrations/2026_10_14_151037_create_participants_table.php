@@ -17,13 +17,15 @@ class CreateParticipantsTable extends Migration
             $table->id('id');
             $table->string('name');
             $table->string('icNo', 25)->comment('Simpan No IC / No Pasport');
+            $table->date('birthOfDate');
             $table->string('email');
             $table->string('noTel', 20);
             $table->enum('gender', ['Lelaki', 'Perempuan']);
+            $table->string('shirtSize', 10)->nullable();
             $table->string('currentGrade', 100);
-            $table->string('supervisorName', 100);
-            $table->string('supervisorEmail', 255);
-            $table->string('supervisorNoTel', 20);
+            $table->string('supervisorName', 100)->nullable();
+            $table->string('supervisorEmail', 255)->nullable();
+            $table->string('supervisorNoTel', 20)->nullable();
             $table->enum('isLeader', ['Leader', 'Member'])->nullable();
             $table->foreignId('teamId')->constrained('teams', 'id')->onDelete('cascade');
             $table->foreignId('userId')->constrained('users', 'id')->onDelete('cascade');

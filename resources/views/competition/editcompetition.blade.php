@@ -189,36 +189,61 @@
                 </div>
             </div>
 
-            <div class="col-12">
-                <label for="participateType" class="form-label fw-semibold d-block">Jenis Penyertaan</label>
-                <div class="form-check form-check-inline mt-1">
-                    <input type="radio" name="participateType" id="individual" value="Individual" class="form-check-input @error('participateType') is-invalid @enderror" {{ old('participateType', $competition->participateType ?? '') == 'Individual' ? 'checked' : '' }}>
-                    <label for="individual" class="form-check-label">Individu</label>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="participateType" class="form-label fw-semibold d-block">Jenis Penyertaan</label>
+                    <div class="form-check form-check-inline mt-1">
+                        <input type="radio" name="participateType" id="individual" value="Individual" class="form-check-input @error('participateType') is-invalid @enderror" {{ old('participateType', $competition->participateType ?? '') == 'Individual' ? 'checked' : '' }}>
+                        <label for="individual" class="form-check-label">Individu</label>
+                    </div>
+
+                    <div class="form-check form-check-inline mt-1">
+                        <input type="radio" name="participateType" id="team" value="Team" class="form-check-input @error('participateType') is-invalid @enderror" {{ old('participateType', $competition->participateType ?? '') == 'Team' ? 'checked' : '' }}>
+                        <label for="team" class="form-check-label">Berkumpulan</label>
+                    </div>
+                    <div class="invalid-feedback d-block"></div>
+
+                    <div class="row g-2 mt-2">
+                        <div class="col-6" id="minParticipate">
+                            <label for="minParticipateGroup" class="form-label text-muted small">Minimum Peserta (Kumpulan)</label>
+                            <div class="input-group">
+                                <input type="number" name="minParticipateGroup" id="minParticipateGroup" placeholder="Contoh: 3" min="2" class="form-control @error('minParticipateGroup') is-invalid @enderror" value="{{ old('minParticipateGroup', $competition->minParticipateGroup ?? '') }}">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-6" id="maxParticipate">
+                            <label for="maxParticipateGroup" class="form-label text-muted small">Maksimum Peserta (Kumpulan)</label>
+                            <div class="input-group">
+                                <input type="number" name="maxParticipateGroup" id="maxParticipateGroup" placeholder="Contoh: 6" min="3" class="form-control @error('maxParticipateGroup') is-invalid @enderror" value="{{ old('maxParticipateGroup', $competition->maxParticipateGroup ?? '') }}">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-check form-check-inline mt-1">
-                    <input type="radio" name="participateType" id="team" value="Team" class="form-check-input @error('participateType') is-invalid @enderror" {{ old('participateType', $competition->participateType ?? '') == 'Team' ? 'checked' : '' }}>
-                    <label for="team" class="form-check-label">Berkumpulan</label>
-                </div>
+                <div class="col-12 col-md-6">
+                    <label for="winnerType" class="form-label fw-semibold d-block">Jenis Pencapaian</label>
+                    <div class="form-check form-check-inline mt-1">
+                        <input type="radio" name="winnerType" id="medal" value="Medal" class="form-check-input @error('winnerType') is-invalid @enderror" {{ old('winnerType', $competition->winnerType ?? '') == 'Medal' ? 'checked' : '' }}>
+                        <label for="medal" class="form-check-label"><i class="bi bi-award-fill"></i> Medal</label>
+                    </div>
 
-                <div class="invalid-feedback d-block"></div>
+                    <div class="form-check form-check-inline mt-1">
+                        <input type="radio" name="winnerType" id="nombor" value="Nombor" class="form-check-input @error('winnerType') is-invalid @enderror" {{ old('winnerType', $competition->winnerType ?? '') == 'Number' ? 'checked' : '' }}>
+                        <label for="nombor" class="form-check-label"><i class="bi bi-list-ol"></i> Nombor</label>
+                    </div>
+                    <div class="invalid-feedback d-block"></div>
+                </div>
             </div>
 
-            <div class="col-6" id="minParticipate">
-                <label for="minimumParticipate" class="form-label text-muted small">Minimum Peserta</label>
-                <div class="input-group">
-                    <input type="number" name="minimumParticipate" id="minimumParticipate" placeholder="Contoh: 3" min="2" class="form-control @error('minimumParticipate') is-invalid @enderror" value="{{ old('minimumParticipate', $competition->minimumParticipate ?? '') }}">                  
-                    
-                    <div class="invalid-feedback"></div>
-                </div>
-            </div>
-
-            <div class="col-6" id="maxParticipate">
-                <label for="maximumParticipate" class="form-label text-muted small">Maksimum Peserta</label>
-                <div class="input-group">
-                    <input type="number" name="maximumParticipate" id="maximumParticipate" placeholder="Contoh: 6" min="3" class="form-control @error('maximumParticipate') is-invalid @enderror" value="{{ old('maximumParticipate', $competition->maximumParticipate ?? '') }}">
-                    
-                    <div class="invalid-feedback"></div>
+            <div class="row g-3 mt-1">
+                <div class="col-12 col-md-6">
+                    <label for="totalParticipate" class="form-label fw-semibold d-block">Maksimum Peserta <span class="text-muted small">(Pertandingan)</span></label>
+                    <div class="input-group">
+                        <input type="number" name="totalParticipate" id="totalParticipate" placeholder="Contoh: 6" min="2" class="form-control @error('totalParticipate') is-invalid @enderror" value="{{ old('totalParticipate', $competition->totalParticipate ?? '') }}">
+                        <div class="invalid-feedback"></div>
+                    </div>
                 </div>
             </div>
 

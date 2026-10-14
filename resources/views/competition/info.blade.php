@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -107,6 +108,11 @@
 
         .btn-daftar:hover {
             background-color: #4338ca;
+            color: white;
+        }
+
+        .btn-daftar:disabled {
+            background-color: #4f46e5;
             color: white;
         }
 
@@ -230,7 +236,7 @@
         .modal-wrap {
             position: relative;
             display: inline-block;
-            max-width: 90%;
+            max-width: 88%;
             max-height: 90%;
         }
 
@@ -245,10 +251,10 @@
 
         .close-btn {
             position: absolute;
-            top: 10px;
+            top: 0px;
             right: 15px;
             color: white;
-            font-size: 35px;
+            font-size: 40px;
             font-weight: bold;
             cursor: pointer;
             z-index: 1000;
@@ -257,6 +263,10 @@
 
         .close-btn:hover {
             color: #c6c6c6;
+        }
+
+        .price {
+            color: #4f46e5;
         }
 
         @media (min-width: 992px) {
@@ -293,10 +303,10 @@
         @endif
 
         @if($competition->participateType === 'Team')
-            @if($competition->minimumParticipate === $competition->maximumParticipate)
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->maximumParticipate}} pax)</span>
+            @if($competition->minParticipateGroup === $competition->maxParticipateGroup)
+                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->maxParticipateGroup}} pax)</span>
             @else
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minimumParticipate}} - {{$competition->maximumParticipate}} pax)</span>
+                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minParticipateGroup}} - {{$competition->maxParticipateGroup}} pax)</span>
             @endif
         @else
             <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-person-fill me-1"></i> {{ $competition->participateType }}</span>
@@ -350,12 +360,12 @@
                     <div>
                         <div class="fw-bold mt-3 info-label">Had Umur / Kelayakan</div>
                         <p class="text-muted mt-1">
-                            @if($competition->minAge && $competition->maxAge)
-                                {{ $competition->minAge }} - {{ $competition->maxAge }} Tahun
-                            @elseif($competition->minAge)
-                                {{ $competition->minAge }} Tahun ke atas
-                            @elseif($competition->maxAge)
-                                Hingga {{ $competition->maxAge }} Tahun
+                            @if($competition->minimumAge && $competition->maximumAge)
+                                {{ $competition->minimumAge }} - {{ $competition->maximumAge }} Tahun
+                            @elseif($competition->minimumAge)
+                                {{ $competition->minimumAge }} Tahun ke atas
+                            @elseif($competition->maximumAge)
+                                Hingga {{ $competition->maximumAge }} Tahun
                             @else
                                 Terbuka (Tiada Had Umur)
                             @endif
@@ -401,20 +411,20 @@
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border">
                                 <small class="text-muted d-block mb-1 fw-semibold">Warganegara</small>
-                                @if($competition->status === 'Published' && $competition->nationalFees === '0.00')
-                                    <span class="fs-5 fw-bold">PERCUMA</span>
+                                @if($competition->statusCompetition === 'Published' && $competition->nationalFees === '0.00')
+                                    <span class="fs-5 fw-bold price">PERCUMA</span>
                                 @else
-                                    <span class="fs-5 fw-bold">RM {{ $competition->nationalFees ?? '0.00' }}</span>
+                                    <span class="fs-5 fw-bold price">RM {{ $competition->nationalFees ?? '0.00' }}</span>
                                 @endif
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border">
                                 <small class="text-muted d-block mb-1 fw-semibold">Bukan Warganegara</small>
-                                @if($competition->status === 'Published' && $competition->internationalFees === '0.00')
-                                    <span class="fs-5 fw-bold">PERCUMA</span>
+                                @if($competition->statusCompetition === 'Published' && $competition->internationalFees === '0.00')
+                                    <span class="fs-5 fw-bold price">PERCUMA</span>
                                 @else
-                                    <span class="fs-5 fw-bold">RM {{ $competition->internationalFees ?? '0.00' }}</span>
+                                    <span class="fs-5 fw-bold price">RM {{ $competition->internationalFees ?? '0.00' }}</span>
                                 @endif
                             </div>
                         </div>
@@ -422,14 +432,17 @@
 
                     @if($competition->registerOpen >= now())
                         <p class="mb-2 bg-warning-subtle text-warning border border-warning-subtle text-center fw-semibold p-1 small register"><i class="bi bi-clock-history"></i>&nbsp Registration Open Soon</p>
-                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now())
+                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
                         <p class="mb-2 bg-success-subtle text-success border border-success-subtle text-center fw-semibold p-1 small register"><i class="bi bi-check-circle"></i>&nbsp&nbsp Registration Open</p>
-                    @elseif($competition->registerClose <= now())
+                    @else
                         <p class="mb-2 bg-danger-subtle text-danger border border-danger-subtle text-center fw-semibold p-1 small register"><i class="bi bi-x-circle"></i>&nbsp&nbsp Registration Closed</p>
                     @endif
+                    
                     <div class="d-flex justify-content-center">
-                        @if($competition->registerOpen <= now() && $competition->registerClose >= now())
+                        @if($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
                             <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" onclick="showRegisterOption()"><i class="bi bi-person-plus me-1"></i> Daftar Sekarang</button>
+                        @else
+                            <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" disabled>Daftar Sekarang</button>
                         @endif
                     </div>
                 </div>
@@ -450,20 +463,20 @@
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border">
                                 <small class="text-muted d-block mb-1 fw-semibold">Warganegara</small>
-                                @if($competition->status === 'Published' && $competition->nationalFees === '0.00')
-                                    <span class="fs-5 fw-bold">PERCUMA</span>
+                                @if($competition->statusCompetition === 'Published' && $competition->nationalFees === '0.00')
+                                    <span class="fs-5 fw-bold price">PERCUMA</span>
                                 @else
-                                    <span class="fs-5 fw-bold">RM {{ $competition->nationalFees ?? '0.00' }}</span>
+                                    <span class="fs-5 fw-bold price">RM {{ $competition->nationalFees ?? '0.00' }}</span>
                                 @endif
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="p-3 bg-light rounded-3 text-center border">
                                 <small class="text-muted d-block mb-1 fw-semibold">Bukan Warganegara</small>
-                                @if($competition->status === 'Published' && $competition->internationalFees === '0.00')
-                                    <span class="fs-5 fw-bold">PERCUMA</span>
+                                @if($competition->statusCompetition === 'Published' && $competition->internationalFees === '0.00')
+                                    <span class="fs-5 fw-bold price">PERCUMA</span>
                                 @else
-                                    <span class="fs-5 fw-bold">RM {{ $competition->internationalFees ?? '0.00' }}</span>
+                                    <span class="fs-5 fw-bold price">RM {{ $competition->internationalFees ?? '0.00' }}</span>
                                 @endif
                             </div>
                         </div>
@@ -471,14 +484,17 @@
 
                     @if($competition->registerOpen >= now())
                         <p class="mb-2 bg-warning-subtle text-warning border border-warning-subtle text-center fw-semibold p-1 small register"><i class="bi bi-clock-history"></i>&nbsp Registration Open Soon</p>
-                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now())
+                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
                         <p class="mb-2 bg-success-subtle text-success border border-success-subtle text-center fw-semibold p-1 small register"><i class="bi bi-check-circle"></i>&nbsp&nbsp Registration Open</p>
-                    @elseif($competition->registerClose <= now())
+                    @else
                         <p class="mb-2 bg-danger-subtle text-danger border border-danger-subtle text-center fw-semibold p-1 small register"><i class="bi bi-x-circle"></i>&nbsp&nbsp Registration Closed</p>
                     @endif
+
                     <div class="d-flex justify-content-center">
-                        @if($competition->registerOpen <= now() && $competition->registerClose >= now())
-                            <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" onclick="showRegisterOption()">Daftar Sekarang</button>
+                        @if($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
+                            <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" onclick="showRegisterOption()"><i class="bi bi-person-plus me-1"></i> Daftar Sekarang</button>
+                        @else
+                            <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" disabled>Daftar Sekarang</button>
                         @endif
                     </div>
                 </div>

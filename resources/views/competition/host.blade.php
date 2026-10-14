@@ -219,7 +219,7 @@
             overflow: hidden;
         }
 
-        .btn-card {
+        .btn-card, .btn-card-update {
             background-color: #4f46e5;
             border-color: #4f46e5;
             color: white;
@@ -228,6 +228,12 @@
         .btn-card:hover {
             background-color: #4338ca;
             border-color: #4338ca;
+            color: white;
+        }
+
+        .btn-card-update:hover {
+            background-color: #454545;
+            border-color: #454545;
             color: white;
         }
 
@@ -258,10 +264,8 @@
                 margin: 5px 0;
             }
 
-            .fill-input,
-            .fill-select,
-            .submit-btn,
-            .btn-container {
+            .fill-input,.fill-select,
+            .submit-btn,.btn-container {
                 width: 100% !important;
             }
 
@@ -329,41 +333,41 @@
             <h4 class="desc mx-auto">Mewujudkan pertandingan menarik dan memberi peluang peserta mempamerkan bakat, kreativiti dan kemahiran melalui platform yang mudah dan teratur.</h4>
         </div>
 
-    <form action="{{ route('competition.host') }}" method="GET" class="mt-4">
-        <div class="d-flex align-items-center box-search">
-            <div class="input-section flex-grow-1 position-relative">
-                <i class="bi bi-search search-icon text-secondary"></i>
-                <input type="text" name="search" id="search" placeholder="Cari nama pertandingan..." value="{{ request('search') }}" class="form-control fill-input">
+        <form action="{{ route('competition.host') }}" method="GET" class="mt-4">
+            <div class="d-flex align-items-center box-search">
+                <div class="input-section flex-grow-1 position-relative">
+                    <i class="bi bi-search search-icon text-secondary"></i>
+                    <input type="text" name="search" id="search" placeholder="Cari nama pertandingan..." value="{{ request('search') }}" class="form-control fill-input">
+                </div>
+
+                <div class="divider d-none d-md-block"></div>
+
+                <div class="d-flex align-items-center input-section">
+                    <select name="category" id="category" class="form-select fill-select">
+                        <option value="">Cari Kategori</option>
+                        @foreach(['Teknologi', 'Inovasi', 'Sains', 'Akademik', 'Multimedia & Kreatif', 'Reka Bentuk', 
+                                'Bahasa & Komunikasi', 'Seni & Kebudayaan', 'Lain-Lain'] as $cat)
+                            <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="d-flex align-items-center btn-container w-100">
+                    <button type="submit" class="btn submit-btn ms-lg-2">Cari Pertandingan</button>
+                    @if(request()->anyFilled(['search', 'category', 'status']))
+                        <a href="{{ route('competition.host') }}" class="btn btn-outline-danger reset-btn ms-lg-2">Reset <i class="bi bi-arrow-counterclockwise ms-1"></i></a>
+                    @endif
+                </div>
             </div>
 
-            <div class="divider d-none d-md-block"></div>
-
-            <div class="d-flex align-items-center input-section">
-                <select name="category" id="category" class="form-select fill-select">
-                    <option value="">Cari Kategori</option>
-                    @foreach(['Teknologi', 'Inovasi', 'Sains', 'Akademik', 'Multimedia & Kreatif', 'Reka Bentuk', 
-                              'Bahasa & Komunikasi', 'Seni & Kebudayaan', 'Lain-Lain'] as $cat)
-                        <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}></div>{{ $cat }}</option>
-                    @endforeach
-                </select>
+            <div class="d-flex flex-wrap justify-content-center align-items-center mt-4 pt-2 gap-2">
+                <span class="status-label text-white">Status: </span>
+                <a href="{{ route('competition.host', array_merge(request()->query(), ['status' => ''])) }}" class="status-btn {{ (empty(request('status')) && !request('search') && !request('category')) ? 'statusBtn-active' : 'statusBtn-inactive' }}">Semua</a>
+                @foreach(['Draft', 'Upcoming', 'Ongoing', 'Completed'] as $sta)
+                    <a href="{{ route('competition.host', array_merge(request()->query(), ['status' => $sta])) }}" class="status-btn {{ request('status') == $sta ? 'statusBtn-active' : 'statusBtn-inactive' }}">{{ $sta }}</a>
+                @endforeach
             </div>
-
-            <div class="d-flex align-items-center btn-container w-100">
-                <button type="submit" class="btn submit-btn ms-lg-2">Cari Pertandingan</button>
-                @if(request()->anyFilled(['search', 'category', 'status']))
-                    <a href="{{ route('competition.host') }}" class="btn btn-outline-danger reset-btn ms-lg-2">Reset <i class="bi bi-arrow-counterclockwise ms-1"></i></a>
-                @endif
-            </div>
-        </div>
-
-        <div class="d-flex flex-wrap justify-content-center align-items-center mt-4 pt-2 gap-2">
-            <span class="status-label text-white">Status: </span>
-            <a href="{{ route('competition.host', array_merge(request()->query(), ['status' => ''])) }}" class="status-btn {{ (empty(request('status')) && !request('search') && !request('category')) ? 'statusBtn-active' : 'statusBtn-inactive' }}">Semua</a>
-            @foreach(['Draft', 'Upcoming', 'Ongoing', 'Completed'] as $sta)
-                <a href="{{ route('competition.host', array_merge(request()->query(), ['status' => $sta])) }}" class="status-btn {{ request('status') == $sta ? 'statusBtn-active' : 'statusBtn-inactive' }}">{{ $sta }}</a>
-            @endforeach
-        </div>
-    </form>
+        </form>
     </div>
     
     <div class="container">
@@ -391,7 +395,7 @@
             @foreach($competitions as $competition)
                 <div class="col">
                     <div class="card h-100 position-relative overflow-hidden">
-                        @if(is_null($competition->competitionStart) || $competition->status == 'Draft')
+                        @if(is_null($competition->competitionStart) || $competition->statusCompetition == 'Draft')
                             <p class="position-absolute end-0 m-2 badge bg-danger z-3">DRAFT</p>
                         @elseif($competition->competitionStart > now())
                             <p class="position-absolute end-0 m-2 badge bg-warning text-dark z-3">PUBLISHED</p>
@@ -427,6 +431,7 @@
                             @endif
 
                             <div class="mt-auto d-flex justify-content-end align-items-center border-top pt-3">
+                                <!-- <a href="{{ route('competition.hostresult', $competition->id) }}" class="btn btn-card-update px-3 py-2 me-3 btn-sm fw-semibold"><i class="bi bi-pencil-square me-1"></i> Kemaskini Keputusan</a> -->
                                 <a href="{{ route('competition.viewcompetition', $competition->id) }}" class="btn btn-card px-3 py-2 btn-sm fw-semibold">Urus <i class="bi bi-arrow-right ms-1"></i></a>
                             </div>
                         </div>

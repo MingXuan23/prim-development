@@ -32,21 +32,24 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 $sheet->setCellValue('A1', '1. Jangan ubah susunan atau nama lajur yang sedia ada.');
                 $sheet->setCellValue('A2', '2. Pastikan semua maklumat peserta adalah lengkap dan tepat.');
                 $sheet->setCellValue('A3', '3. Pilih jenis institusi terlebih dahulu sebelum memilih nama institusi & pengajian semasa.');
+                $sheet->setCellValue('A4', '4. Anda boleh mendaftar dahulu dan membuat pembayaran kemudian di menu Rekod Pendaftaran.');
 
-                $sheet->getStyle('A1:A3')->getFont()->getColor()->setARGB(Color::COLOR_RED);
+                $sheet->getStyle('A1:A4')->getFont()->getColor()->setARGB(Color::COLOR_RED);
 
                 $headers = [
                     'A7' => 'Nama Penuh',
                     'B7' => 'Jantina',
                     'C7' => 'No IC / No Pasport',
-                    'D7' => 'Alamat Email',
-                    'E7' => 'No Telefon',
-                    'F7' => 'Jenis Institusi',
-                    'G7' => 'Nama Institusi',
-                    'H7' => 'Pengajian Semasa',
-                    'I7' => 'Nama Penyelia',
-                    'J7' => 'Alamat Email Penyelia',
-                    'K7' => 'No Telefon Penyelia',
+                    'D7' => 'Tarikh Lahir',
+                    'E7' => 'Alamat Email',
+                    'F7' => 'No Telefon',
+                    'G7' => 'Saiz Baju',
+                    'H7' => 'Jenis Institusi',
+                    'I7' => 'Nama Institusi',
+                    'J7' => 'Pengajian Semasa',
+                    'K7' => 'Nama Penyelia',
+                    'L7' => 'Alamat Email Penyelia',
+                    'M7' => 'No Telefon Penyelia',
                 ];
 
                 foreach ($headers as $cell => $text) {
@@ -64,9 +67,9 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                         'color' => ['argb' => Color::COLOR_WHITE],
                     ],
                 ];
-                $sheet->getStyle('A7:K7')->applyFromArray($headerStyle);
+                $sheet->getStyle('A7:M7')->applyFromArray($headerStyle);
 
-                foreach(range('A', 'K') as $column) {
+                foreach(range('A', 'M') as $column) {
                     $sheet->getColumnDimension($column)->setAutoSize(true);
                 }
 
@@ -185,6 +188,24 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 $jantinaValidation->setShowDropDown(true);
                 $jantinaValidation->setFormula1('"Lelaki,Perempuan"');
 
+                $saizBajuValidation = new DataValidation();
+                $saizBajuValidation->setType(DataValidation::TYPE_LIST);
+                $saizBajuValidation->setErrorStyle(DataValidation::STYLE_STOP);
+                $saizBajuValidation->setAllowBlank(true);
+                $saizBajuValidation->setShowDropDown(true);
+                $saizBajuValidation->setFormula1('"XS,S,M,L,XL,XXL,XXXL"');
+
+                $dobValidation = new DataValidation();
+                $dobValidation->setType(DataValidation::TYPE_DATE);
+                $dobValidation->setOperator(DataValidation::OPERATOR_BETWEEN);
+                $dobValidation->setErrorStyle(DataValidation::STYLE_STOP);
+                $dobValidation->setAllowBlank(false);
+                $dobValidation->setShowErrorMessage(true);
+                $dobValidation->setErrorTitle('Error');
+                $dobValidation->setError('Invalid birth of date (Y-m-d).');
+                $dobValidation->setFormula1('DATE(1930, 1, 1)');
+                $dobValidation->setFormula2('TODAY()');
+
                 $jenisValidation = new DataValidation();
                 $jenisValidation->setType(DataValidation::TYPE_LIST);
                 $jenisValidation->setErrorStyle(DataValidation::STYLE_STOP);
@@ -219,42 +240,47 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 $phoneValidation->setShowErrorMessage(true);
                 $phoneValidation->setErrorTitle('Error');
                 $phoneValidation->setError('Invalid phone number');
-
+                    
                 for ($row = 8; $row <= 100; $row++) {
                     $sheet->getCell('B' . $row)->setDataValidation(clone $jantinaValidation);
+
+                    $sheet->getCell('G' . $row)->setDataValidation(clone $saizBajuValidation);
 
                     $sheet->getStyle('C' . $row)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
                     $sheet->getCell('C' . $row)->setDataType(DataType::TYPE_STRING);
 
-                    $emailValidationRowD = clone $emailValidation;
-                    $emailValidationRowD->setFormula1('AND(ISNUMBER(FIND("@", D' . $row . ')), ISNUMBER(FIND(".", D' . $row . ')))');
-                    $sheet->getCell('D' . $row)->setDataValidation($emailValidationRowD);
+                    $sheet->getCell('D' . $row)->setDataValidation(clone $dobValidation);
+                    $sheet->getStyle('D' . $row)->getNumberFormat()->setFormatCode('yyyy-mm-dd');
 
-                    $phoneValidationRowE = clone $phoneValidation;
-                    $sheet->getStyle('E' . $row)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
-                    $sheet->getCell('E' . $row)->setDataType(DataType::TYPE_STRING);
-                    $phoneValidationRowE->setFormula1('ISNUMBER(VALUE(E' . $row . '))');
-                    $sheet->getCell('E' . $row)->setDataValidation($phoneValidationRowE);
+                    $emailValidationRowE = clone $emailValidation;
+                    $emailValidationRowE->setFormula1('AND(ISNUMBER(FIND("@", E' . $row . ')), ISNUMBER(FIND(".", E' . $row . ')))');
+                    $sheet->getCell('E' . $row)->setDataValidation($emailValidationRowE);
 
-                    $sheet->getCell('F' .$row)->setDataValidation(clone $jenisValidation);
+                    $phoneValidationRowF = clone $phoneValidation;
+                    $sheet->getStyle('F' . $row)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+                    $sheet->getCell('F' . $row)->setDataType(DataType::TYPE_STRING);
+                    $phoneValidationRowF->setFormula1('ISNUMBER(VALUE(F' . $row . '))');
+                    $sheet->getCell('F' . $row)->setDataValidation($phoneValidationRowF);
+
+                    $sheet->getCell('H' .$row)->setDataValidation(clone $jenisValidation);
 
                     $namaValidationRow = clone $namaValidation;
-                    $namaValidationRow->setFormula1('=INDEX($o$15:$S$' . $lastInstRow . ', 0, MATCH(F' . $row . ', $O$14:$S$14, 0))');
-                    $sheet->getCell('G' . $row)->setDataValidation($namaValidationRow);
+                    $namaValidationRow->setFormula1('=INDEX($o$15:$S$' . $lastInstRow . ', 0, MATCH(H' . $row . ', $O$14:$S$14, 0))');
+                    $sheet->getCell('I' . $row)->setDataValidation($namaValidationRow);
 
                     $pengajianValidationRow = clone $pengajianValidation;
-                    $pengajianValidationRow->setFormula1('=INDEX($O$5:$S$13, 0, MATCH(F' . $row . ', $O$4:$S$4, 0))');
-                    $sheet->getCell('H' . $row)->setDataValidation($pengajianValidationRow);
+                    $pengajianValidationRow->setFormula1('=INDEX($O$5:$S$13, 0, MATCH(H' . $row . ', $O$4:$S$4, 0))');
+                    $sheet->getCell('J' . $row)->setDataValidation($pengajianValidationRow);
 
-                    $emailValidationRowJ = clone $emailValidation;
-                    $emailValidationRowJ->setFormula1('AND(ISNUMBER(FIND("@", J' . $row . ')), ISNUMBER(FIND(".", J' . $row . ')))');
-                    $sheet->getCell('J' . $row)->setDataValidation($emailValidationRowJ);
+                    $emailValidationRowL = clone $emailValidation;
+                    $emailValidationRowL->setFormula1('AND(ISNUMBER(FIND("@", L' . $row . ')), ISNUMBER(FIND(".", L' . $row . ')))');
+                    $sheet->getCell('L' . $row)->setDataValidation($emailValidationRowL);
 
-                    $phoneValidationRowK = clone $phoneValidation;
-                    $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
-                    $sheet->getCell('K' . $row)->setDataType(DataType::TYPE_STRING);
-                    $phoneValidationRowK->setFormula1('ISNUMBER(VALUE(K' . $row . '))');
-                    $sheet->getCell('K' . $row)->setDataValidation($phoneValidationRowK);
+                    $phoneValidationRowM = clone $phoneValidation;
+                    $sheet->getStyle('M' . $row)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_TEXT);
+                    $sheet->getCell('M' . $row)->setDataType(DataType::TYPE_STRING);
+                    $phoneValidationRowM->setFormula1('ISNUMBER(VALUE(M' . $row . '))');
+                    $sheet->getCell('M' . $row)->setDataValidation($phoneValidationRowM);
                 }
             },
         ];

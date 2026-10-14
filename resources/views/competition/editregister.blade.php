@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"/>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>PRiM | Competition</title>
 
     <style>
@@ -155,6 +159,13 @@
                 </div>
 
                 <div class="col-md-6">
+                    <label for="birthOfDate" class="form-label fw-semibold">Tarikh Lahir</label>
+                    <input type="date" name="members[0][birthOfDate]" class="form-control @error('members.0.birthOfDate') is-invalid @enderror" value="{{ old('members.0.birthOfDate', $participant->birthOfDate ?? '') }}">
+
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-md-6">
                     <label for="noTel" class="form-label fw-semibold">No Telefon</label>
                     <input type="number" name="members[0][noTel]" placeholder="Contoh: 0123456789" max="20" class="form-control  @error('members.0.noTel') is-invalid @enderror" value="{{ old('members.0.noTel', $participant->noTel ?? '') }}">
 
@@ -181,6 +192,18 @@
                     </div>
 
                     <div class="invalid-feedback d-block"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                    <select name="members[0][shirtSize]" class="form-select @error('members.0.shirtSize') is-invalid @enderror">
+                        <option value="" selected>Pilih Saiz Baju</option>
+                        @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                            <option value="{{ $size }}" {{ old('members.0.shirtSize', $participant->shirtSize ?? '') == $size ? 'selected' : '' }}>{{ $size }}</option>
+                        @endforeach
+                    </select>
+                            
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>
         </div>
@@ -232,6 +255,13 @@
                             </div>
 
                             <div class="col-md-6">
+                                <label for="birthOfDate" class="form-label fw-semibold">Tarikh Lahir</label>
+                                <input type="date" name="members[{{ $memberIndex }}][birthOfDate]" class="form-control @error('members.' . $memberIndex . '.birthOfDate') is-invalid @enderror" value="{{ old('members.' . $memberIndex . '.birthOfDate', $member->birthOfDate ?? '') }}">
+
+                                <div class="invalid-feedback"></div>
+                            </div>
+
+                            <div class="col-md-6">
                                 <label for="noTel" class="form-label fw-semibold">No Telefon</label>
                                 <input type="number" name="members[{{ $memberIndex }}][noTel]" placeholder="Contoh: 0123456789" max="20" class="form-control  @error('members.' . $memberIndex . '.noTel') is-invalid @enderror" value="{{ old('members.' . $memberIndex . '.noTel', $member->noTel ?? '') }}">
 
@@ -259,12 +289,24 @@
 
                                 <div class="invalid-feedback d-block"></div>
                             </div>
+
+                            <div class="col-md-6">
+                                <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                                <select name="members[{{ $memberIndex }}][shirtSize]" class="form-select @error('members.' . $memberIndex . '.shirtSize') is-invalid @enderror">
+                                    <option value="" selected>Pilih Saiz Baju</option>
+                                    @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                                        <option value="{{ $size }}" {{ old('members.' .$memberIndex. '.shirtSize', $member->shirtSize ?? '') == $size ? 'selected' : '' }}>{{ $size }}</option>
+                                    @endforeach
+                                </select>
+                                        
+                                <div class="invalid-feedback"></div>
+                            </div>  
                         </div>
                     </div>
                 @endforeach
 
                 <div class="col-12 mt-3 p-4 pt-0">
-                    <button type="button" class="btn btn-outline-primary p-1 w-100 addMemberBtn" data-max="{{ $competition->maximumParticipate }}"><i class="bi bi-plus-circle me-1"></i> Ahli Kumpulan</button>
+                    <button type="button" class="btn btn-outline-primary p-1 w-100 addMemberBtn" data-max="{{ $competition->maxParticipateGroup }}"><i class="bi bi-plus-circle me-1"></i> Ahli Kumpulan</button>
                 </div>
             </div>
         </div>
@@ -295,6 +337,13 @@
                             
                     <div class="invalid-feedback"></div>
                 </div>
+
+                <div class="col-md-6">
+                    <label for="birthOfDate" class="form-label fw-semibold">Tarikh Lahir</label>
+                    <input type="date" name="birthOfDate" id="birthOfDate" class="form-control @error('birthOfDate') is-invalid @enderror" value="{{ old('birthOfDate', $participant->birthOfDate ?? '') }}">
+
+                    <div class="invalid-feedback"></div>
+                </div>
                 
                 <div class="col-md-6">
                     <label for="noTel" class="form-label fw-semibold">No Telefon</label>
@@ -323,6 +372,18 @@
                     </div>
 
                     <div class="invalid-feedback d-block"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                    <select name="shirtSize" class="form-select @error('shirtSize') is-invalid @enderror">
+                        <option value="" selected>Pilih Saiz Baju</option>
+                            @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                                <option value="{{ $size }}" {{ old('shirtSize', $participant->shirtSize ?? '') == $size ? 'selected' : '' }}>{{ $size }}</option>
+                            @endforeach
+                    </select>
+                            
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>
         </div>
@@ -359,6 +420,14 @@
                     </select>
 
                     <div class="invalid-feedback"></div>
+
+                    <div>
+                        <div class="mt-3 d-none" id="add-institution">
+                            <label for="add-institute-name" class="form-label fw-semibold">Nyatakan Nama Institusi</label>
+                            <input type="text" name="add-institute-name" id="add-institute-name" class="form-control @error('add-institute-name') is-invalid @enderror" placeholder="Masukkan nama institusi" value="{{ old('add-institute-name') }}">
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="col-md-6">
@@ -422,7 +491,7 @@
 
                 <div class="mt-2 alert alert-info mb-0 py-2 border-0 d-flex align-items-center" style="font-size: 13px;">
                     <i class="bi bi-info-circle-fill text-info fs-5 me-2"></i>
-                    <span><strong>Nota:</strong> Anda boleh mendaftar dahulu dan membuat pembayaran kemudian di menu <strong>Pendaftaran Saya</strong>.</span>
+                        <span><strong>Nota:</strong> Anda boleh mendaftar dahulu dan membuat pembayaran kemudian di menu <strong>Rekod Pendaftaran</strong>.</span>
                 </div>
             </div>
         </div>
@@ -459,17 +528,76 @@
             filterInstitutionName(education.value, oldInstitutions);
         }
 
-        function filterInstitutionName(selectEducate, targetInstitution = null)
+        function filterInstitutionName(education, targetInstitute = null)
         {
-            educationName.innerHTML = `<option value="" selected disabled>Pilih Nama Institusi</option>`; 
+            const $educationName = $('#instituteName');
 
-            const filter = allInstitutions.filter(institution => institution.instituteType === selectEducate);
+            let option = `<option value="" selected disabled>Pilih Nama Institusi</option>`;
+
+            const filter = allInstitutions.filter(institution => institution.instituteType === education);
 
             filter.forEach(institution => {
-                let isSelect = targetInstitution && String(targetInstitution) === String(institution.id) ? 'selected' : '';
-                educationName.innerHTML += `<option value="${institution.id}" ${isSelect}>${institution.instituteName}</option>`;
+                let isSelect = (targetInstitute && String(targetInstitute) === String(institution.id)) ? 'selected' : '';
+                option += `<option value="${institution.id}" ${isSelect}>${institution.instituteName}</option>`;
             });
+
+            const otherSelect = (String(targetInstitute) === 'Lain-Lain') ? 'selected' : '';
+            option  += `<option value="Lain-Lain" ${otherSelect}>Lain-Lain</option>`;
+
+            $educationName.html(option);
+
+            if (targetInstitute)
+            {
+                $educationName.val(targetInstitute);
+            }
+
+            $educationName.trigger('change.select2');
         }
+
+        $(document).ready(function () {
+            $('#instituteName').on('change.select2', function () {
+                const value = $(this).val();
+                const $wrapInput = $('#add-institution');
+                const $inputAdd = $('#add-institute-name');
+                const $parent = $(this).closest('div');
+
+                if ($(this).val() === 'Lain-Lain')
+                {
+                    $wrapInput.removeClass('d-none');
+                    $inputAdd.prop('required', true);
+                }
+                else
+                {
+                    $wrapInput.addClass('d-none');
+                    $inputAdd.prop('required', false).val('');
+                }
+
+                if (value && value !== '')
+                {
+                    $(this).removeClass('is-invalid');
+                    $parent.find('.invalid-feedback').removeClass('d-block').hide().text('');
+
+                    const $select2 = $parent.find('.select2-container');
+
+                    if ($select2.length)
+                    {
+                        $select2.removeClass('is-invalid');
+                        $select2.find('.select2-selection').removeClass('is-invalid').css('border-color', '');
+                    }
+                }
+                else
+                {
+                    $parent.find('.invalid-feedback').addClass('d-block');
+                }
+            });
+
+            $('#instituteName').select2({
+                theme: 'bootstrap-5',
+                placeholder: "Pilih nama institusi",
+                allowClear: true,
+                width: '100%'
+            }); 
+        });
 
         function callSelect (selectEducate, targetGrade = null) {
             grade.innerHTML = `<option value="" selected disabled>Pilih Pengajian Semasa</option>`;    
@@ -783,6 +911,13 @@
                     </div>
 
                     <div class="col-md-6">
+                        <label for="birthOfDate_${arrayIndex}" class="form-label fw-semibold">Tarikh Lahir</label>
+                        <input type="date" id="birthOfDate_${arrayIndex}" name="members[${arrayIndex}][birthOfDate]" class="form-control" value="">
+
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-6">
                         <label for="noTel_${arrayIndex}" class="form-label fw-semibold">No Telefon</label>
                         <input type="number" id="icNo_${arrayIndex}" name="members[${arrayIndex}][noTel]" placeholder="Contoh: 0123456789" max="20" class="form-control" value="">
 
@@ -809,6 +944,18 @@
                         </div>
 
                         <div class="invalid-feedback d-block"></div>
+                    </div>
+                                    
+                    <div class="col-md-6">
+                        <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                        <select name="members[${arrayIndex}][shirtSize]" id="shirtSize_${arrayIndex}" class="form-select">
+                            <option value="" selected>Pilih Saiz Baju</option>
+                            @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                                <option value="{{ $size }}">{{ $size }}</option>
+                            @endforeach
+                        </select>
+                                
+                        <div class="invalid-feedback"></div>
                     </div>
                 </div>`;
 

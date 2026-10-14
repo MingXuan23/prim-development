@@ -15,6 +15,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Validators\Failure;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Exception;
 
 class ParticipantImport implements ToCollection, WithStartRow, WithValidation, SkipsOnFailure
@@ -50,14 +51,16 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
             '0' => ['required', 'string', 'max:255'],
             '1' => ['required'],
             '2' => ['required'],
-            '3' => ['required', 'email'],
-            '4' => ['required'],
+            '3' => ['required'],
+            '4' => ['required', 'email'],
             '5' => ['required'],
-            '6' => ['required'],
+            '6' => ['nullable'],
             '7' => ['required'],
             '8' => ['required'],
-            '9' => ['required', 'email'],
-            '10' => ['required'],
+            '9' => ['required'],
+            '10' => ['nullable'],
+            '11' => ['nullable', 'email'],
+            '12' => ['nullable'],
         ];
     }
 
@@ -98,8 +101,8 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
 
             try {
             $selectId = null;
-            $cleanInput = strtolower(trim($row[6]));
-            $type = $row[5];
+            $cleanInput = strtolower(trim($row[8]));
+            $type = $row[7];
 
             $IsExist = Institution::where(function ($q) use ($cleanInput) {
                 $q->whereRaw('LOWER(instituteName) = ?', [$cleanInput])
@@ -114,8 +117,8 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
             if (!$IsExist)
             {
                 $institution = Institution::create([
-                    'instituteType' => $row[5],
-                    'instituteName' => trim($row[6]),
+                    'instituteType' => $row[7],
+                    'instituteName' => trim($row[8]),
                     'instituteLogo' => ''
                 ]);
 
@@ -128,16 +131,38 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
             
                 $team = Team::create(['groupName' => '---Individu---']);
 
+                $rawDob = $row[3];
+                $formatDob = null;
+
+                if (!empty($rawDob)) 
+                {
+                    if (is_numeric($rawDob)) 
+                    {
+                        $formatDob = Date::excelToDateTimeObject($rawDob)->format('Y-m-d');
+                    } 
+                    else 
+                    {
+                        try {
+                            $formatDob = Carbon::parse($rawDob)->format('Y-m-d');
+                        } 
+                        catch (\Exception $e) {
+                            $formatDob = null;
+                        }
+                    }
+                }
+
                 $participant = Participant::create([
                     'name' => $row[0],
                     'gender' => $row[1],
                     'icNo' => $row[2],
-                    'email' => $row[3],
-                    'noTel' => $row[4],
-                    'currentGrade' => $row[7],
-                    'supervisorName' => $row[8],
-                    'supervisorEmail' => $row[9],
-                    'supervisorNoTel' => $row[10],
+                    'birthOfDate' => $formatDob,
+                    'email' => $row[4],
+                    'noTel' => $row[5],
+                    'shirtSize' => $row[6],
+                    'currentGrade' => $row[9],
+                    'supervisorName' => $row[10],
+                    'supervisorEmail' => $row[11],
+                    'supervisorNoTel' => $row[12],
                     'isLeader' => null,
                     'teamId' => $team->id,
                     'userId' => Auth::id(),

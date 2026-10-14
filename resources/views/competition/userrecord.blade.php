@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -129,6 +131,30 @@
             max-height: 620px;
             overflow-y: auto;
         }
+
+        .btn-pay:disabled {
+            color: white;
+            background-color: #4f46e5;
+        }
+
+        .btn-pay {
+            color: white;
+            background-color: #4f46e5;
+        }
+
+        .btn-pay:hover {
+            color: white;
+            background-color: #4338ca;
+        }
+
+        .btn-sijil {
+            color: grey;
+        }
+
+        .btn-sijil:hover {
+            background-color: #6366f1;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -162,114 +188,177 @@
                         <button type="submit" name="status" value="all" class="btn filter-btn {{ !request()->filled('search') && request('status', 'all') == 'all' ? 'active' : '' }}">Semua</button>
                         <button type="submit" name="status" value="pending" class="btn filter-btn {{ request('status') == 'pending' ? 'active' : '' }}">Belum Bayar</button>
                         <button type="submit" name="status" value="paid" class="btn filter-btn {{ request('status') == 'paid' ? 'active' : '' }}">Telah Bayar</button>
+                        <button type="submit" name="status" value="free" class="btn filter-btn {{ request('status') == 'free' ? 'active' : '' }}">Tiada Bayaran</button>
                     </div>
                 </div>
             </form>
         </div>
 
         <div class="card bg-white registration-card overflow-hidden mb-4 shadow-sm">
-            <div class="table-responsive table-scroll-container">
-                <table class="table table-bordered table-hover text-center table-custom align-middle">
-                    <thead class="sticky-top" style="z-index: 10;">
-                        <tr>
-                            <th><input type="checkbox" name="selectAllPayment" id="selectAllPayment" class="form-check-input"></th>
-                            <th style="width: 6%;">No</th>
-                            <th style="width: 25%;">Kumpulan / Individu</th>
-                            <th style="width: 20%;">Pertandingan</th>
-                            <th style="width: 14%;">Tarikh Daftar</th>
-                            <th style="width: 14%;">Status</th>
-                            <th>Tindakan</th>
-                        </tr>
-                    </thead>
+            <form method="POST" action="{{ route('directpayIndex') }}">
+                @csrf
+                <input type="hidden" name="desc" id="desc" value="Competition">
 
-                    <tbody>
-                        @forelse($participants as $participant)
-                            @php
-                                $member = $participant->first();
-                                $team = $member->team->team_registration->first();
-                                $bridge = $team->pivot;
+                <div class="table-responsive table-scroll-container">
+                    <table class="table table-bordered table-hover text-center table-custom align-middle">
+                        <thead class="sticky-top" style="z-index: 10;">
+                            <tr>
+                                <th><input type="checkbox" name="selectAllPayment" id="selectAllPayment" class="form-check-input"></th>
+                                <th style="width: 6%;">No</th>
+                                <th style="width: 25%;">Kumpulan / Individu</th>
+                                <th style="width: 20%;">Pertandingan</th>
+                                <th style="width: 14%;">Tarikh Daftar</th>
+                                <th style="width: 14%;">Status</th>
+                                <th>Tindakan</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse($participants as $participant)
+                                @php
+                                    $member = $participant->first();
+                                    $team = $member->team->team_registration->first();
+                                    $bridge = $team->pivot;
+                                    
+                                    $fee = $participant->sum(function($q) use($team) {
+                                        $filterByIC = preg_replace('/[^0-9]/', '', $q->icNo ?? '');
+
+                                        $ICFormat = (strlen($filterByIC) === 12);
+
+                                        return $ICFormat ? ($team->nationalFees ?? 0) : ($team->internationalFees ?? 0);
+                                    });
+                                @endphp
                                 
-                                $fee = $participant->sum(function($q) use($team) {
-                                    $filterByIC = preg_replace('/[^0-9]/', '', $q->icNo ?? '');
-
-                                    $ICFormat = (strlen($filterByIC) === 12);
-
-                                    return $ICFormat ? ($team->nationalFees ?? 0) : ($team->internationalFees ?? 0);
-                                });
-                            @endphp
-                            
-                            <tr>
-                                <td>
-                                    @if($bridge->statusPayment == 'Pending')
-                                        <input type="checkbox" name="selectPayById[]" id="selectPayById" data-fee="{{ $fee }}" data-participant="{{ $participant->count() }}" value="{{ $member->id }}" class="form-check-input participant-checkbox">
-                                    @else   
-                                        <input type="checkbox" class="form-check-input" hidden disabled>
-                                    @endif
-                                </td>
-                                <td class="fw-medium">{{ $loop->iteration }}</td>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        @if($team->participateType == 'Individual')
-                                            <span class="d-flex justify-content-start ms-2 mb-1 fw-bold">{{ $member->name ?? 'N/A' }} <span class="badge bg-light text-secondary border fw-semibold d-flex align-items-center justify-content-center ms-2" style="font-size: 10px;">Individu</span></span> 
-                                            <small class="d-block text-truncate text-start ms-2 text-muted" style="font-size: 12px; max-width: 290px;">IC/Pasport: {{ $member->icNo ?? 'N/A'}}&nbsp Email: {{ $member->email ?? 'N/A' }}</small>
-                                        @else
-                                            <span class="d-flex justify-content-start ms-2 mb-1 fw-bold">{{ $member->team->groupName ?? 'N/A' }} <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 d-flex align-items-center justify-content-center ms-2" style="font-size: 10px;">Team ({{ $member->team->participant->count() }} members)</span></span> 
-                                            <small class="d-block text-truncate text-start ms-2 text-muted" style="font-size: 12px; max-width: 290px;">Ahli: {{ $participant->formatted_members ?? 'N/A'}}</small>
+                                <tr>
+                                    <td>
+                                        @if($bridge->statusPayment == 'Pending')
+                                            <input type="checkbox" name="selectPayById[]" id="selectPayById" data-fee="{{ $fee }}" data-participant="{{ $participant->count() }}" data-org-id="{{ $team->organizationId }}" value="{{ $bridge->id }}" class="form-check-input participant-checkbox">
+                                        @else   
+                                            <input type="checkbox" class="form-check-input" hidden disabled>
                                         @endif
-                                    </div>
-                                </td>
-                                <td class="fw-medium">{{ $team->competitionTitle ?? 'N/A' }}</td>
-                                <td class="text-muted small">{{ $bridge->registeredDate ? \Carbon\Carbon::parse($bridge->registeredDate)->format('d M Y, h:i A') : 'N/A' }}</td>
-                                <td>
-                                    @if($bridge->statusPayment == 'Pending')
-                                        <span class="badge badge-pending text-dark">Belum Bayar</span>
-                                    @elseif($bridge->statusPayment == 'Paid')
-                                        <span class="badge badge-paid">Selesai Bayar</span>
-                                    @elseif($bridge->statusPayment == 'Free')
-                                        <span class="badge badge-free text-dark">Tiada Bayaran</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($bridge->statusPayment == 'Pending')
-                                    <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <a href="{{ route('competition.editregister', $member->id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i> Edit</a>
-                                        <form action="{{ route('competition.deleteregister', $member->id) }}" class="deleteRegister d-inline" data-name="{{ $member->name ?? '' }}" data-group="{{ $member->team->groupName ?? '' }}" data-type="{{ $team->participateType }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-outline-danger btn-padam"><i class="bi bi-trash me-1"></i> Padam</button>
-                                        </form>
-                                    </div>
-                                    @elseif($bridge->statusPayment == 'Paid' || $bridge->statusPayment == 'Free')
-                                        <a href="{{ route('competition.viewregister', $member->id) }}" class="btn btn-light border px-3 py-1 text-secondary fw-medium"><i class="bi bi-eye me-1"></i> Lihat</a>
-                                    @endif
-                                </td>
-                            </tr>
-                        
-                            @empty
-                            <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">Tiada Rekod dijumpai.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            @if($participants->count() !== 0)
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-light p-3 border gap-3">
-                <div>
-                    <span class="fw-bold">Dipilih: </span><span id="selectedParticipant">0</span> Peserta &nbsp&nbsp |
-                    <span class="ms-3 fw-bold">Jumlah Bayaran:</span><span class="fw-bold fs-5"> <span id="totalAmount" style="color: #4f46e5;">RM 0.00</span></span>
-                </div>
+                                    </td>
+                                    <td class="fw-medium">{{ $loop->iteration }}</td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            @if($team->participateType == 'Individual')
+                                                <span class="d-flex align-items-center ms-2 mb-1 fw-bold">
+                                                    <span class="d-inline-block text-truncate" style="max-width: 235px;">{{ $member->name ?? 'N/A' }}</span>
+                                                    <span class="badge bg-light text-secondary border fw-semibold d-flex align-items-center justify-content-center ms-2" style="font-size: 10px;">Individu</span>
+                                                </span>
+                                                <small class="d-block text-truncate text-start ms-2 text-muted" style="font-size: 12px; max-width: 290px;">IC/Pasport: {{ $member->icNo ?? 'N/A'}}&nbsp Email: {{ $member->email ?? 'N/A' }}</small>
+                                            @else
+                                                <span class="d-flex justify-content-start ms-2 mb-1 fw-bold">{{ $member->team->groupName ?? 'N/A' }} <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 d-flex align-items-center justify-content-center ms-2" style="font-size: 10px;">Team ({{ $member->team->participant->count() }} members)</span></span> 
+                                                <small class="d-block text-truncate text-start ms-2 text-muted" style="font-size: 12px; max-width: 290px;">Ahli: {{ $participant->formatted_members ?? 'N/A'}}</small>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="fw-medium">{{ $team->competitionTitle ?? 'N/A' }}</td>
+                                    <td class="text-muted small">{{ $bridge->registeredDate ? \Carbon\Carbon::parse($bridge->registeredDate)->format('d M Y, h:i A') : 'N/A' }}</td>
+                                    <td>
+                                        @if($bridge->statusPayment == 'Pending')
+                                            <span class="badge badge-pending text-dark">Belum Bayar</span>
+                                        @elseif($bridge->statusPayment == 'Paid')
+                                            <span class="badge badge-paid">Selesai Bayar</span>
+                                        @elseif($bridge->statusPayment == 'Free')
+                                            <span class="badge badge-free text-dark">Tiada Bayaran</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($bridge->statusPayment == 'Pending')
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <a href="{{ route('competition.editregister', $member->id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil-square me-1"></i> Edit</a>
+                                                <button type="button" class="btn btn-outline-danger btn-padam" data-url="{{ route('competition.deleteregister', $member->id) }}" data-name="{{ $member->name ?? '' }}" data-group="{{ $member->team->groupName ?? '' }}" data-type="{{ $team->participateType }}">
+                                                    <i class="bi bi-trash me-1"></i> Padam
+                                                </button>
 
-                <div>
-                    <button type="submit" class="btn btn-primary py-2 w-100 w-md-auto rounded-5" id="btnPay" disabled><i class="bi bi-wallet2 me-1"></i> Teruskan ke Pembayaran</button>
+                                            </div>
+                                        @elseif($bridge->statusPayment == 'Paid' || $bridge->statusPayment == 'Free')
+                                            <a href="{{ route('competition.viewregister', $member->id) }}" class="btn btn-light border px-3 py-1 text-secondary fw-medium"><i class="bi bi-eye me-1"></i> Lihat</a>
+                                            <!-- @if($team->statusResult == 'Published' && in_array($bridge->statusPayment, ['Paid', 'Free']))
+                                                <button type="button" class="btn btn-light px-3 py-1 border fw-medium btn-sijil mt-2" data-bs-toggle="modal" data-bs-target="#sijilModal" 
+                                                        data-participant-id="{{ $participant->first()->id }}" data-participant-name="{{ $participant->first()->name }}" 
+                                                        data-participant-title="{{ $participant->first()->team->team_registration->first()->competitionTitle }}"
+                                                        data-participant-startDate="{{ \Carbon\Carbon::parse($participant->first()->team->team_registration->first()->competitionStart)->format('d F Y') }}"
+                                                        data-participant-endDate="{{ \Carbon\Carbon::parse($participant->first()->team->team_registration->first()->competitionEnd)->format('d F Y') }}">
+                                                        <i class="bi bi-download me-1"></i> Muat Turun Sijil
+                                                </button>
+                                            @endif -->
+                                        @endif
+                                    </td>
+                                </tr>
+                            
+                                @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">Tiada Rekod dijumpai.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>    
+                </div>
+                
+                @if($participants->count() !== 0)
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-light p-3 border gap-3">
+                        <div>
+                            <span class="fw-bold">Dipilih: </span><span id="selectedParticipant">0</span> Peserta &nbsp&nbsp |
+                            <span class="ms-3 fw-bold">Jumlah Bayaran:</span><span class="fw-bold fs-5"> <span id="totalAmount" style="color: #4f46e5;">RM 0.00</span></span>
+                        </div>
+
+                        <div>
+                            <button type="submit" class="btn btn-pay py-2 w-100 w-md-auto rounded-5" id="btnPay" disabled><i class="bi bi-wallet2 me-1"></i> Teruskan ke Pembayaran</button>
+                        </div>
+                    </div>
+                @endif
+            </form>
+        </div>
+
+        <div id="sijilModal" class="modal fade" tabindex="-1" aria-modal="true" role="dialog">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content rounded-4 shadow border-0">
+
+                    <div class="modal-header border-0 pb-0">
+                        <div>
+                            <h5 class="modal-title fw-bold text-dark">Pilih Template Sijil</h5>
+                            <p class="text-muted small mb-0">Sila pilih template pilihan anda sebelum memuat turun. Pilihan tidak boleh diubah.</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="{{ route('competition.generatesijil') }}" method="POST" target="_blank">
+                        @csrf
+                        <input type="hidden" name="participantId" id="participantId">
+
+                        <div class="modal-body py-4">
+                            <div class="row g-3 mb-3">
+
+                            @foreach(['Template1', 'Template2', 'Template3', 'Template4'] as $template)
+                                <div class="col-md-6 col-6">
+                                    <label for="template{{ $loop->iteration }}" class="sijil-card border rounded-3 p-2 d-block position-relative cursor-pointer">
+                                        <div class="sijil-preview position-relative overflow-hidden rounded bg-secondary">
+                                            <a href="{{ asset('assets/images/template-sijil-competition/' . $template . '.png') }}" target="_blank" class="d-block text-decoration-none">
+                                                <img src="{{ asset('assets/images/template-sijil-competition/' . $template . '.png') }}" alt="Template {{ $loop->iteration }}" class="w-100 h-auto d-block">
+                                            </a>
+                                        </div>
+
+                                        <div class="text-center mt-2 fw-semibold text-dark">Template {{ $loop->iteration }}</div>
+                                    </label>
+                                    <div class="d-flex justify-content-center mt-2">
+                                        <input type="radio" name="templateId" id="template{{ $loop->iteration }}" value="{{ $template }}" class="" required>
+                                    </div>
+                                </div>
+                            @endforeach
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-0 pt-0">
+                            <button type="submit" class="btn btn-primary px-4">Save & Muat Turun Sijil</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            @endif
         </div>
     </div>
 
-    <script>
+    <script>    
         function hideMessage()
         {
             $('.hide-message').fadeOut(500, function () {
@@ -320,17 +409,50 @@
             });
         });
 
-        document.querySelectorAll('.deleteRegister').forEach(function (currentForm) {
-            currentForm.addEventListener('submit', function (e) {
+        $(document).ready(function() {
+            $('.participant-checkbox').on('change', function() {
+                let checkbox = $('.participant-checkbox:checked');
+
+                if (checkbox.length > 1)
+                {
+                    let firstId = checkbox.first().data('org-id');
+                    let isMismatch = false;
+
+                    checkbox.each(function () {
+                        if ($(this).data('org-id') !== firstId)
+                        {
+                            isMismatch = true;
+                            return false;
+                        }
+                    });
+
+                    if (isMismatch)
+                    {
+                        $(this).prop('checked', false);
+
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Organisasi Pertandingan Berbeza',
+                            text: 'Anda tidak boleh membuat pembayaran sekaligus untuk pertandingan dari organisasi yang berbeza.',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#f7b814'
+                        });
+
+                        $(this).trigger('change');
+                        return;
+                    }
+                }
+            });
+
+            $(document).on('click', '.btn-padam', function (e) {
                 e.preventDefault();
 
-                let form = this;
-                let formData = new FormData(form);
+                let $form = $(this);
 
-                let name = form.dataset.name;
-                let group = form.dataset.group;
-                let participateType = form.dataset.type;
-                let actionUrl = form.action;
+                let actionUrl = $form.data('url');
+                let name = $form.data('name');
+                let group = $form.data('group');
+                let participateType = $form.data('type');
 
                 let display = (participateType === 'Team') ? group : name;
 
@@ -346,50 +468,63 @@
                 }).then ((result) => {
                     if (result.isConfirmed)
                     {
-                        fetch(actionUrl, {
-                            method: "POST",
-                            body: formData,
+                        $.ajax ({
+                            url: actionUrl,
+                            type: 'DELETE',
                             headers: {
-                                "Accept": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                            }
-                        })
-                        .then (response => response.json())
-                        .then (data => {
-                            if (data.status === 'success')
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                                'Accept': 'application/json'
+                            },
+                            dataType: 'json',
+                            success: function(data) {
+                                if (data.status === 'success')
+                                {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Berjaya dipadam',
+                                        text: `Pendaftaran ${display} berjaya dipadam.`,
+                                        confirmButtonColor: '#4f46e5'
+                                    }).then (() => {
+                                        if (data.redirect) 
+                                        {
+                                            window.location.href = data.redirect;
+                                        }
+                                        else
+                                        {
+                                            location.reload();
+                                        }
+                                    });
+                                }
+                                else 
+                                {
+                                    throw new Error(data.message);
+                                }
+                            },
+                            error: function(xhr) 
                             {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Berjaya dipadam',
-                                    text: `Pendaftaran ${display} berjaya dipadam.`,
+                                console.error('Error: ', xhr.responseText);
+                                Swal.fire ({
+                                    icon: 'error',
+                                    title: 'Ralat',
+                                    text: 'Terdapat ralat semasa memadam pendaftaran.',
                                     confirmButtonColor: '#4f46e5'
-                                }).then (() => {
-                                    if (data.redirect) 
-                                    {
-                                        window.location.href = data.redirect;
-                                    }
-                                    else
-                                    {
-                                        location.reload();
-                                    }
                                 });
                             }
-                            else 
-                            {
-                                throw new Error(data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error: ', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Ralat',
-                                text: 'Terdapat ralat semasa memadam pendaftaran.',
-                                confirmButtonColor: '#4f46e5'
-                            });
                         });
                     }
                 });
+            });
+
+            $('#sijilModal').on('show.bs.modal', function (event) {
+                const $button = $(event.relatedTarget);
+                
+                const pId = $button.data('participant-id');
+                const pName = $button.data('participant-name');
+                const cTitle = $button.data('participant-title');
+                const sDate = $button.data('participant-startDate');
+                const eDate = $button.data('participant-endDate');
+
+                $('#participantId').val(pId);
             });
         });
     </script>

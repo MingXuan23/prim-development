@@ -10,16 +10,16 @@ class Competition extends Model
     public $timestamps = false;
     protected $fillable = ['competitionTitle', 'category', 'venue', 'registerOpen', 'registerClose',
                            'competitionStart', 'competitionEnd', 'minimumAge', 'maximumAge', 'nationalFees',
-                           'internationalFees', 'participateType', 'minimumParticipate', 'maximumParticipate',
-                           'description', 'imagePoster', 'status', 'userId'];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'userId');
-    }
+                           'internationalFees', 'participateType', 'winnerType', 'minParticipateGroup', 'maxParticipateGroup',
+                           'totalParticipate', 'description', 'imagePoster', 'statusCompetition', 'statusResult', 'organizationId'];
 
     public function participant_registration()
     {
-        return $this->belongsToMany(Team::class, 'competition_registration', 'competitionId', 'teamId')->withPivot('statusPayment', 'registeredDate');
+        return $this->belongsToMany(Team::class, 'competition_registration', 'competitionId', 'teamId')->withPivot('statusPayment', 'registeredDate', 'winnerPlacement', 'certificateSelected');
+    }
+
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organizationId', 'id');
     }
 }

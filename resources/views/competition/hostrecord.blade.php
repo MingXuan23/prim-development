@@ -315,10 +315,10 @@
                             <td>
                                 <div class="d-flex flex-column">
                                     @if($team->participateType === 'Individual')
-                                        <span class="d-flex justify-content-start ms-2 fw-bold">
-                                            {{ $participant->name ?? 'N/A' }} 
+                                        <span class="d-flex align-items-center ms-2 mb-1 fw-bold">
+                                            <span class="d-inline-block text-truncate" style="max-width: 235px;">{{ $participant->name ?? 'N/A' }} </span> 
                                             <span class="badge bg-light text-secondary border fw-semibold d-flex align-items-center justify-content-center ms-2" style="font-size: 10px;">Individu</span>
-                                        </span> 
+                                        </span>
                                         <small class="d-block text-truncate text-start ms-2 text-muted" style="font-size: 12px; max-width: 290px;">IC/Pasport: {{ $participant->icNo ?? 'N/A'}}&nbsp Email: {{ $participant->email ?? 'N/A' }}</small>
                                     @else
                                     <div class="d-flex align-items-center">

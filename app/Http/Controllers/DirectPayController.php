@@ -49,6 +49,8 @@ use Illuminate\Support\Facades\Redirect;
 use phpDocumentor\Reflection\Types\Null_;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Controllers\Merchant\Regular\OrderController;
+use App\Models\Competition;
+use App\Models\CompetitionRegistration;
 use League\CommonMark\Inline\Parser\EscapableParser;
 
 
@@ -112,6 +114,52 @@ class DirectPayController extends Controller
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
                 // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            } else if ($request->desc == 'Competition') {
+
+                $user = User::find(Auth::id());
+                $registrationId = $request->input('selectPayById', []);
+                $registration = CompetitionRegistration::with(['competition.organization', 'team.participant'])->whereIn('id', $registrationId)->get();
+                if ($registration->isEmpty()) return;
+                $organization = $registration->first()->competition->organization;
+
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = $user->name;
+
+                if ($request->has('source') && $request->source == 'mobile') {
+                    //$fpx_sellerExOrderNo = $request->desc . "_M_" . date('YmdHis');
+                    $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_M_" . date('YmdHis');
+                    //for mobile, using Auth::id() will cause null,so need to direct use user
+                    $fpx_buyerName = $user->name;
+                } else {
+                    $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
+                }
+
+                $fpx_sellerOrderNo = "COMP" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                $private_key = $organization->private_key;
+                
+                $fpx_txnAmount = 0;
+
+                foreach($registration as $register) {
+                    $participant = $register->team->participant;
+                    $competition = $register->competition;
+
+                    foreach($participant as $participants) {
+                        $filterByIC = preg_replace(
+                        '/[^0-9]/',
+                        '',
+                        $participants->icNo ?? ''
+                        );
+
+                        $ICFormat = (strlen($filterByIC) === 12);
+
+                        if ($ICFormat) {
+                            $fpx_txnAmount += $competition->nationalFees ?? 0;
+                        } else {
+                            $fpx_txnAmount += $competition->internationalFees ?? 0;
+                        }
+                    }
+                }
             } else if ($request->desc == 'School_Fees') {
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
@@ -345,7 +393,7 @@ class DirectPayController extends Controller
 
 
             $fpx_sellerTxnTime = date('YmdHis');
-            $fpx_txnAmount = $request->amount;
+            if ($request->desc != 'Competition') $fpx_txnAmount = $request->amount;
 
 
             $transaction = new Transaction();
@@ -406,6 +454,8 @@ class DirectPayController extends Controller
                                 ]);
                         }
                     }
+                } else if (substr($trimmedSellerExOrderNo, 0, 1) == 'C') {
+                    $transaction->competitionRegistration()->attach($registrationId);
                 } else if (substr($trimmedSellerExOrderNo, 0, 1) == 'F') {
                     $result = DB::table('orders')
                         ->where('id', $request->order_id)
@@ -627,6 +677,52 @@ class DirectPayController extends Controller
                 //$fpx_sellerId       = config('app.env') == 'production' ? $organization->seller_id : "SE00013841";
 
                 // $fpx_buyerIban      = $request->name . "/" . $telno . "/" . $request->email;
+            } else if ($request->desc == 'Competition') {
+
+                $user = User::find(Auth::id());
+                $registrationId = $request->input('selectPayById', []);
+                $registration = CompetitionRegistration::with(['competition.organization', 'team.participant'])->whereIn('id', $registrationId)->get();
+                if ($registration->isEmpty()) return;
+                $organization = $registration->first()->competition->organization;
+
+                $fpx_buyerEmail = $user->email;
+                $telno = $user->telno;
+                $fpx_buyerName = $user->name;
+
+                if ($request->has('source') && $request->source == 'mobile') {
+                    //$fpx_sellerExOrderNo = $request->desc . "_M_" . date('YmdHis');
+                    $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_M_" . date('YmdHis');
+                    //for mobile, using Auth::id() will cause null,so need to direct use user
+                    $fpx_buyerName = $user->name;
+                } else {
+                    $fpx_sellerExOrderNo = substr($request->desc, 0, 4) . "_" . date('YmdHis');
+                }
+
+                $fpx_sellerOrderNo = "COMP" . date('YmdHis') . str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                $private_key = $organization->private_key;
+                
+                $fpx_txnAmount = 0;
+
+                foreach($registration as $register) {
+                    $participant = $register->team->participant;
+                    $competition = $register->competition;
+
+                    foreach($participant as $participants) {
+                        $filterByIC = preg_replace(
+                        '/[^0-9]/',
+                        '',
+                        $participants->icNo ?? ''
+                        );
+
+                        $ICFormat = (strlen($filterByIC) === 12);
+
+                        if ($ICFormat) {
+                            $fpx_txnAmount += $competition->nationalFees ?? 0;
+                        } else {
+                            $fpx_txnAmount += $competition->internationalFees ?? 0;
+                        }
+                    }
+                }
             } else if ($request->desc == 'School_Fees') {
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
@@ -874,7 +970,7 @@ class DirectPayController extends Controller
 
 
             $fpx_sellerTxnTime = date('YmdHis');
-            $fpx_txnAmount = $request->amount;
+            if ($request->desc != 'Competition') $fpx_txnAmount = $request->amount;
 
 
             $transaction = new Transaction();
@@ -935,6 +1031,8 @@ class DirectPayController extends Controller
                                 ]);
                         }
                     }
+                } else if (substr($trimmedSellerExOrderNo, 0, 1) == 'C') {
+                    $transaction->competitionRegistration()->attach($registrationId);
                 } else if (substr($trimmedSellerExOrderNo, 0, 1) == 'F') {
                     $result = DB::table('orders')
                         ->where('id', $request->order_id)
@@ -1862,6 +1960,20 @@ class DirectPayController extends Controller
         $transaction = Transaction::where('nama', '=', $fpx_sellerOrderNo)->first();
         $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
         switch ($fpx_productDescCode) {
+            case 'C':
+                $registerId = $transaction->competitionRegistration()->pluck('competition_registration.id');
+                
+                DB::table('competition_registration')
+                    ->where('id', $registerId)
+                    ->update(['statusPayment', 'Paid']);
+
+                if ($returnView)
+                {
+                    return;
+                }
+                
+                break;
+
             case 'S':
                 $list_student_fees_id_by_student = DB::table('student_fees_new')
                     ->join('fees_transactions_new', 'fees_transactions_new.student_fees_id', '=', 'student_fees_new.id')

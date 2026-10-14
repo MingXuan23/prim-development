@@ -46,6 +46,7 @@
         border: 1px solid white;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         width: 200px;
+        height: 200px;
         cursor: pointer;
         transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -88,7 +89,7 @@
 
     .close-btn {
         position: absolute;
-        top: 10px;
+        top: 0px;
         right: 15px;
         color: white;
         font-size: 35px;
@@ -133,10 +134,10 @@
         @endif
 
         @if($competition->participateType === 'Team')
-            @if($competition->minimumParticipate === $competition->maximumParticipate)
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->maximumParticipate}} pax)</span>
+            @if($competition->minParticipateGroup === $competition->maxParticipateGroup)
+                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->maxParticipateGroup}} pax)</span>
             @else
-                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minimumParticipate}} - {{$competition->maximumParticipate}} pax)</span>
+                <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-people-fill me-1"></i> {{ $competition->participateType }} ({{$competition->minParticipateGroup}} - {{$competition->maxParticipateGroup}} pax)</span>
             @endif
         @else
             <span class="badge bg-light ms-2 text-dark border fw-normal"><i class="bi bi-person-fill me-1"></i> {{ $competition->participateType }}</span>

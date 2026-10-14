@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"/>
@@ -57,7 +58,7 @@
             margin: 0 auto;
         }
 
-        label:not(.small, .form-check-label)::after {
+        label:not(.small, .form-check-label, .shirtSize, .supervisorName, .supervisorEmail, .supervisorNoTel)::after {
             content: " *";
             color: red;
         }
@@ -145,8 +146,15 @@
 
                 <div class="col-md-6">
                     <label for="icNo" class="form-label fw-semibold">No IC / No Pasport</label>
-                    <input type="text" name="members[0][icNo]" placeholder="Contoh: 012021105432 / A19232534" max="25" class="form-control @error('icNo') is-invalid @enderror" value="{{ old('icNo') }}">
+                    <input type="text" name="members[0][icNo]" placeholder="Contoh: 012021105432 / A19232534" max="25" class="form-control @error('icNo') is-invalid @enderror" value="{{ old('icNo', Auth::user()->icno ?? '') }}">
                             
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="birthOfDate" class="form-label fw-semibold">Tarikh Lahir</label>
+                    <input type="date" name="members[0][birthOfDate]" class="form-control @error('birthOfDate') is-invalid @enderror" value="{{ old('birthOfDate') }}">
+
                     <div class="invalid-feedback"></div>
                 </div>
 
@@ -177,6 +185,18 @@
                     </div>
 
                     <div class="invalid-feedback d-block"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                    <select name="members[0][shirtSize]" id="shirtSize" class="form-select @error('shirtSize') is-invalid @enderror">
+                        <option value="" selected>Pilih Saiz Baju</option>
+                        @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                            <option value="{{ $size }}">{{ $size }}</option>
+                        @endforeach
+                    </select>
+                            
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>
         </div>
@@ -210,6 +230,13 @@
                     </div>
 
                     <div class="col-md-6">
+                        <label for="birthOfDate" class="form-label fw-semibold">Tarikh Lahir</label>
+                        <input type="date" name="members[1][birthOfDate]" class="form-control @error('birthOfDate') is-invalid @enderror" value="{{ old('birthOfDate') }}">
+
+                        <div class="invalid-feedback"></div>
+                    </div>
+
+                    <div class="col-md-6">
                         <label for="noTel" class="form-label fw-semibold">No Telefon</label>
                         <input type="number" name="members[1][noTel]" placeholder="Contoh: 0123456789" min="0" class="form-control  @error('noTel') is-invalid @enderror" value="{{ old('noTel') }}">
 
@@ -236,6 +263,18 @@
                         </div>
 
                         <div class="invalid-feedback d-block"></div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                        <select name="members[1][shirtSize]" id="shirtSize" class="form-select @error('shirtSize') is-invalid @enderror">
+                            <option value="" selected>Pilih Saiz Baju</option>
+                            @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                                <option value="{{ $size }}">{{ $size }}</option>
+                            @endforeach
+                        </select>
+                                
+                        <div class="invalid-feedback"></div>
                     </div>
                 </div>
 
@@ -265,8 +304,15 @@
 
                 <div class="col-md-6">
                     <label for="icNo" class="form-label fw-semibold">No IC / No Pasport</label>
-                    <input type="text" name="icNo" id="icNo" placeholder="Contoh: 012021105432 / A19232534" max="25" class="form-control @error('icNo') is-invalid @enderror" value="{{ old('icNo') }}">
+                    <input type="text" name="icNo" id="icNo" placeholder="Contoh: 012021105432 / A19232534" max="25" class="form-control @error('icNo') is-invalid @enderror" value="{{ old('icNo', Auth::user()->icno ?? '') }}">
                             
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="birthOfDate" class="form-label fw-semibold">Tarikh Lahir</label>
+                    <input type="date" name="birthOfDate" id="birthOfDate" class="form-control @error('birthOfDate') is-invalid @enderror" value="{{ old('birthOfDate') }}">
+
                     <div class="invalid-feedback"></div>
                 </div>
 
@@ -297,6 +343,18 @@
                     </div>
 
                     <div class="invalid-feedback d-block"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                    <select name="shirtSize" id="shirtSize" class="form-select @error('shirtSize') is-invalid @enderror">
+                        <option value="" selected>Pilih Saiz Baju</option>
+                            @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                                <option value="{{ $size }}">{{ $size }}</option>
+                            @endforeach
+                    </select>
+                            
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>
         </div>
@@ -365,21 +423,21 @@
 
             <div class="row g-3 p-4">
                 <div class="col-12">
-                    <label for="supervisorName" class="form-label fw-semibold">Nama Penyelia</label>
+                    <label for="supervisorName" class="form-label fw-semibold supervisorName">Nama Penyelia</label>
                     <input type="text" name="supervisorName" id="supervisorName" placeholder="Contoh: Dr. Abu bin Ali" class="form-control @error('supervisorName') is-invalid @enderror" value="{{ old('supervisorName') }}">
 
                     <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="supervisorEmail" class="form-label fw-semibold">Alamat Email Penyelia</label>
+                    <label for="supervisorEmail" class="form-label fw-semibold supervisorEmail">Alamat Email Penyelia</label>
                     <input type="email" name="supervisorEmail" id="supervisorEmail" placeholder="Contoh: abu@email.com" class="form-control @error('supervisorEmail') is-invalid @enderror" value="{{ old('supervisorEmail') }}">
 
                     <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="col-md-6">
-                    <label for="supervisorNoTel" class="form-label fw-semibold">No Telefon Penyelia</label>
+                    <label for="supervisorNoTel" class="form-label fw-semibold supervisorNoTel">No Telefon Penyelia</label>
                     <input type="number" name="supervisorNoTel" id="supervisorNoTel" placeholder="Contoh: 0123456789" min="0" class="form-control @error('supervisorNoTel') is-invalid @enderror" value="{{ old('supervisorNoTel') }}">
                     
                     <div class="invalid-feedback"></div>
@@ -396,7 +454,7 @@
 
                 <div class="mt-2 alert alert-info mb-0 py-2 border-0 d-flex align-items-center" style="font-size: 13px;">
                     <i class="bi bi-info-circle-fill text-info fs-5 me-2"></i>
-                    <span><strong>Nota:</strong> Anda boleh mendaftar dahulu dan membuat pembayaran kemudian di menu <strong>Pendaftaran Saya</strong>.</span>
+                    <span><strong>Nota:</strong> Anda boleh mendaftar dahulu dan membuat pembayaran kemudian di menu <strong>Rekod Pendaftaran</strong>.</span>
                 </div>
             </div>
         </div>
@@ -827,7 +885,7 @@
             let addBtn = $(this);
 
             let memberHTML = `
-            <div class="row g-3 bg-light mt-2 rounded-3 pb-3 member-card" id="member-card-${index}" data-max="{{ $competition->maximumParticipate }}">
+            <div class="row g-3 bg-light mt-2 rounded-3 pb-3 member-card" id="member-card-${index}" data-max="{{ $competition->maxParticipateGroup }}">
                 <input type="hidden" name="members[${index}][id]" value="">
 
                 <div class="col-12">
@@ -848,6 +906,13 @@
                     <label for="icNo_${index}" class="form-label fw-semibold">No IC / No Pasport</label>
                     <input type="text" id="icNo_${index}" name="members[${index}][icNo]" placeholder="Contoh: 012021105432 / A19232534" max="25" class="form-control @error('icNo') is-invalid @enderror" value="{{ old('icNo') }}">
                             
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="birthOfDate_${index}" class="form-label fw-semibold">Tarikh Lahir</label>
+                    <input type="date" id="birthOfDate_${index}" name="members[${index}][birthOfDate]" class="form-control @error('birthOfDate') is-invalid @enderror" value="{{ old('birthOfDate') }}">
+
                     <div class="invalid-feedback"></div>
                 </div>
 
@@ -878,6 +943,18 @@
                     </div>
 
                     <div class="invalid-feedback d-block"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="shirtSize" class="form-label fw-semibold shirtSize">Saiz Baju</label>
+                    <select name="members[${index}][shirtSize]" id="shirtSize_${index}" class="form-select @error('shirtSize') is-invalid @enderror">
+                        <option value="" selected>Pilih Saiz Baju</option>
+                        @foreach(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'] as $size)
+                            <option value="{{ $size }}">{{ $size }}</option>
+                        @endforeach
+                    </select>
+                            
+                    <div class="invalid-feedback"></div>
                 </div>
             </div>`;
 
