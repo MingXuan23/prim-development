@@ -1964,8 +1964,8 @@ class DirectPayController extends Controller
                 $registerId = $transaction->competitionRegistration()->pluck('competition_registration.id');
                 
                 DB::table('competition_registration')
-                    ->where('id', $registerId)
-                    ->update(['statusPayment', 'Paid']);
+                    ->whereIn('id', $registerId)
+                    ->update(['statusPayment' => 'Paid']);
 
                 if ($returnView)
                 {

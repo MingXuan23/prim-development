@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\models\Participant;
+use App\Models\Participant;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
@@ -48,10 +48,11 @@ class ParticipantExport implements FromQuery, WithHeadings, WithMapping, WithCus
 
     public function query()
     {
-        $userId = Auth::id();
-        $query = Participant::whereHas('team.team_registration', function($q) use ($userId) 
-        {
-            $q->where('userId', $userId);
+        $organizationId = Auth::user()->organization->first()->id ?? null;
+        $query = Participant::when('organizationId', function ($q) use ($organizationId) {
+            $q->whereHas('team.team_registration', function($q) use ($organizationId) {
+                $q->where('organizationId', $organizationId);
+            });
         })->with(['user', 'team.team_registration']);
 
         if ($this->request->filled('title') && $this->request->title !== 'all')

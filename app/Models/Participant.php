@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\models\Team;
-use App\models\Institution;
+use App\Models\Team;
+use App\Models\Institution;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
 

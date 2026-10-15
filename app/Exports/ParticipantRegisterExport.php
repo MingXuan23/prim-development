@@ -179,7 +179,7 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 $maxRowX = Institution::where('instituteType', 'Kolej Vokasional & Politeknik')->count();
                 $maxRowY = Institution::where('instituteType', 'Universiti')->count();
 
-                $lastInstRow = max(5, $maxRowU + 4, $maxRowV + 4, $maxRowW + 4, $maxRowX + 4, $maxRowY + 4);
+                $lastInstRow = max(14, $maxRowU + 14, $maxRowV + 14, $maxRowW + 14, $maxRowX + 14, $maxRowY + 14);
 
                 $jantinaValidation = new DataValidation();
                 $jantinaValidation->setType(DataValidation::TYPE_LIST);

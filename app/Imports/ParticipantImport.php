@@ -3,8 +3,8 @@
 namespace App\Imports;
 
 use App\Models\Institution;
-use App\models\Participant;
-use App\models\Team;
+use App\Models\Participant;
+use App\Models\Team;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Illuminate\Support\Facades\Auth;
@@ -86,7 +86,7 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
             self::$totalCount++;
 
             $checkRegister = Participant::where(function($q) use($row) {
-                $q->where('email', $row[3])
+                $q->where('email', $row[4])
                 ->orWhere('icNo', $row[2]);
             })->whereHas('team.team_registration', function($q) {
                 $q->where('competitionId', $this->competitionId);
@@ -94,7 +94,7 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
 
             if ($checkRegister)
             {
-                Log::info("Skip: Peserta {$row[3]} pada baris ke- . ($rowIndex + 1) . sudah mendaftar.");
+                Log::info("Skip: Peserta {$row[4]} pada baris ke-" . ($rowIndex + 1) . " Participantsudah mendaftar.");
                 self::$alreadyRegister[] = $row[0];
                 continue;
             }
@@ -112,7 +112,7 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
             ->when($type, function ($query) use ($type) {
                 return $query->where('instituteType', $type);
             })
-            ->exists();
+            ->first();
             
             if (!$IsExist)
             {
@@ -126,7 +126,7 @@ class ParticipantImport implements ToCollection, WithStartRow, WithValidation, S
             }
             else
             {
-                $selectId = $IsExist;
+                $selectId = $IsExist->id;
             }
             
                 $team = Team::create(['groupName' => '---Individu---']);

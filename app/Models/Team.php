@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\models\Competition;
-use App\models\Participant;
+use App\Models\Competition;
+use App\Models\Participant;
 use Illuminate\Database\Eloquent\Model;
 
 class Team extends Model

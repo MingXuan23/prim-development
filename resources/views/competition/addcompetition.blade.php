@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ URL::asset('assets/images/logo/fav-logo-prim.png')}}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -37,7 +38,7 @@
             opacity: 1;
         }
 
-        label:not(.small, .form-check-label, .no-required)::after {
+        label:not(.small, .form-check-label, .no-required, .max-register)::after {
             content: " *";
             color: red;
         }
@@ -230,7 +231,7 @@
 
             <div class="row g-3 mt-1">
                 <div class="col-12 col-md-6">
-                    <label for="totalParticipate" class="form-label fw-semibold d-block">Maksimum Peserta <span class="text-muted small">(Pertandingan)</span></label>
+                    <label for="totalParticipate" class="form-label fw-semibold d-block max-register">Maksimum Peserta <span class="text-muted small">(Pertandingan)</span></label>
                     <div class="input-group">
                         <input type="number" name="totalParticipate" id="totalParticipate" placeholder="Contoh: 6" min="2" class="form-control @error('totalParticipate') is-invalid @enderror" value="{{ old('totalParticipate') }}">
                         <div class="invalid-feedback"></div>

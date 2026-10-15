@@ -445,13 +445,8 @@
 
         $title = $participant->team->team_registration->first()->winnerType;
         $winnerPlacement = $participant->team->team_registration->first()->pivot->winnerPlacement;
-        $isWinner = !empty($winnerPlacement);
+        $isWinner = !empty($winnerPlacement) && winnerPlacement !== 'Participation';
         $spacing = $isWinner ? 'pdf-winner' : 'pdf-participation';
-
-        $sijilName = 'Sijil Pencapaian';
-        $sijilDeclare = 'Sijil ini dianugerahkan kepada';
-        $sijilComp = 'Dalam';
-        $sijilWinner = 'Atas kejayaan mendapat';
 
         $number = [
             1 => 'Pertama',
@@ -469,50 +464,56 @@
         preg_match('/\d+/', $winnerPlacement, $matches);
         $rankNum = isset($matches[0]) ? (int)$matches[0] : null;
 
-        if($title == 'Medal')
+        $sijilName = 'Sijil Penyertaan';
+        $sijilDeclare = 'Dengan ini diperakui bahawa';
+        $sijilComp = 'Telah menyertai';
+                
+        if ($isWinner)
         {
-            if (stripos($winnerPlacement, 'Gold Medal') !== false) 
+            $sijilName = 'Sijil Pencapaian';
+            $sijilDeclare = 'Sijil ini dianugerahkan kepada';
+            $sijilComp = 'Dalam';
+            $sijilWinner = 'Atas kejayaan mendapat';
+
+            if($title == 'Medal')
             {
-                $winner = 'Pingat Emas';
-            } 
-            else if (stripos($winnerPlacement, 'Silver Medal') !== false) 
-            {
-                $winner = 'Pingat Perak';
-            } 
-            else if (stripos($winnerPlacement, 'Bronze Medal') !== false) 
-            {
-                $winner = 'Pingat Gangsa';
-            } 
-            else if ($rankNum) 
-            {
-                $Num = $number[$rankNum] ?? "Ke-{$rankNum}";
-                $winner = "Pingat Tempat {$Num}";
-            } 
-            else 
-            {
-                $winner = $winnerPlacement;
+                if (stripos($winnerPlacement, 'Gold Medal') !== false) 
+                {
+                    $winner = 'Pingat Emas';
+                } 
+                else if (stripos($winnerPlacement, 'Silver Medal') !== false) 
+                {
+                    $winner = 'Pingat Perak';
+                } 
+                else if (stripos($winnerPlacement, 'Bronze Medal') !== false) 
+                {
+                    $winner = 'Pingat Gangsa';
+                } 
+                else if ($rankNum) 
+                {
+                    $Num = $number[$rankNum] ?? "Ke-{$rankNum}";
+                    $winner = "Pingat Tempat {$Num}";
+                }
+                else 
+                {
+                    $winner = $winnerPlacement;
+                }
             }
-        }
-        else if ($title == 'Number')
-        {
-            if ($rankNum && isset($number[$rankNum]))
+            else if ($title == 'Number')
             {
-                $winner = 'Tempat ' . $number[$rankNum];
-            } 
-            else if ($rankNum) 
-            {
-                $winner = "Tempat Ke-{$rankNum}";
-            } 
-            else 
-            {
-                $winner = $winnerPlacement;
+                if ($rankNum && isset($number[$rankNum]))
+                {
+                    $winner = 'Tempat ' . $number[$rankNum];
+                } 
+                else if ($rankNum) 
+                {
+                    $winner = "Tempat Ke-{$rankNum}";
+                } 
+                else 
+                {
+                    $winner = $winnerPlacement;
+                }
             }
-        }
-        else
-        {
-            $sijilName = 'Sijil Penyertaan';
-            $sijilDeclare = 'Dengan ini diperakui bahawa';
-            $sijilComp = 'Telah menyertai';
         }
     @endphp
 

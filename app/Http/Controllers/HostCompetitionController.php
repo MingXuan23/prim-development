@@ -26,7 +26,10 @@ class HostCompetitionController extends Controller
             $today = now()->toDateString();
 
             $query->when($req->status === 'Draft', fn ($q) =>
-                $q->whereNull('competitionStart')->orWhere('statusCompetition', 'Draft'))
+                $q->where(fn ($p) =>
+                    $p->whereNull('competitionStart')->orWhere('statusCompetition', 'Draft')
+                )
+            )
             ->when($req->status === 'Upcoming', fn ($q) =>
                 $q->where('competitionStart', '>', $today))
             ->when($req->status === 'Ongoing', fn ($q) =>
@@ -35,21 +38,23 @@ class HostCompetitionController extends Controller
                 $q->where('competitionEnd', '<', $today));
         }
 
-        $competitions = $query->where('organizationId', Auth::user()->organization->first()->competition->first()->organizationId)
-        ->with(['organization', 'participant_registration'])->withCount('participant_registration')->orderBy('statusCompetition', 'desc')->get()
+        $competitions = $query->where('organizationId', Auth::user()->organization->first()->id ?? null)
+        ->with(['organization', 'participant_registration.participant'])->withCount('participant_registration')->orderBy('statusCompetition', 'desc')->get()
             ->map(function ($competition)
             {
-                $competition->totalFees = $competition->participant_registration->sum(function ($q) use ($competition)
+                $competition->totalFees = $competition->participant_registration->sum(function ($team) use ($competition)
                 {
-                    if ($q->pivot->statusPayment !== 'Paid')
+                    if ($team->pivot->statusPayment !== 'Paid')
                     {
                         return 0;
                     }
 
-                    $cleanIc = str_replace('-', '', $q->icNo ?? '');
-                    $isMalaysia = ctype_digit($cleanIc) && strlen($cleanIc) === 12;
+                    return $team->participant->sum(function ($participant) use ($competition) {
+                        $cleanIc = str_replace('-', '', $participant->icNo ?? '');
+                        $isMalaysia = ctype_digit($cleanIc) && strlen($cleanIc) === 12;
 
-                    return ($isMalaysia) ? $competition->nationalFees : $competition->internationalFees;
+                        return ($isMalaysia) ? $competition->nationalFees : $competition->internationalFees;
+                    });
                 });
                 return $competition;
             });
@@ -163,7 +168,14 @@ class HostCompetitionController extends Controller
         }
 
         $data['statusCompetition'] = $isPublish ? 'Published' : 'Draft';
-        $data['organizationId'] = Auth::user()->organization->first()->id;
+
+        $orgExist = Auth::user()->organization->first();
+        if (!$orgExist)
+        {
+            return response()->json(['status' => false, 'message' => 'Anda perlu mempunyai organisasi untuk menganjur pertandingan.'], 422);
+        }
+
+        $data['organizationId'] = $orgExist->id;
         Competition::create($data);
 
         $message = $data['statusCompetition'] == 'Published' ? 'Pertandingan berjaya disimpan!' : 'Draf berjaya disimpan!';
@@ -174,7 +186,7 @@ class HostCompetitionController extends Controller
     {
         $isPublish = $req->input('submit') === 'publish' || $req->input('action') === 'publish';
 
-        $competition = Competition::with('organization')->findOrFail($id);
+        $competition = Competition::with('organization')->where('id', $id)->whereIn('organizationId', Auth::user()->organization->pluck('id'))->firstOrFail();
         [$validate, $message] = $this->validator($req, $id);
         $validator = Validator::make($req->all(), $validate, $message);
 
@@ -211,7 +223,9 @@ class HostCompetitionController extends Controller
 
     public function viewCompetition(int $id)
     {
-        $competition = Competition::with('organization', 'participant_registration')->findOrFail($id);
+        $competition = Competition::with('organization', 'participant_registration')->where('id', $id)
+            ->whereIn('organizationId', Auth::user()->organization->pluck('id'))->firstOrFail();
+            
         $pendingCount = $competition->participant_registration()
             ->wherePivot('statusPayment', 'Pending')
             ->count();
@@ -223,13 +237,13 @@ class HostCompetitionController extends Controller
 
     public function editCompetition($id)
     {
-        $competition = Competition::with('organization', 'participant_registration')->findOrFail($id);
+        $competition = Competition::with('organization', 'participant_registration')->where('id', $id)->whereIn('organizationId', Auth::user()->organization->pluck('id'))->firstOrFail();
         return view('competition.editcompetition', compact('competition'));
     }
 
     public function deleteCompetition(int $id)
     {
-        $delCompetition = Competition::findOrFail($id);
+        $delCompetition = Competition::where('id', $id)->whereIn('organizationId', Auth::user()->organization->pluck('id'))->firstOrFail();
 
         if ($delCompetition->imagePoster)
         {

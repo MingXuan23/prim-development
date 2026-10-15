@@ -349,7 +349,7 @@ class RegistrationCompetitionController extends Controller
 
     public function editStoreRegister(Request $req, int $id)
     {
-        $participant = Participant::with('team')->findOrFail($id);
+        $participant = Participant::with('team')->where('id', $id)->where('userId', Auth::id())->firstOrFail();
 
         $isTeam = $req->input('participant_type') === 'team';
         [$validate, $message] = $this->validator($req);
@@ -370,14 +370,15 @@ class RegistrationCompetitionController extends Controller
         }
         else
         {
-            $list = ['id' => $participant->id, 
-                     'name' => $data['name'], 
-                     'icNo' => $data['icNo'], 
-                     'birthOfDate' => $data['birthOfDate'], 
-                     'gender' => $data['gender'], 
-                     'email' => $data['email'], 
-                     'noTel' => $data['noTel'],
-                     'shirtSize' => $data['shirtSize']
+            $list = [
+                ['id' => $participant->id, 
+                 'name' => $data['name'], 
+                 'icNo' => $data['icNo'], 
+                 'birthOfDate' => $data['birthOfDate'], 
+                 'gender' => $data['gender'], 
+                 'email' => $data['email'], 
+                 'noTel' => $data['noTel'],
+                 'shirtSize' => $data['shirtSize'],]
                 ];
         }
 
@@ -528,7 +529,7 @@ class RegistrationCompetitionController extends Controller
 
     public function recordRegister(Request $req)
     {
-        $query = Participant::with('user', 'team.team_registration');
+        $query = Participant::with('user', 'team.team_registration')->where('userId', Auth::id());
 
         if ($req->filled('search'))
         {
@@ -617,7 +618,7 @@ class RegistrationCompetitionController extends Controller
      
     public function viewRegister(int $id)
     {
-        $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->findOrFail($id);
+        $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->where('id', $id)->where('userId', Auth::id())->firstOrFail();
         $member = $participant->team->participant;
         $competition = $participant->team->team_registration->first();
         
@@ -626,7 +627,7 @@ class RegistrationCompetitionController extends Controller
 
     public function editRegister(int $id)
     {
-        $participant = Participant::with(['user', 'team.team_registration'])->findOrFail($id);
+        $participant = Participant::with(['user', 'team.team_registration'])->where('id', $id)->where('userId', Auth::id())->firstOrFail();
         $competition = $participant->team->team_registration->first();
         $institution = Institution::all();
 
@@ -635,7 +636,7 @@ class RegistrationCompetitionController extends Controller
     
     public function deleteRegister(int $id)
     {
-        $participant = Participant::with('team.team_registration')->findOrFail($id);
+        $participant = Participant::with('team.team_registration')->where('id', $id)->where('userId', Auth::id())->firstOrFail();
         $team = $participant->team;
         
         if ($team)

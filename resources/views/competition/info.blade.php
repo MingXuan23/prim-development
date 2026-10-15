@@ -432,14 +432,14 @@
 
                     @if($competition->registerOpen >= now())
                         <p class="mb-2 bg-warning-subtle text-warning border border-warning-subtle text-center fw-semibold p-1 small register"><i class="bi bi-clock-history"></i>&nbsp Registration Open Soon</p>
-                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
+                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (empty($competition->totalParticipate) || $competition->participant_registration->count() < $competition->totalParticipate))
                         <p class="mb-2 bg-success-subtle text-success border border-success-subtle text-center fw-semibold p-1 small register"><i class="bi bi-check-circle"></i>&nbsp&nbsp Registration Open</p>
                     @else
                         <p class="mb-2 bg-danger-subtle text-danger border border-danger-subtle text-center fw-semibold p-1 small register"><i class="bi bi-x-circle"></i>&nbsp&nbsp Registration Closed</p>
                     @endif
                     
                     <div class="d-flex justify-content-center">
-                        @if($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
+                        @if($competition->registerOpen <= now() && $competition->registerClose >= now() && (empty($competition->totalParticipate) || $competition->participant_registration->count() < $competition->totalParticipate))
                             <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" onclick="showRegisterOption()"><i class="bi bi-person-plus me-1"></i> Daftar Sekarang</button>
                         @else
                             <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" disabled>Daftar Sekarang</button>
@@ -484,14 +484,14 @@
 
                     @if($competition->registerOpen >= now())
                         <p class="mb-2 bg-warning-subtle text-warning border border-warning-subtle text-center fw-semibold p-1 small register"><i class="bi bi-clock-history"></i>&nbsp Registration Open Soon</p>
-                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
+                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (empty($competition->totalParticipate) || $competition->participant_registration->count() < $competition->totalParticipate))
                         <p class="mb-2 bg-success-subtle text-success border border-success-subtle text-center fw-semibold p-1 small register"><i class="bi bi-check-circle"></i>&nbsp&nbsp Registration Open</p>
                     @else
                         <p class="mb-2 bg-danger-subtle text-danger border border-danger-subtle text-center fw-semibold p-1 small register"><i class="bi bi-x-circle"></i>&nbsp&nbsp Registration Closed</p>
                     @endif
 
                     <div class="d-flex justify-content-center">
-                        @if($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
+                        @if($competition->registerOpen <= now() && $competition->registerClose >= now() && (empty($competition->totalParticipate) || $competition->participant_registration->count() < $competition->totalParticipate))
                             <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" onclick="showRegisterOption()"><i class="bi bi-person-plus me-1"></i> Daftar Sekarang</button>
                         @else
                             <button id="daftar" class="btn btn-daftar w-100 mt-1 mb-3" disabled>Daftar Sekarang</button>

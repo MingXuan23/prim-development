@@ -809,34 +809,7 @@
 
             if (e.target.name === 'icNo' || (e.target.name && e.target.name.includes('[icNo]')))
             {   
-                let national = parseFloat("{{ $competition->nationalFees ?? 0 }}");
-                let international = parseFloat("{{ $competition->internationalFees ?? 0 }}");
-                let total = 0;
-
-                const ICInput = document.querySelectorAll('input[name="icNo"], input[name*="[icNo]"]');
-
-                ICInput.forEach(input => {
-                    let value = input.value.trim();
-                    if (value === '') return;
-
-                    let cleanIc = input.value.replace(/[^0-9]/g, '');
-
-                    if (cleanIc.length === 12 && !/[a-zA-Z]/.test(value))
-                    {
-                        total += national;
-                    }
-                    else
-                    {
-                        total += international;
-                    }
-                });
-                
-                const display = document.getElementById('displayFee');
-
-                if (display)
-                {
-                    display.textContent = 'RM ' + total.toFixed(2);
-                }
+                totalPrice();
             }
         });
 
@@ -970,16 +943,25 @@
             }
         });
 
+        $(document).ready(function () {
+            totalPrice();
+        });
+
         function totalPrice()
         {
             let national = parseFloat("{{ $competition->nationalFees ?? 0 }}");
             let international = parseFloat("{{ $competition->internationalFees ?? 0 }}");
             let total = 0;
 
-            $('input[name*="[icNo]"]').each(function () {
-                let cleanIc = $(this).val().replace(/[^0-9]/g, '');
+            const ICInput = document.querySelectorAll('input[name="icNo"], input[name*="[icNo]"]');
 
-                if (cleanIc.length === 12)
+            ICInput.forEach(input => {
+                let value = input.value.trim();
+                if (value === '') return;
+
+                let cleanIc = input.value.replace(/[^0-9]/g, '');
+
+                if (cleanIc.length === 12 && !/[a-zA-Z]/.test(value))
                 {
                     total += national;
                 }

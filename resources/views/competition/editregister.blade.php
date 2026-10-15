@@ -515,7 +515,7 @@
         let grade = document.getElementById('currentGrade');
         let oldGrade = "{{ old('currentGrade', $participant->currentGrade) }}";
         let oldInstitutions = "{{ old('instituteName', $participant->institutionId) }}";
-        const allInstitutions = JSON.parse('@json($institution)');
+        const allInstitutions = @json($institution);
 
         education.addEventListener('change', function () {
             callSelect(this.value);
@@ -621,6 +621,21 @@
                 grade.innerHTML += `<option value="Tingkatan 6" ${targetGrade === `Tingkatan 6` ? 'selected' : ''}>Tingkatan 6</option>`;
                 grade.innerHTML += `<option value="Matrikulasi"${targetGrade === `Matrikulasi` ? 'selected' : ''}>Matrikulasi</option>`;
                 grade.innerHTML += `<option value="Asasi" ${targetGrade === `Asasi` ? 'selected' : ''}>Asasi</option>`;
+            }
+            else if (selectEducate === "Kolej Vokasional & Politeknik")
+            {
+                for (let i = 1; i <= 2; i++)
+                {
+                    grade.innerHTML += `<option value="Sijil Vokasional Malaysia (SVM) Tahun ${i}" ${targetGrade === `Sijil Vokasional Malaysia (SVM) Tahun ${i}` ? 'selected' : ''}>Sijil Vokasional Malaysia (SVM) Tahun ${i}</option>`;
+                }
+                for (let i = 1; i <= 2; i++)
+                {
+                    grade.innerHTML += `<option value="Diploma Vokasional Malaysia (DVM) Tahun ${i}" ${targetGrade === `Diploma Vokasional Malaysia (DVM) Tahun ${i}` ? 'selected' : ''}>Diploma Vokasional Malaysia (DVM) Tahun ${i}</option>`;
+                }
+                for (let i = 1; i <= 2; i++)
+                {
+                    grade.innerHTML += `<option value="Politeknik / Kolej Komuniti Diploma Tahun ${i}" ${targetGrade === `Politeknik / Kolej Komuniti Diploma Tahun ${i}` ? 'selected' : ''}>Politeknik / Kolej Komuniti Diploma Tahun ${i}</option>`;
+                }
             }
             else if (selectEducate === "Universiti")
             {

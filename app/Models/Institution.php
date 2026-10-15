@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\models\Participant;
+use App\Models\Participant;
 use Illuminate\Database\Eloquent\Model;
 
 class Institution extends Model

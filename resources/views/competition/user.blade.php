@@ -319,7 +319,7 @@
                                     <p class="card-text text-muted" style="font-size: 0.85rem;">{{ $competition->category }}</p>
                                     @if($competition->registerOpen >= now())
                                         <span class="badge bg-warning-subtle text-warning border border-warning-subtle fw-semibold"><i class="bi bi-clock-history"></i>&nbsp Open Soon</span>
-                                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (!empty($competition->totalParticipate) && $competition->participant_registration->count() < $competition->totalParticipate))
+                                    @elseif($competition->registerOpen <= now() && $competition->registerClose >= now() && (empty($competition->totalParticipate) || $competition->participant_registration->count() < $competition->totalParticipate))
                                         <span class="badge bg-success-subtle text-success border border-success-subtle fw-semibold"><i class="bi bi-check-circle-fill"></i>&nbsp Open</span>
                                     @elseif($competition->registerClose <= now())
                                         <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-semibold"><i class="bi bi-x-circle-fill"></i>&nbsp Closed</span>
@@ -337,7 +337,30 @@
                                 </div>
 
                                 <p class="card-text small mb-2 text-secondary text-truncate"><i class="bi bi-geo-alt-fill text-danger me-2"></i>{{ $competition->venue }}</p> 
-                                <p class="card-text small text-secondary text-truncate"><i class="bi bi-calendar-event-fill text-primary me-2"></i>Tutup: {{ \Carbon\Carbon::parse($competition->registerClose)->format('d M Y') }}</p> 
+                                <p class="card-text small mb-2 text-secondary text-truncate"><i class="bi bi-calendar-event-fill text-primary me-2"></i>Tutup: {{ \Carbon\Carbon::parse($competition->registerClose)->format('d M Y') }}</p> 
+
+                                @php
+                                    $total = $competition->totalParticipate ?? null;
+                                    $register = $competition->participant_registration->count();
+                                    $percent = $total > 0 ? min(round(($register / $total) * 100), 100) : 0;
+                                    $barColor = $percent > 85 ? 'bg-danger' : ($percent > 60 ? 'bg-warning' : 'bg-primary');
+                                    $isTeam = $competition->participateType == 'Team';
+                                @endphp
+
+                                @if($total)
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="card-text small text-secondary"><i class="bi bi-people-fill me-1"></i> {{ $isTeam ? 'Jumlah Kumpulan' : 'Jumlah Peserta' }}</span>
+                                        <span class="card-text small text-secondary"><strong>{{ $register }}</strong> / {{ $total }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar {{ $barColor }}" role="progressbar" style="width: {{ $percent }}%;" aria-valuenow="{{ $register }}" aria-valuemin="0" aria-valuemax="{{ $total }}"></div>
+                                    </div>
+                                @else
+                                    <div class="mb-2">
+                                        <span class="card-text small text-secondary"><i class="bi bi-people-fill me-1"></i> {{ $isTeam ? 'Jumlah Kumpulan:' : 'Jumlah Peserta:' }} </span>
+                                        <span class="card-text small text-secondary"><strong>{{ $register }}</strong> / Tiada Had</span>
+                                    </div>
+                                @endif
                                 
                                 <div class="d-flex justify-content-between align-items-center border-top pt-3">
                                     @php

@@ -123,7 +123,7 @@ class ManageParticipantController extends Controller
 
     public function manageRegister(Request $req)
     {
-        $userId = Auth::user()->organization->first()->id;
+        $userId = Auth::user()->organization->first()->id ?? null;
         $competitions = Competition::where('organizationId', $userId)->where('statusCompetition', 'Published')->pluck('competitionTitle')->unique();
 
         $filter = function ($q) use($req, $userId) {
