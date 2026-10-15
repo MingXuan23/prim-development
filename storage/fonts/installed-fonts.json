@@ -1,0 +1,34 @@
+{
+    "material design icons": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/material_design_icons_normal_5bab27a37ff8b966ac7420966b483f74"
+    },
+    "ionicons": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/ionicons_normal_e6a3c2c74e22e818cea53b8a7152cb52"
+    },
+    "font awesome 5 brands": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/font_awesome_5_brands_normal_78cd8cfdcda3b712c0728daf4228e1db"
+    },
+    "font awesome 5 free": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/font_awesome_5_free_normal_e0f1b98a3938341459691490615ff1ac",
+        "900": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/font_awesome_5_free_900_7d16e5e499ce43b412239a205b62abc0"
+    },
+    "dripicons-v2": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/dripicons_v2_normal_0f591d46c599133d91805978d5fa4ee0"
+    },
+    "themify": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/themify_normal_6dbb1f14968181692cfa68fe439739b2"
+    },
+    "typicons": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/typicons_normal_a199da1b381fff60be4090d2e538d5e2"
+    },
+    "cinzel": {
+        "500": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/cinzel_500_409b27f0243b7a18e7541cb9bdc06979",
+        "600": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/cinzel_600_ad3dbcc53a5ddb2ef0f1b9ede4270e5d",
+        "bold": "cinzel_bold_c9c3879c158e0dafc0f2487c789a9af5"
+    },
+    "montserrat": {
+        "normal": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/montserrat_normal_95c77d2830d640f06faa8261ded6db33",
+        "500": "C:\\Users\\user\\Desktop\\prim-development\\storage\\fonts\/\/montserrat_500_2da570d656c67ef7297f2b0b288ce8bc",
+        "600": "montserrat_600_da2f80af0e6d548904b08d3547b44b1c"
+    }
+}

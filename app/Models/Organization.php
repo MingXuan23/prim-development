@@ -16,6 +16,11 @@ class Organization extends Model
 
     protected $dates = ['deleted_at'];
 
+    public function competition()
+    {
+        return $this->hasMany(Competition::class, 'organizationId', 'id');
+    }
+
     public function user()
     {
         return $this->belongsToMany(User::class, 'organization_user', 'organization_id', 'user_id');

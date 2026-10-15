@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\CompetitionRegistration;
 use App\Models\Donation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +13,11 @@ class Transaction extends Model
     public $timestamps = false;
 
     protected $dates = ['datetime_created', 'transaction_balance_id', 'datetime_of_success'];
+
+    public function competitionRegistration()
+    {
+        return $this->belongsToMany(CompetitionRegistration::class, 'transaction_competition', 'transactionId', 'registerId');
+    }
 
     public function donation()
     {
