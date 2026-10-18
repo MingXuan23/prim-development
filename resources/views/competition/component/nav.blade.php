@@ -56,6 +56,7 @@
         justify-content: center;
         align-items: center;
         font-size: 0.75rem;
+        margin: 0 6px 0 0;
     }
 
     .logo a img {
@@ -129,11 +130,24 @@
                 </a>
             </span>
 
-            <div class="user-box ms-lg-auto d-lg-none">
-                <div class="user-icon">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-                <span>{{ Auth::user()->name }}</span>
+            <div class="user-box ms-lg-auto d-lg-none dropdown">
+                <a href="#" class="d-flex align-items-center text-decoration-none text-dark dropdown-toggle" id="userDropDown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-icon">
+                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                    </div>
+                    <span>{{ Auth::user()->name }}</span>
+                </a>
+                
+                <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropDown">
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
 
         <div class="collapse navbar-collapse" id="navbarMobile">
@@ -156,11 +170,24 @@
             </div>
         </div>
             
-        <div class="user-box ms-lg-auto d-none d-lg-inline-flex">
-            <div class="user-icon">
-                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-            </div>
-            <span>{{ Auth::user()->name }}</span>
+        <div class="user-box ms-lg-auto d-none d-lg-inline-flex dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none text-dark dropdown-toggle" id="userDropDown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="user-icon">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                </div>
+                <span>{{ Auth::user()->name }}</span>
+            </a>
+            
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropDown">
+                <li>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="dropdown-item text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
         </div>
     </div>
 </div>
