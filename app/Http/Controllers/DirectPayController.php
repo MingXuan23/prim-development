@@ -1983,6 +1983,7 @@ class DirectPayController extends Controller
                     ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
                     ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
                     ->where('competition_registration.id', $registerId)
+                    ->where('transactions.status', 'Success')
                     ->select('transactions.*')
                     ->first();
 

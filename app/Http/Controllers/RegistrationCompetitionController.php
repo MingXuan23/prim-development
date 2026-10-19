@@ -618,13 +618,13 @@ class RegistrationCompetitionController extends Controller
      
     public function viewRegister(int $id)
     {
-        $orgId = Auth::user()->organization->first()->id ?? null;
+        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
 
         $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->where('id', $id)
         ->where(function ($q) use ($orgId) {
             $q->where('userId', Auth::id())
             ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
-                $p->where('organizationId', $orgId);
+                $p->whereIn('organizationId', $orgId);
             });
         })->firstOrFail();
         
@@ -651,6 +651,7 @@ class RegistrationCompetitionController extends Controller
             ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
             ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
             ->where('participants.userId', Auth::id())
+            ->where('transactions.status', 'Success')
             ->select('transactions.*')
             ->first();
 
@@ -659,13 +660,13 @@ class RegistrationCompetitionController extends Controller
 
     public function editRegister(int $id)
     {
-        $orgId = Auth::user()->organization->first()->id ?? null;
+        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
 
         $participant = Participant::with(['user', 'team.team_registration'])->where('id', $id)
         ->where(function ($q) use ($orgId) {
             $q->where('userId', Auth::id())
             ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
-                $p->where('organizationId', $orgId);
+                $p->whereIn('organizationId', $orgId);
             });
         })->firstOrFail();
 
@@ -677,13 +678,13 @@ class RegistrationCompetitionController extends Controller
     
     public function deleteRegister(int $id)
     {
-        $orgId = Auth::user()->organization->first()->id ?? null;
+        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
 
         $participant = Participant::with('team.team_registration')->where('id', $id)
         ->where(function ($q) use ($orgId) {
             $q->where('userId', Auth::id())
             ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
-                $p->where('organizationId', $orgId);
+                $p->whereIn('organizationId', $orgId);
             });
         })->firstOrFail();
         
