@@ -30,7 +30,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'ContestPro'], function() {
     Route::get('/record-registration','RegistrationCompetitionController@recordRegister')->name('competition.userrecord');
     Route::delete('/record-registration/delete-registration/{id}','RegistrationCompetitionController@deleteRegister')->name('competition.deleteregister');
     Route::get('/record-registration/view-registration/{id}','RegistrationCompetitionController@viewRegister')->name('competition.viewregister');
-    Route::get('/record-registration/receipt-registration','RegistrationCompetitionController@viewReceipt')->name('competition.receipt');
+    Route::get('/record-registration/receipt-registration/{id}','RegistrationCompetitionController@viewReceipt')->name('competition.receipt');
 
     Route::get('/result-competition','UserCompetitionController@displayResult')->name('competition.user.displayresult');
 

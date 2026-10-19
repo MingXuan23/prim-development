@@ -634,14 +634,17 @@ class RegistrationCompetitionController extends Controller
         return view('competition.viewregister', compact('competition', 'participant', 'member'));
     }
 
-    public function viewReceipt()
+    public function viewReceipt($id)
     {
+        
+        $registerId = [(int) $id];
+
         $get_participant_to_organization = DB::table('participants')
             ->join('teams', 'participants.teamId', '=', 'teams.id')
             ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
             ->join('competitions', 'competition_registration.competitionId', '=', 'competitions.id')
             ->join('organizations', 'competitions.organizationId', '=', 'organizations.id')
-            ->where('participants.userId', Auth::id())
+            ->whereIn('participants.userId', $registerId)
             ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
             ->get();
 
@@ -650,7 +653,7 @@ class RegistrationCompetitionController extends Controller
             ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
             ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
             ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
-            ->where('participants.userId', Auth::id())
+            ->whereIn('participants.userId', $registerId)
             ->where('transactions.status', 'Success')
             ->select('transactions.*')
             ->first();

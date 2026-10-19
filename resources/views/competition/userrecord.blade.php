@@ -365,6 +365,9 @@
                                     </td>
                                 </tr>
                             
+                                @php
+                                    $registration = $participant->first()->team->team_registration->first();                                
+                                @endphp
                                 <!-- Receipt Payment -->
                                 <div id="daftarOption" onclick="hideRegister()">
                                     <div class="modal-card position-relative" onclick="event.stopPropagation()">
@@ -383,7 +386,7 @@
                                                 </div>
                                             </a>
 
-                                            <a href="{{ route('competition.receipt') }}" class="btn register-team layout-register">
+                                            <!-- <a href="{{ route('competition.receipt', $registration->id) }}" class="btn register-team layout-register">
                                                 <div class="icon">
                                                     <i class="bi bi-file-earmark-text-fill"></i>
                                                 </div>
@@ -391,7 +394,7 @@
                                                     <div class="fw-bold">Resit Pembayaran</div>
                                                     <div class="small text-muted">Lihat resit pembayaran</div>
                                                 </div>
-                                            </a>
+                                            </a> -->
                                         </div>
                                     </div>
                                 </div>

@@ -1962,7 +1962,7 @@ class DirectPayController extends Controller
         $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
         switch ($fpx_productDescCode) {
             case 'C':
-                $registerId = $transaction->competitionRegistration()->pluck('competition_registration.id');
+                $registerId = $transaction->competitionRegistration()->pluck('competition_registration.id')->toArray();
                 
                 DB::table('competition_registration')
                     ->whereIn('id', $registerId)
@@ -1973,7 +1973,7 @@ class DirectPayController extends Controller
                     ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
                     ->join('competitions', 'competition_registration.competitionId', '=', 'competitions.id')
                     ->join('organizations', 'competitions.organizationId', '=', 'organizations.id')
-                    ->where('competition_registration.id', $registerId)
+                    ->whereIn('competition_registration.id', $registerId)
                     ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
                     ->get();
 
@@ -1982,7 +1982,7 @@ class DirectPayController extends Controller
                     ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
                     ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
                     ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
-                    ->where('competition_registration.id', $registerId)
+                    ->whereIn('competition_registration.id', $registerId)
                     ->where('transactions.status', 'Success')
                     ->select('transactions.*')
                     ->first();
