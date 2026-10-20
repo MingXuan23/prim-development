@@ -44,7 +44,7 @@
                                 </center>
                             </div>
                             <div class="col-lg-6 col-sm-12 p-0">
-                                <h4>{{ $type == 'Team' ? $org->nama . ' (' . $org->groupName . ')' : $org->nama }}</h4>
+                                <h4>{{ $org->nama }}</h4>
 
                                 @if($org && !empty($org->address))
                                     <p>{{ $org->address }},
@@ -90,16 +90,16 @@
                                     <tr>
                                         <td class="py-3">Nama</td>
                                         <td class="py-2">:</td>
-                                        <td class="py-2 w-50">{{ $org->name }}</td>
+                                        <td class="py-2 w-50">{{ $loginUser->name }}</td>
                                         <td class="py-2" colspan="3"></td>
                                         <td class="py-2">No. Kad Pengenalan
                                         </td>
                                         <td class="py-2">:</td>
                                         <td class="py-2">
-                                            @if($org && $org->icNo)
-                                                {{ $org->icNo }}
+                                            @if($loginUser && $loginUser->icno)
+                                                {{ $loginUser->icno }}
                                             @else
-                                                {{ $org->noTel }}
+                                                {{ $loginUser->telno }}
                                             @endif    
                                         </td>
                                     </tr>
@@ -113,60 +113,50 @@
                                     </tr> --}}
                                 </table>
 
-                                    {{-- ******** --}}
-                                        <div class="pt-2" style="border-bottom:2px solid #e0e0e0;font-size: 18px">
-                                            {{ $org->name }}
-                                        </div>
-                                        {{-- <center class="my-2">
-                                            <span style="font-weight: bold;text-transform: uppercase;">
-                                                {{ $org->name }}
-                                            </span>
-                                        </center> --}}
+                                <table class="table table-bordered table-striped" style="margin-top: 30px;">
+                                    <tr style="text-align: center">
+                                        <th style="width:3%">Bil.</th>
+                                        <th>Pertandingan</th>
+                                        <th style="width:10%">Kuantiti</th>
+                                        <th style="width:20%">Amaun per item (RM)</th>
+                                        <th style="width:20%">Amaun (RM)</th>
+                                    </tr>
 
-                                        <table class="table table-bordered table-striped" style="">
-                                            <tr style="text-align: center">
-                                                <th style="width:3%">Bil.</th>
-                                                <th>Pertandingan</th>
-                                                <th style="width:10%">Kuantiti</th>
-                                                <th style="width:20%">Amaun per item (RM)</th>
-                                                <th style="width:20%">Amaun (RM)</th>
-                                            </tr>
+                                    @foreach ($get_participant_to_organization as $index => $item)
+                                        @php
+                                            $cleanIc = str_replace('-', '', $item->icNo ?? '');
+                                            $isMalaysia = ctype_digit($cleanIc) && strlen($cleanIc) === 12;
+                                            
+                                            $fee = $isMalaysia ? $item->nationalFees : $item->internationalFees;
+                                            $quantity = 1;
+                                            $itemTotal = $fee * $quantity;
+                                        @endphp
+                                        
+                                        <tr>
+                                            <td style="text-align: center"> {{ $index + 1 }}.</td>
+                                            <td>
+                                                <div class="pl-2"> {{ $item->competitionTitle }} - {{ $type == 'Team' ? $item->name . ' (' . $item->groupName . ')' : $item->name }} </div>
+                                            </td>
+                                            <td style="text-align: center">{{ $quantity }}</td>
+                                            <td style="text-align: center">
 
-                                            @foreach ($get_participant_to_organization as $index => $item)
-                                                @php
-                                                    $cleanIc = str_replace('-', '', $item->icNo ?? '');
-                                                    $isMalaysia = ctype_digit($cleanIc) && strlen($cleanIc) === 12;
-                                                    
-                                                    $fee = $isMalaysia ? $item->nationalFees : $item->internationalFees;
-                                                    $quantity = 1;
-                                                    $itemTotal = $fee * $quantity;
-                                                @endphp
-                                                
-                                                <tr>
-                                                    <td style="text-align: center"> {{ $index + 1 }}.</td>
-                                                    <td>
-                                                        <div class="pl-2"> {{ $item->competitionTitle }} </div>
-                                                    </td>
-                                                    <td style="text-align: center">{{ $quantity }}</td>
-                                                    <td style="text-align: center">
+                                                {{  number_format((float) $fee, 2, '.', '') }} </td>
+                                            <td style="text-align: center">
 
-                                                        {{  number_format((float) $fee, 2, '.', '') }} </td>
-                                                    <td style="text-align: center">
+                                                {{  number_format((float) $itemTotal, 2, '.', '')  }}</td>
+                                        </tr>
+                                    @endforeach
 
-                                                        {{  number_format((float) $itemTotal, 2, '.', '')  }}</td>
-                                                </tr>
-                                            @endforeach
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
+                                        <td style="text-align:center">
+                                            <b>{{ number_format($get_transaction->amount, 2)  }}</b>
 
-                                                <tr>
-                                                    <td></td>
-                                                    <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
-                                                    <td style="text-align:center">
-                                                        <b>{{ number_format($get_transaction->amount, 2)  }}</b>
+                                        </td>
+                                    </tr>
 
-                                                    </td>
-                                                </tr>
-
-                                            </table>
+                                </table>
 
                                 <table style="width:100%" class="infotbl">
                                     <tr>
@@ -181,11 +171,11 @@
                                     <tr>
                                         <td></td>
                                         <td colspan="3" style="text-align:right; font-size:18px;"><b>Jumlah Bayaran (RM)</b> <br>
-                                            @if($get_participant_to_organization->count() > 1)
+                                            <!-- @if($get_participant_to_organization->count() > 1)
                                                 <small class="text-muted" style="font-size: 12px; font-weight: normal;">
                                                     (Termasuk bayaran untuk {{ $get_participant_to_organization->count() }} penyertaan pertandingan)
                                                 </small> 
-                                            @endif
+                                            @endif -->
                                         </td>
                                         <td style="text-align:center; width:20%; font-size:18px">
                                             <b>{{  number_format((float) $get_transaction->amount, 2, '.', '') }}</b>

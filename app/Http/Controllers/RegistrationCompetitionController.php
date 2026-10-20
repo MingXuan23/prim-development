@@ -636,29 +636,34 @@ class RegistrationCompetitionController extends Controller
 
     public function viewReceipt($id)
     {
-        
         $registerId = [(int) $id];
-
-        $get_participant_to_organization = DB::table('participants')
-            ->join('teams', 'participants.teamId', '=', 'teams.id')
-            ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
-            ->join('competitions', 'competition_registration.competitionId', '=', 'competitions.id')
-            ->join('organizations', 'competitions.organizationId', '=', 'organizations.id')
-            ->whereIn('participants.userId', $registerId)
-            ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
-            ->get();
+        $loginUser = Auth::user();
 
         $get_transaction = DB::table('participants')
             ->join('teams', 'participants.teamId', '=', 'teams.id')
             ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
             ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
             ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
-            ->whereIn('participants.userId', $registerId)
+            ->whereIn('competition_registration.id', $registerId)
             ->where('transactions.status', 'Success')
             ->select('transactions.*')
             ->first();
+            
+        $registerIds = DB::table('transaction_competition')
+            ->where('transactionId', $get_transaction->id)
+            ->pluck('registerId')
+            ->toArray();
 
-        return view('competition.receipt', compact('get_participant_to_organization', 'get_transaction'));
+        $get_participant_to_organization = DB::table('participants')
+            ->join('teams', 'participants.teamId', '=', 'teams.id')
+            ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
+            ->join('competitions', 'competition_registration.competitionId', '=', 'competitions.id')
+            ->join('organizations', 'competitions.organizationId', '=', 'organizations.id')
+            ->whereIn('competition_registration.id', $registerIds)
+            ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
+            ->get();
+
+        return view('competition.receipt', compact('get_participant_to_organization', 'get_transaction', 'loginUser'));
     }
 
     public function editRegister(int $id)

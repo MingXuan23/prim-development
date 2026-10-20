@@ -14,17 +14,19 @@ class CompetitionReceipt extends Mailable
     public $get_participant_to_organization;
     public $get_transaction;
     public $transaction;
+    public $loginUser;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($get_participant_to_organization, $get_transaction, $transaction)
+    public function __construct($get_participant_to_organization, $get_transaction, $transaction, $loginUser)
     {
         $this->get_participant_to_organization = $get_participant_to_organization;
         $this->get_transaction = $get_transaction;
         $this->transaction = $transaction;
+        $this->loginUser = $loginUser;
     }
 
     /**

@@ -351,7 +351,10 @@
 
                                             </div>
                                         @elseif($bridge->statusPayment == 'Paid' || $bridge->statusPayment == 'Free')
-                                            <button type="button" id="daftar" class="btn btn-light border px-3 py-1 text-secondary fw-medium" onclick="showRegisterOption()"><i class="bi bi-eye me-1"></i> Lihat</button>
+                                            <button type="button" id="daftar" class="btn btn-light border px-3 py-1 text-secondary fw-medium" 
+                                                    data-view-url="{{ route('competition.viewregister', $member->id) }}" data-receipt-url="{{ route('competition.receipt', $bridge->id) }}" 
+                                                    onclick="showRegisterOption(this)"><i class="bi bi-eye me-1"></i> Lihat</button>
+                                            
                                             <!-- @if($team->statusResult == 'Published' && in_array($bridge->statusPayment, ['Paid', 'Free']))
                                                 <button type="button" class="btn btn-light px-3 py-1 border fw-medium btn-sijil mt-2" data-bs-toggle="modal" data-bs-target="#sijilModal" 
                                                         data-participant-id="{{ $participant->first()->id }}" data-participant-name="{{ $participant->first()->name }}" 
@@ -364,40 +367,6 @@
                                         @endif
                                     </td>
                                 </tr>
-                            
-                                @php
-                                    $registration = $participant->first()->team->team_registration->first();                                
-                                @endphp
-                                <!-- Receipt Payment -->
-                                <div id="daftarOption" onclick="hideRegister()">
-                                    <div class="modal-card position-relative" onclick="event.stopPropagation()">
-                                        <button type="button" class="btn btn-close position-absolute end-0 top-0 me-3 mt-3" onclick="hideRegister()" aria-label="Close"></button>
-
-                                        <h3 class="fw-bold text-center mb-4">Pilihan Rekod</h3>
-
-                                        <div class="d-flex flex-column gap-3">
-                                            <a href="{{ route('competition.viewregister', $member->id) }}" class="btn register-solo layout-register">
-                                                <div class="icon">
-                                                    <i class="bi bi-person-lines-fill"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">Rekod Pendaftaran</div>
-                                                    <div class="small opacity-75">Semak butiran peserta</div>
-                                                </div>
-                                            </a>
-
-                                            <!-- <a href="{{ route('competition.receipt', $registration->id) }}" class="btn register-team layout-register">
-                                                <div class="icon">
-                                                    <i class="bi bi-file-earmark-text-fill"></i>
-                                                </div>
-                                                <div>
-                                                    <div class="fw-bold">Resit Pembayaran</div>
-                                                    <div class="small text-muted">Lihat resit pembayaran</div>
-                                                </div>
-                                            </a> -->
-                                        </div>
-                                    </div>
-                                </div>
 
                                 @empty
                                 <tr>
@@ -406,6 +375,47 @@
                             @endforelse
                         </tbody>
                     </table>    
+                </div>
+
+                <!-- Receipt -->
+                <div id="daftarOption" onclick="hideRegister()">
+                    <div class="modal-card position-relative"
+                        onclick="event.stopPropagation()">
+
+                        <button type="button"
+                            class="btn btn-close position-absolute end-0 top-0 me-3 mt-3"
+                            onclick="hideRegister()"
+                            aria-label="Close">
+                        </button>
+
+                        <h3 class="fw-bold text-center mb-4">Pilihan Rekod</h3>
+
+                        <div class="d-flex flex-column gap-3">
+
+                            <a id="viewRegisterLink" href="#"
+                            class="btn register-solo layout-register">
+                                <div class="icon">
+                                    <i class="bi bi-person-lines-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Rekod Pendaftaran</div>
+                                    <div class="small opacity-75">Semak butiran peserta</div>
+                                </div>
+                            </a>
+
+                            <a id="receiptLink" href="#"
+                            class="btn register-team layout-register">
+                                <div class="icon">
+                                    <i class="bi bi-file-earmark-text-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Resit Pembayaran</div>
+                                    <div class="small text-muted">Lihat resit pembayaran</div>
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
                 </div>
                 
                 @if($participants->count() !== 0)
@@ -472,8 +482,11 @@
     </div>
 
     <script>
-        function showRegisterOption()
+        function showRegisterOption(button)
         {
+            document.getElementById('viewRegisterLink').href = button.dataset.viewUrl;
+            document.getElementById('receiptLink').href = button.dataset.receiptUrl;
+
             document.getElementById('daftarOption').style.display = 'flex';
         }
 

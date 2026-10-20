@@ -161,6 +161,10 @@ class DirectPayController extends Controller
                         }
                     }
                 }
+                    
+                $fixedCharge = $competition->organization->fixed_charges ?? 0;
+                $fpx_txnAmount += $fixedCharge;
+
             } else if ($request->desc == 'School_Fees') {
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
@@ -724,6 +728,10 @@ class DirectPayController extends Controller
                         }
                     }
                 }
+
+                $fixedCharge = $competition->organization->fixed_charges ?? 0;
+                $fpx_txnAmount += $fixedCharge;
+
             } else if ($request->desc == 'School_Fees') {
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
@@ -1968,6 +1976,8 @@ class DirectPayController extends Controller
                     ->whereIn('id', $registerId)
                     ->update(['statusPayment' => 'Paid']);
 
+                $loginUser = Auth::user();
+
                 $get_participant_to_organization = DB::table('participants')
                     ->join('teams', 'participants.teamId', '=', 'teams.id')
                     ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
@@ -1977,21 +1987,13 @@ class DirectPayController extends Controller
                     ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
                     ->get();
 
-                $get_transaction = DB::table('participants')
-                    ->join('teams', 'participants.teamId', '=', 'teams.id')
-                    ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
-                    ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
-                    ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
-                    ->whereIn('competition_registration.id', $registerId)
-                    ->where('transactions.status', 'Success')
-                    ->select('transactions.*')
-                    ->first();
+                $get_transaction = $transaction;
 
-                Mail::to($transaction->email)->send(new CompetitionReceipt($get_participant_to_organization, $get_transaction, $transaction));
+                Mail::to($transaction->email)->send(new CompetitionReceipt($get_participant_to_organization, $get_transaction, $transaction, $loginUser));
                 
                 if ($returnView)
                 {
-                    return view('competition.receipt', compact('get_participant_to_organization', 'get_transaction'));
+                    return view('competition.receipt', compact('get_participant_to_organization', 'get_transaction', 'loginUser'));
                 }
                 
                 break;
