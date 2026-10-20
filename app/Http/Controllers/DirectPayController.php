@@ -161,6 +161,10 @@ class DirectPayController extends Controller
                         }
                     }
                 }
+                    
+                $fixedCharge = $competition->organization->fixed_charges ?? 0;
+                $fpx_txnAmount += $fixedCharge;
+
             } else if ($request->desc == 'School_Fees') {
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
@@ -724,6 +728,10 @@ class DirectPayController extends Controller
                         }
                     }
                 }
+
+                $fixedCharge = $competition->organization->fixed_charges ?? 0;
+                $fpx_txnAmount += $fixedCharge;
+
             } else if ($request->desc == 'School_Fees') {
                 $user = User::find(isset($request->user_id) ? $request->user_id : Auth::id());
                 $organization = Organization::find($request->o_id);
