@@ -178,7 +178,7 @@
                                             @endif -->
                                         </td>
                                         <td style="text-align:center; width:20%; font-size:18px">
-                                            <b>{{  number_format((float) $get_transaction->amount, 2, '.', '') }}</b>
+                                            <b>{{  number_format((float) $get_transaction->amount + (float) ($org->fixed_charges ?? 0), 2, '.', '') }}</b>
                                         </td>
                                     </tr>
                                 </table>
