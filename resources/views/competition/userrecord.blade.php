@@ -155,6 +155,84 @@
             background-color: #6366f1;
             color: white;
         }
+
+        #daftarOption {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background-color: white;
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 440px;
+            margin: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        .layout-register {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-radius: 12px;
+            padding: 14px 18px;
+            text-align: left;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
+            border-radius: 10px;
+            font-size: 1.25rem;
+        }
+
+        .register-solo .icon {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .register-team .icon {
+            background: #f1f5f9;
+            color: #4f46e5;
+        }
+
+        .register-solo {
+            background-color: #4f46e5;
+            color: white;
+            border: 1px solid #4f46e5;
+        }
+
+        .register-solo:hover {
+            background-color: #4338ca;
+            color: white;
+        }
+
+        .register-team {
+            background-color: white;
+            color: #1e293b;
+            border: 1.5px solid #e2e8f0;
+        }
+
+        .register-team:hover {
+            background-color: #f8fafc;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
     </style>
 </head>
 <body>
@@ -273,7 +351,7 @@
 
                                             </div>
                                         @elseif($bridge->statusPayment == 'Paid' || $bridge->statusPayment == 'Free')
-                                            <a href="{{ route('competition.viewregister', $member->id) }}" class="btn btn-light border px-3 py-1 text-secondary fw-medium"><i class="bi bi-eye me-1"></i> Lihat</a>
+                                            <button type="button" id="daftar" class="btn btn-light border px-3 py-1 text-secondary fw-medium" onclick="showRegisterOption()"><i class="bi bi-eye me-1"></i> Lihat</button>
                                             <!-- @if($team->statusResult == 'Published' && in_array($bridge->statusPayment, ['Paid', 'Free']))
                                                 <button type="button" class="btn btn-light px-3 py-1 border fw-medium btn-sijil mt-2" data-bs-toggle="modal" data-bs-target="#sijilModal" 
                                                         data-participant-id="{{ $participant->first()->id }}" data-participant-name="{{ $participant->first()->name }}" 
@@ -287,6 +365,40 @@
                                     </td>
                                 </tr>
                             
+                                @php
+                                    $registration = $participant->first()->team->team_registration->first();                                
+                                @endphp
+                                <!-- Receipt Payment -->
+                                <div id="daftarOption" onclick="hideRegister()">
+                                    <div class="modal-card position-relative" onclick="event.stopPropagation()">
+                                        <button type="button" class="btn btn-close position-absolute end-0 top-0 me-3 mt-3" onclick="hideRegister()" aria-label="Close"></button>
+
+                                        <h3 class="fw-bold text-center mb-4">Pilihan Rekod</h3>
+
+                                        <div class="d-flex flex-column gap-3">
+                                            <a href="{{ route('competition.viewregister', $member->id) }}" class="btn register-solo layout-register">
+                                                <div class="icon">
+                                                    <i class="bi bi-person-lines-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">Rekod Pendaftaran</div>
+                                                    <div class="small opacity-75">Semak butiran peserta</div>
+                                                </div>
+                                            </a>
+
+                                            <!-- <a href="{{ route('competition.receipt', $registration->id) }}" class="btn register-team layout-register">
+                                                <div class="icon">
+                                                    <i class="bi bi-file-earmark-text-fill"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold">Resit Pembayaran</div>
+                                                    <div class="small text-muted">Lihat resit pembayaran</div>
+                                                </div>
+                                            </a> -->
+                                        </div>
+                                    </div>
+                                </div>
+
                                 @empty
                                 <tr>
                                     <td colspan="7" class="text-center py-4 text-muted">Tiada Rekod dijumpai.</td>
@@ -311,6 +423,7 @@
             </form>
         </div>
 
+        <!-- Sijil -->
         <div id="sijilModal" class="modal fade" tabindex="-1" aria-modal="true" role="dialog">
             <div class="modal-dialog modal-dialog-centered modal-lg">
                 <div class="modal-content rounded-4 shadow border-0">
@@ -358,7 +471,17 @@
         </div>
     </div>
 
-    <script>    
+    <script>
+        function showRegisterOption()
+        {
+            document.getElementById('daftarOption').style.display = 'flex';
+        }
+
+        function hideRegister()
+        {
+            document.getElementById('daftarOption').style.display = 'none';
+        }
+
         function hideMessage()
         {
             $('.hide-message').fadeOut(500, function () {

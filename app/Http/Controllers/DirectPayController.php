@@ -49,6 +49,7 @@ use Illuminate\Support\Facades\Redirect;
 use phpDocumentor\Reflection\Types\Null_;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Controllers\Merchant\Regular\OrderController;
+use App\Mail\CompetitionReceipt;
 use App\Models\Competition;
 use App\Models\CompetitionRegistration;
 use League\CommonMark\Inline\Parser\EscapableParser;
@@ -1961,15 +1962,36 @@ class DirectPayController extends Controller
         $fpx_productDescCode = substr(ltrim($fpx_productDesc, "PRIM_"), 0, 1);
         switch ($fpx_productDescCode) {
             case 'C':
-                $registerId = $transaction->competitionRegistration()->pluck('competition_registration.id');
+                $registerId = $transaction->competitionRegistration()->pluck('competition_registration.id')->toArray();
                 
                 DB::table('competition_registration')
                     ->whereIn('id', $registerId)
                     ->update(['statusPayment' => 'Paid']);
 
+                $get_participant_to_organization = DB::table('participants')
+                    ->join('teams', 'participants.teamId', '=', 'teams.id')
+                    ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
+                    ->join('competitions', 'competition_registration.competitionId', '=', 'competitions.id')
+                    ->join('organizations', 'competitions.organizationId', '=', 'organizations.id')
+                    ->whereIn('competition_registration.id', $registerId)
+                    ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
+                    ->get();
+
+                $get_transaction = DB::table('participants')
+                    ->join('teams', 'participants.teamId', '=', 'teams.id')
+                    ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
+                    ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
+                    ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
+                    ->whereIn('competition_registration.id', $registerId)
+                    ->where('transactions.status', 'Success')
+                    ->select('transactions.*')
+                    ->first();
+
+                Mail::to($transaction->email)->send(new CompetitionReceipt($get_participant_to_organization, $get_transaction, $transaction));
+                
                 if ($returnView)
                 {
-                    return;
+                    return view('competition.receipt', compact('get_participant_to_organization', 'get_transaction'));
                 }
                 
                 break;

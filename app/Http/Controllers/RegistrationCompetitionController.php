@@ -618,16 +618,61 @@ class RegistrationCompetitionController extends Controller
      
     public function viewRegister(int $id)
     {
-        $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->where('id', $id)->where('userId', Auth::id())->firstOrFail();
+        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
+
+        $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->where('id', $id)
+        ->where(function ($q) use ($orgId) {
+            $q->where('userId', Auth::id())
+            ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
+                $p->whereIn('organizationId', $orgId);
+            });
+        })->firstOrFail();
+        
         $member = $participant->team->participant;
         $competition = $participant->team->team_registration->first();
         
         return view('competition.viewregister', compact('competition', 'participant', 'member'));
     }
 
+    public function viewReceipt($id)
+    {
+        
+        $registerId = [(int) $id];
+
+        $get_participant_to_organization = DB::table('participants')
+            ->join('teams', 'participants.teamId', '=', 'teams.id')
+            ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
+            ->join('competitions', 'competition_registration.competitionId', '=', 'competitions.id')
+            ->join('organizations', 'competitions.organizationId', '=', 'organizations.id')
+            ->whereIn('participants.userId', $registerId)
+            ->select('organizations.*', 'competitions.*', 'participants.name', 'participants.icNo', 'teams.groupName')
+            ->get();
+
+        $get_transaction = DB::table('participants')
+            ->join('teams', 'participants.teamId', '=', 'teams.id')
+            ->join('competition_registration', 'teams.id', '=', 'competition_registration.teamId')
+            ->join('transaction_competition', 'competition_registration.id', '=', 'transaction_competition.registerId')
+            ->join('transactions', 'transaction_competition.transactionId', '=', 'transactions.id')
+            ->whereIn('participants.userId', $registerId)
+            ->where('transactions.status', 'Success')
+            ->select('transactions.*')
+            ->first();
+
+        return view('competition.receipt', compact('get_participant_to_organization', 'get_transaction'));
+    }
+
     public function editRegister(int $id)
     {
-        $participant = Participant::with(['user', 'team.team_registration'])->where('id', $id)->where('userId', Auth::id())->firstOrFail();
+        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
+
+        $participant = Participant::with(['user', 'team.team_registration'])->where('id', $id)
+        ->where(function ($q) use ($orgId) {
+            $q->where('userId', Auth::id())
+            ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
+                $p->whereIn('organizationId', $orgId);
+            });
+        })->firstOrFail();
+
         $competition = $participant->team->team_registration->first();
         $institution = Institution::all();
 
@@ -636,7 +681,16 @@ class RegistrationCompetitionController extends Controller
     
     public function deleteRegister(int $id)
     {
-        $participant = Participant::with('team.team_registration')->where('id', $id)->where('userId', Auth::id())->firstOrFail();
+        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
+
+        $participant = Participant::with('team.team_registration')->where('id', $id)
+        ->where(function ($q) use ($orgId) {
+            $q->where('userId', Auth::id())
+            ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
+                $p->whereIn('organizationId', $orgId);
+            });
+        })->firstOrFail();
+        
         $team = $participant->team;
         
         if ($team)
