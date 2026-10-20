@@ -529,7 +529,7 @@ class RegistrationCompetitionController extends Controller
 
     public function recordRegister(Request $req)
     {
-        $query = Participant::with('user', 'team.team_registration')->where('userId', Auth::id());
+        $query = Participant::with('user', 'team.team_registration.organization')->where('userId', Auth::id());
 
         if ($req->filled('search'))
         {

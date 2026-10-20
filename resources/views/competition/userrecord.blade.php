@@ -310,7 +310,9 @@
                                 <tr>
                                     <td>
                                         @if($bridge->statusPayment == 'Pending')
-                                            <input type="checkbox" name="selectPayById[]" id="selectPayById" data-fee="{{ $fee }}" data-participant="{{ $participant->count() }}" data-org-id="{{ $team->organizationId }}" value="{{ $bridge->id }}" class="form-check-input participant-checkbox">
+                                            <input type="checkbox" name="selectPayById[]" id="selectPayById" data-fee="{{ $fee }}" data-participant="{{ $participant->count() }}" 
+                                                data-org-id="{{ $team->organizationId }}" data-fixed-charges="{{ $team->organization->fixed_charges }}" value="{{ $bridge->id }}" 
+                                                class="form-check-input participant-checkbox">
                                         @else   
                                             <input type="checkbox" class="form-check-input" hidden disabled>
                                         @endif
@@ -423,6 +425,10 @@
                         <div>
                             <span class="fw-bold">Dipilih: </span><span id="selectedParticipant">0</span> Peserta &nbsp&nbsp |
                             <span class="ms-3 fw-bold">Jumlah Bayaran:</span><span class="fw-bold fs-5"> <span id="totalAmount" style="color: #4f46e5;">RM 0.00</span></span>
+                            
+                            <div id="fixed-charges" class="d-none mt-2 text-muted small">
+                                <span><i class="bi bi-info-circle me-1"></i> Jumlah yuran termasuk caj tetap daripada organisasi</span>
+                            </div>
                         </div>
 
                         <div>
@@ -507,19 +513,46 @@
         const selectedCount = document.getElementById('selectedParticipant');
         const totalAmount = document.getElementById('totalAmount');
         const btnPay = document.getElementById('btnPay');
+        const noticeDiv = document.getElementById('fixed-charges');
 
         function update() 
         {
             let count = 0;
             let total = 0;
+            let fixedCharge = false;
 
             checkbox.forEach (cb => {
                 if(cb.checked)
                 {
                     count += parseInt(cb.getAttribute('data-participant') || 1, 10);
                     total += parseFloat(cb.getAttribute('data-fee') || 0);
+
+                    let chargeVal = parseFloat(cb.getAttribute('data-fixed-charges'));
+                    if(chargeVal > 0)
+                    {
+                        fixedCharge = true;
+                        fixedChargesAmount = chargeVal;
+                    }
                 }
             });
+
+            if (fixedCharge) 
+            {
+                total += fixedChargesAmount;
+
+                if (noticeDiv) 
+                {
+                    noticeDiv.classList.remove('d-none');
+                }
+            } 
+            else 
+            {
+                if (noticeDiv) 
+                {
+                    noticeDiv.classList.add('d-none');
+                }
+            }
+
             selectedCount.textContent = count;
             totalAmount.textContent = 'RM ' + total.toFixed(2);
             btnPay.disabled = (count === 0);
