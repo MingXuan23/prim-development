@@ -64,6 +64,10 @@
         border: none;
     }
 
+    .logout:active {
+        background-color: #f8f9fa;
+    }
+
     @media (max-width: 992px) {
         .navigate {
             padding: 1.2rem 0rem;
@@ -182,7 +186,7 @@
                 <li>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="dropdown-item text-danger">
+                        <button type="submit" class="dropdown-item text-danger logout">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout
                         </button>
                     </form>
