@@ -304,8 +304,8 @@ class DonationController extends Controller
             ->where('transactions.status', 'success')
             ->where('transactions.nama', 'LIKE', '%Dona%')
             ->when(filled($request->startDate) && filled($request->endDate), function ($query) use ($request) {
-                $start_date = Carbon::createFromFormat('Y-m-d', $request->startDate)->startOfDay();
-                $end_date = Carbon::createFromFormat('Y-m-d', $request->endDate)->endOfDay();
+                $start_date = Carbon::createFromFormat('d-m-Y', $request->startDate)->startOfDay();
+                $end_date = Carbon::createFromFormat('d-m-Y', $request->endDate)->endOfDay();
                 $query->whereBetween('transactions.datetime_created', [$start_date, $end_date]);
             })
             ->orderBy('transactions.datetime_created', 'desc');
