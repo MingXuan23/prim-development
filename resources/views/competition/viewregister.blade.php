@@ -178,17 +178,17 @@
                         <div class="row g-3">
                             <div class="col-sm-6">
                                 <label class="text-muted small d-block">Nama Penyelia</label>
-                                <span class="fw-semibold text-dark">{{ $participant->supervisorName }}</span>
+                                <span class="fw-semibold text-dark">{{ $participant->supervisorName ?? '-' }}</span>
                             </div>
 
                             <div class="col-sm-6">
                                 <label class="text-muted small d-block">Email Penyelia</label>
-                                <span class="fw-semibold text-dark">{{ $participant->supervisorEmail }}</span>
+                                <span class="fw-semibold text-dark">{{ $participant->supervisorEmail ?? '-' }}</span>
                             </div>
 
                             <div class="col-sm-6">
                                 <label class="text-muted small d-block">No. Telefon Penyelia</label>
-                                <span class="fw-semibold text-dark">{{ $participant->supervisorNoTel }}</span>
+                                <span class="fw-semibold text-dark">{{ $participant->supervisorNoTel ?? '-' }}</span>
                             </div>
                         </div>
                     </div>

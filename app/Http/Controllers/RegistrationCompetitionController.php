@@ -245,7 +245,7 @@ class RegistrationCompetitionController extends Controller
 
                             if (!empty($competition->maximumAge) && $age > $competition->maximumAge)
                             {
-                                $errorMessage = $isTeam > 1 ? "{$p['name']} telah melepasi syarat umur maksimum." : 'Umur anda telah melepasi syarat umur maksimum.';
+                                $errorMessage = $isTeam ? "{$p['name']} telah melepasi syarat umur maksimum." : 'Umur anda telah melepasi syarat umur maksimum.';
 
                                 DB::rollBack();
                                 return response()->json(['status' => false, 'message' => $errorMessage], 422);
