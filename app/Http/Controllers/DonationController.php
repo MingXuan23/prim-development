@@ -297,29 +297,18 @@ class DonationController extends Controller
 
     public function getHistoryDonorDT(Request $request)
     {
-        if (!isset($request->startDate) && !isset($request->endDate)) {
-            $listhistory = DB::table('transactions')
-                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
-                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
-                ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
-                ->where('transactions.status', 'success')
-                ->where('transactions.nama', 'LIKE', 'Donation%')
-                ->orderBy('transactions.datetime_created', 'desc')
-                ->get();
-        } else {
-            $start_date = date('Y-m-d', strtotime($request->startDate));
-            $end_date = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
-
-            $listhistory = DB::table('transactions')
-                ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
-                ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
-                ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
-                ->where('transactions.status', 'success')
-                ->where('transactions.nama', 'LIKE', 'Donation%')
-                ->whereBetween('transactions.datetime_created', [$start_date, $end_date])
-                ->orderBy('transactions.datetime_created', 'desc')
-                ->get();
-        }
+        $listhistory = DB::table('transactions')
+            ->leftJoin('donation_transaction', 'transactions.id', 'donation_transaction.transaction_id')
+            ->leftJoin('donations', 'donations.id', 'donation_transaction.donation_id')
+            ->select('donations.nama as dname', 'transactions.amount', 'transactions.status', 'transactions.username', 'transactions.telno', 'transactions.email', 'transactions.datetime_created')
+            ->where('transactions.status', 'success')
+            ->where('transactions.nama', 'LIKE', '%Dona%')
+            ->when(filled($request->startDate) && filled($request->endDate), function ($query) use ($request) {
+                $start_date = date('Y-m-d', strtotime($request->startDate));
+                $end_date = date('Y-m-d', strtotime("+1 day", strtotime($request->endDate)));
+                $query->whereBetween('transactions.datetime_created', [$start_date, $end_date]);
+            })
+            ->orderBy('transactions.datetime_created', 'desc');
 
         if (request()->ajax()) {
             return datatables()->of($listhistory)
