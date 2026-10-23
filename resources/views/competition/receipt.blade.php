@@ -32,7 +32,6 @@
                         <div class="row">
                             @php 
                                 $org = $get_participant_to_organization->first();
-                                $type = $org->participateType;
                             @endphp
 
                             <div class="col-lg-2 col-sm-12 p-0">
@@ -122,6 +121,10 @@
                                         <th style="width:20%">Amaun (RM)</th>
                                     </tr>
 
+                                    @php 
+                                        $calculatedSubtotal = 0; 
+                                    @endphp
+
                                     @foreach ($get_participant_to_organization as $index => $item)
                                         @php
                                             $cleanIc = str_replace('-', '', $item->icNo ?? '');
@@ -130,12 +133,13 @@
                                             $fee = $isMalaysia ? $item->nationalFees : $item->internationalFees;
                                             $quantity = 1;
                                             $itemTotal = $fee * $quantity;
+                                            $calculatedSubtotal += $itemTotal;
                                         @endphp
                                         
                                         <tr>
                                             <td style="text-align: center"> {{ $index + 1 }}.</td>
                                             <td>
-                                                <div class="pl-2"> {{ $item->competitionTitle }} - {{ $type == 'Team' ? $item->name . ' (' . $item->groupName . ')' : $item->name }} </div>
+                                                <div class="pl-2"> {{ $item->competitionTitle }} - {{ $item->participateType == 'Team' ? $item->name . ' (' . $item->groupName . ')' : $item->name }} </div>
                                             </td>
                                             <td style="text-align: center">{{ $quantity }}</td>
                                             <td style="text-align: center">
@@ -151,7 +155,7 @@
                                         <td></td>
                                         <td colspan="3" style="text-align:center"><b>Jumlah</b> </td>
                                         <td style="text-align:center">
-                                            <b>{{ number_format($get_transaction->amount, 2)  }}</b>
+                                            <b>{{ number_format($calculatedSubtotal, 2)  }}</b>
 
                                         </td>
                                     </tr>
@@ -178,7 +182,7 @@
                                             @endif -->
                                         </td>
                                         <td style="text-align:center; width:20%; font-size:18px">
-                                            <b>{{  number_format((float) $get_transaction->amount + (float) ($org->fixed_charges ?? 0), 2, '.', '') }}</b>
+                                            <b>{{  number_format((float) $calculatedSubtotal + (float) ($org->fixed_charges ?? 0), 2, '.', '') }}</b>
                                         </td>
                                     </tr>
                                 </table>

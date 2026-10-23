@@ -355,7 +355,7 @@
                                         @elseif($bridge->statusPayment == 'Paid' || $bridge->statusPayment == 'Free')
                                             <button type="button" id="daftar" class="btn btn-light border px-3 py-1 text-secondary fw-medium" 
                                                     data-view-url="{{ route('competition.viewregister', $member->id) }}" data-receipt-url="{{ route('competition.receipt', $bridge->id) }}" 
-                                                    onclick="showRegisterOption(this)"><i class="bi bi-eye me-1"></i> Lihat</button>
+                                                    data-status-payment="{{ $bridge->statusPayment }}" onclick="showRegisterOption(this)"><i class="bi bi-eye me-1"></i> Lihat</button>
                                             
                                             <!-- @if($team->statusResult == 'Published' && in_array($bridge->statusPayment, ['Paid', 'Free']))
                                                 <button type="button" class="btn btn-light px-3 py-1 border fw-medium btn-sijil mt-2" data-bs-toggle="modal" data-bs-target="#sijilModal" 
@@ -490,15 +490,29 @@
     <script>
         function showRegisterOption(button)
         {
-            document.getElementById('viewRegisterLink').href = button.dataset.viewUrl;
-            document.getElementById('receiptLink').href = button.dataset.receiptUrl;
+            var $btn = $(button);
+            
+            var viewUrl = $btn.data('view-url');
+            var receiptUrl = $btn.data('receipt-url');
+            var statusPayment = $btn.data('status-payment');
 
-            document.getElementById('daftarOption').style.display = 'flex';
+            $('#viewRegisterLink').attr('href', viewUrl);
+
+            if (statusPayment === 'Free') 
+            {
+                $('#receiptLink').hide();
+            } 
+            else 
+            {
+                $('#receiptLink').attr('href', receiptUrl).show();
+            }
+
+            $('#daftarOption').css('display', 'flex');
         }
 
         function hideRegister()
         {
-            document.getElementById('daftarOption').style.display = 'none';
+            $('#daftarOption').hide();
         }
 
         function hideMessage()

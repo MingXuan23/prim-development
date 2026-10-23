@@ -207,7 +207,7 @@
                         <div class="col-6" id="maxParticipate">
                             <label for="maxParticipateGroup" class="form-label text-muted small">Maksimum Peserta (Kumpulan)</label>
                             <div class="input-group">
-                                <input type="number" name="maxParticipateGroup" id="maxParticipateGroup" placeholder="Contoh: 6" min="3" class="form-control @error('maxParticipateGroup') is-invalid @enderror" value="{{ old('maxParticipateGroup') }}">
+                                <input type="number" name="maxParticipateGroup" id="maxParticipateGroup" placeholder="Contoh: 6" min="2" class="form-control @error('maxParticipateGroup') is-invalid @enderror" value="{{ old('maxParticipateGroup') }}">
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>
