@@ -322,6 +322,35 @@ class DonationController extends Controller
         }
     }
 
+    public function getMembersByUserIndex()
+    {
+        if (!Auth::user()->hasRole('Superadmin')) {
+            return redirect('/home');
+        }
+
+        return view('donate.members');
+    }
+
+    public function searchUsers(Request $request)
+    {
+        if (!Auth::user()->hasRole('Superadmin')) {
+            return collect([]);
+        }
+
+        return DB::table('users as u')
+            ->select('u.id', 'u.name', 'u.email', 'u.telno')
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('referral_code as rc')
+                    ->whereColumn('rc.user_id', 'u.id');
+            })
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $query->where('u.name', 'LIKE', '%' . $request->q . '%');
+            })
+            ->orderBy('u.name')
+            ->simplePaginate(20);
+    }
+
     public function listAllOrganization()
     {
         $organization = Organization::get();

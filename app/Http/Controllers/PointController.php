@@ -247,14 +247,16 @@ class PointController extends Controller
         }
     }
     
-    public function getReferralCodeMemberDatatable()
+    public function getReferralCodeMemberDatatable(Request $request)
     {
+        $userId = $request->query('user_id');
+
         if (request()->ajax()) {
-            $referral_code = $this->getReferralCode(true);
+            $referral_code = $this->getReferralCode(true, $userId);
             
             $data = DB::table('referral_code_member as rcm')
                     ->join('users as mu', 'mu.id', '=', 'rcm.member_user_id') 
-                    ->where('rcm.leader_referral_code_id', $referral_code->id)
+                    ->where('rcm.leader_referral_code_id', $referral_code->id ?? 0)
                     ->select('mu.name as member_name','mu.telno as member_telno','mu.email as member_email', 'rcm.created_at', 'mu.id as member_user_id','rcm.level','rcm.id as rcm_id')
                     ->get(); // Execute the query to fetch data
             
@@ -274,19 +276,6 @@ class PointController extends Controller
                                     ->sum('ph.points');
                 $level = DB::table('referral_code_member_level')->where('id', $d->level)->first();
                 $d->level = $level == null? $d->level:$level->level;
-                // switch($d->level){
-                //     case '1':
-                //         $d->level = 'Ahli Biasa'; break;
-                //     case '2':
-                //         $d->level = 'Ahli Aktif'; break;
-                //     case '3':
-                //         $d->level = 'Super Ahli'; break;
-                //     default:
-                //         $d->level = 'Ahli Tingkat '.$d->level; break;
-
-                // }
-
-            
                 unset($d->member_user_id); // Remove member_user_id from the object
             }
             
