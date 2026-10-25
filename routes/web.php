@@ -15,37 +15,37 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 //Competition route
-Route::get('ContestPro','UserCompetitionController@competition')->name('competition.index');
+Route::get('ContestPro', 'UserCompetitionController@competition')->name('competition.index');
 
-Route::group(['middleware' => ['auth'], 'prefix' => 'ContestPro'], function() {
-    Route::get('/user-competition','UserCompetitionController@userCompetition')->name('competition.user');
-    Route::get('/user-competition/info-competition/{id}/downloadtemplate','UserCompetitionController@downloadTemplateCompetition')->name('competition.downloadtemplatecompetition');
-    Route::get('/user-competition/info-competition/{id}','UserCompetitionController@infoCompetition')->name('competition.info');
+Route::group(['middleware' => ['auth'], 'prefix' => 'ContestPro'], function () {
+    Route::get('/user-competition', 'UserCompetitionController@userCompetition')->name('competition.user');
+    Route::get('/user-competition/info-competition/{id}/downloadtemplate', 'UserCompetitionController@downloadTemplateCompetition')->name('competition.downloadtemplatecompetition');
+    Route::get('/user-competition/info-competition/{id}', 'UserCompetitionController@infoCompetition')->name('competition.info');
 
-    Route::post('/record-registration','RegistrationCompetitionController@storeRegister')->name('competition.storeregister');
-    Route::get('/record-registration/edit-registration/{id}','RegistrationCompetitionController@editRegister')->name('competition.editregister');
-    Route::put('/record-registration/edit-registration/{id}','RegistrationCompetitionController@editStoreRegister')->name('competition.editstoreregister');
-    Route::post('/generate-certificate','RegistrationCompetitionController@GenerateSijil')->name('competition.generatesijil');
+    Route::post('/record-registration', 'RegistrationCompetitionController@storeRegister')->name('competition.storeregister');
+    Route::get('/record-registration/edit-registration/{id}', 'RegistrationCompetitionController@editRegister')->name('competition.editregister');
+    Route::put('/record-registration/edit-registration/{id}', 'RegistrationCompetitionController@editStoreRegister')->name('competition.editstoreregister');
+    Route::post('/generate-certificate', 'RegistrationCompetitionController@GenerateSijil')->name('competition.generatesijil');
 
-    Route::get('/record-registration','RegistrationCompetitionController@recordRegister')->name('competition.userrecord');
-    Route::delete('/record-registration/delete-registration/{id}','RegistrationCompetitionController@deleteRegister')->name('competition.deleteregister');
-    Route::get('/record-registration/view-registration/{id}','RegistrationCompetitionController@viewRegister')->name('competition.viewregister');
-    Route::get('/record-registration/receipt-registration/{id}','RegistrationCompetitionController@viewReceipt')->name('competition.receipt');
+    Route::get('/record-registration', 'RegistrationCompetitionController@recordRegister')->name('competition.userrecord');
+    Route::delete('/record-registration/delete-registration/{id}', 'RegistrationCompetitionController@deleteRegister')->name('competition.deleteregister');
+    Route::get('/record-registration/view-registration/{id}', 'RegistrationCompetitionController@viewRegister')->name('competition.viewregister');
+    Route::get('/record-registration/receipt-registration/{id}', 'RegistrationCompetitionController@viewReceipt')->name('competition.receipt');
 
-    Route::get('/result-competition','UserCompetitionController@displayResult')->name('competition.user.displayresult');
+    Route::get('/result-competition', 'UserCompetitionController@displayResult')->name('competition.user.displayresult');
 
-    Route::get('/host-competition','HostCompetitionController@hostCompetition')->name('competition.host');
-    Route::get('/host-competition/add-competition','HostCompetitionController@addCompetition')->name('competition.addcompetition');
-    Route::get('/host-competition/view-competition/{id}','HostCompetitionController@viewCompetition')->name('competition.viewcompetition');
-    Route::get('/host-competition/edit-competition/{id}','HostCompetitionController@editCompetition')->name('competition.editcompetition');
-    Route::put('/host-competition/edit-competition/{id}','HostCompetitionController@editStoreCompetition')->name('competition.editstorecompetition');
-    Route::delete('/host-competition/delete-competition/{id}','HostCompetitionController@deleteCompetition')->name('competition.deletecompetition');
+    Route::get('/host-competition', 'HostCompetitionController@hostCompetition')->name('competition.host');
+    Route::get('/host-competition/add-competition', 'HostCompetitionController@addCompetition')->name('competition.addcompetition');
+    Route::get('/host-competition/view-competition/{id}', 'HostCompetitionController@viewCompetition')->name('competition.viewcompetition');
+    Route::get('/host-competition/edit-competition/{id}', 'HostCompetitionController@editCompetition')->name('competition.editcompetition');
+    Route::put('/host-competition/edit-competition/{id}', 'HostCompetitionController@editStoreCompetition')->name('competition.editstorecompetition');
+    Route::delete('/host-competition/delete-competition/{id}', 'HostCompetitionController@deleteCompetition')->name('competition.deletecompetition');
 
-    Route::get('/manage-result/{id}','ManageParticipantController@resultCompetition')->name('competition.hostresult');
-    Route::post('/manage-result/{id}','ManageParticipantController@updateResult')->name('competition.storeresult');
-    Route::get('/manage-registration','ManageParticipantController@manageRegister')->name('competition.hostrecord');
-    Route::post('/manage-registration','HostCompetitionController@storeCompetition')->name('competition.storecompetition');
-    Route::get('/manage-registration/view-registration/export-participant','ManageParticipantController@exportParticipant')->name('competition.exportparticipant');
+    Route::get('/manage-result/{id}', 'ManageParticipantController@resultCompetition')->name('competition.hostresult');
+    Route::post('/manage-result/{id}', 'ManageParticipantController@updateResult')->name('competition.storeresult');
+    Route::get('/manage-registration', 'ManageParticipantController@manageRegister')->name('competition.hostrecord');
+    Route::post('/manage-registration', 'HostCompetitionController@storeCompetition')->name('competition.storecompetition');
+    Route::get('/manage-registration/view-registration/export-participant', 'ManageParticipantController@exportParticipant')->name('competition.exportparticipant');
 });
 
 //Mobile Yuran API skip AUTHENTICATION
@@ -166,6 +166,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
     Route::get('history', 'DonationController@historyDonor')->name('donate.donor_history');
     Route::get('historyDT', 'DonationController@getHistoryDonorDT')->name('donate.donor_history_datatable');
 
+    Route::get('/members', 'DonationController@getMembersByUserIndex')->name('donate.members');
+    Route::get('/search-users', 'DonationController@searchUsers')->name('donate.searchUsers');
     //Route::get('getReferralCode', 'PointController@getReferralCode')->name('donate.getReferralCode');
 });
 

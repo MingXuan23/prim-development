@@ -72,6 +72,12 @@
                                 <span>Sejarah Derma</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('donate.members') }}" class=" waves-effect">
+                                <i class="fas fa-users"></i>
+                                <span>Ahli Derma</span>
+                            </a>
+                        </li>
                         @endrole
 
                         {{-- @role('Superadmin|Admin LHDN')
