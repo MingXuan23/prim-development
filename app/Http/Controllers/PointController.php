@@ -251,39 +251,51 @@ class PointController extends Controller
     {
         $userId = $request->query('user_id');
 
-        if (request()->ajax()) {
-            $referral_code = $this->getReferralCode(true, $userId);
-            
-            $data = DB::table('referral_code_member as rcm')
-                    ->join('users as mu', 'mu.id', '=', 'rcm.member_user_id') 
-                    ->where('rcm.leader_referral_code_id', $referral_code->id ?? 0)
-                    ->select('mu.name as member_name','mu.telno as member_telno','mu.email as member_email', 'rcm.created_at', 'mu.id as member_user_id','rcm.level','rcm.id as rcm_id')
-                    ->get(); // Execute the query to fetch data
-            
-            foreach ($data as $d) {
-                $d->contribution = DB::table('point_history as ph')
-                                    ->where([ 
-                                        ['ph.status', 1],
-                                        ['ph.member_id', $d->rcm_id]
-                                    ])->sum('ph.points');
-
-                $d->todayContribution = DB::table('point_history as ph')
-                                    ->where([ 
-                                        ['ph.status', 1],
-                                        ['ph.member_id', $d->rcm_id]
-                                    ])
-                                    ->whereBetween('ph.created_at', [Carbon::today(), Carbon::tomorrow()])
-                                    ->sum('ph.points');
-                $level = DB::table('referral_code_member_level')->where('id', $d->level)->first();
-                $d->level = $level == null? $d->level:$level->level;
-                unset($d->member_user_id); // Remove member_user_id from the object
-            }
-            
-            // Using DataTables to format the data
-            $table = Datatables::of($data);
-            //dd($table);
-            return $table->make(true);
+        if (!request()->ajax()) {
+            return response()->json(['error' => 'Invalid request.'], 400);
         }
+
+        if (isset($userId) && !Auth::user()->hasRole('Superadmin') && Auth::id() != $userId) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $referral_code = $this->getReferralCode(true, $userId);
+
+        $totalSub = DB::table('point_history')
+            ->where('status', 1)
+            ->groupBy('member_id')
+            ->select('member_id', DB::raw('SUM(points) as total_points'));
+
+        $todaySub = DB::table('point_history')
+            ->where('status', 1)
+            ->where('created_at', '>=', Carbon::today())
+            ->where('created_at', '<', Carbon::tomorrow())
+            ->groupBy('member_id')
+            ->select('member_id', DB::raw('SUM(points) as today_points'));
+
+        $data = DB::table('referral_code_member as rcm')
+            ->join('users as mu', 'mu.id', '=', 'rcm.member_user_id')
+            ->leftJoin('referral_code_member_level as lvl', 'lvl.id', '=', 'rcm.level')
+            ->leftJoinSub($totalSub, 'ph_total', 'ph_total.member_id', '=', 'rcm.id')
+            ->leftJoinSub($todaySub, 'ph_today', 'ph_today.member_id', '=', 'rcm.id')
+            ->where('rcm.leader_referral_code_id', $referral_code->id ?? 0)
+            ->select([
+                'mu.name as member_name',
+                'mu.telno as member_telno',
+                'mu.email as member_email',
+                'rcm.created_at',
+                'rcm.id as rcm_id',
+                'lvl.level as member_level',
+                'rcm.level as base_level',
+                'ph_total.total_points as contribution',
+                'ph_today.today_points as todayContribution',
+            ]);
+
+        return Datatables::of($data)
+            ->addColumn('level', fn($row) => $row->member_level ?? $row->base_level)
+            ->editColumn('contribution', fn($row) => $row->contribution ?? 0)
+            ->editColumn('todayContribution', fn($row) => $row->todayContribution ?? 0)
+            ->make(true);
     }
 
 
