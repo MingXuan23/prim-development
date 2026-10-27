@@ -339,7 +339,11 @@
                     </div>
                     <div>
                         <div class="fw-bold mt-3 info-label">Tarikh Pertandingan</div>
-                        <p class="text-muted mt-1">{{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}</p>
+                        @if($competition->competitionStart === $competition->competitionEnd)
+                            <p class="text-muted mt-1"> {{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }}</p>
+                        @else
+                            <p class="text-muted mt-1">{{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}</p>
+                        @endif
                     </div>
                 </div>
                     <hr>
@@ -363,9 +367,9 @@
                             @if($competition->minimumAge && $competition->maximumAge)
                                 {{ $competition->minimumAge }} - {{ $competition->maximumAge }} Tahun
                             @elseif($competition->minimumAge)
-                                {{ $competition->minimumAge }} Tahun ke atas
+                                {{ $competition->minimumAge }} Tahun dan ke atas
                             @elseif($competition->maximumAge)
-                                Hingga {{ $competition->maximumAge }} Tahun
+                                {{ $competition->maximumAge }} Tahun dan ke bawah
                             @else
                                 Terbuka (Tiada Had Umur)
                             @endif
