@@ -305,7 +305,11 @@
                     <div>
                         <h6 class="fw-bold mt-3 info-label">Tarikh Pertandingan</h6>
                         @if($competition->competitionStart && $competition->competitionEnd)
-                            <p class="text-muted">{{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}</p>
+                            @if($competition->competitionStart === $competition->competitionEnd)
+                                <p class="text-muted"> {{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }}</p>
+                            @else
+                                <p class="text-muted">{{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}</p>
+                            @endif
                         @else
                             <p class="text-muted">Tarikh belum ditetapkan</p>
                         @endif

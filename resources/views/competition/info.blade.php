@@ -339,7 +339,11 @@
                     </div>
                     <div>
                         <div class="fw-bold mt-3 info-label">Tarikh Pertandingan</div>
-                        <p class="text-muted mt-1">{{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}</p>
+                        @if($competition->competitionStart === $competition->competitionEnd)
+                            <p class="text-muted mt-1"> {{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }}</p>
+                        @else
+                            <p class="text-muted mt-1">{{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}</p>
+                        @endif
                     </div>
                 </div>
                     <hr>
