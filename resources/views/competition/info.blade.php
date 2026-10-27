@@ -367,9 +367,9 @@
                             @if($competition->minimumAge && $competition->maximumAge)
                                 {{ $competition->minimumAge }} - {{ $competition->maximumAge }} Tahun
                             @elseif($competition->minimumAge)
-                                {{ $competition->minimumAge }} Tahun ke atas
+                                {{ $competition->minimumAge }} Tahun dan ke atas
                             @elseif($competition->maximumAge)
-                                Hingga {{ $competition->maximumAge }} Tahun
+                                {{ $competition->maximumAge }} Tahun dan ke bawah
                             @else
                                 Terbuka (Tiada Had Umur)
                             @endif
