@@ -425,7 +425,11 @@
                             <p class="card-text small mb-2 text-secondary"><i class="bi bi-clock-history me-1"></i> <strong>Tutup:</strong> {{ $competition->registerClose ? \Carbon\Carbon::parse($competition->registerClose)->format('d M Y') : '...' }}</p>
                             @if($competition->registerClose)
                                 <p class="card-text small text-secondary text-truncate"><i class="bi bi-calendar3 text-primary me-2"></i>
-                                    {{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}
+                                    @if($competition->competitionStart === $competition->competitionEnd)
+                                        {{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M Y') }}
+                                    @else
+                                        {{ \Carbon\Carbon::parse($competition->competitionStart)->format('d M') }} - {{ \Carbon\Carbon::parse($competition->competitionEnd)->format('d M Y') }}
+                                    @endif
                                 </p>
                             @else
                                 <p class="card-text small text-secondary text-truncate"><i class="bi bi-calendar3 text-primary me-2"></i>Belum ditetapkan</p>
