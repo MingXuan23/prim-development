@@ -178,7 +178,10 @@ class ManageParticipantController extends Controller
         $filter($query);
 
         $participate = $query->get();
-        $participants = $participate->groupBy('teamId')->map(function ($q) {
+        $participants = $participate->groupBy(function ($r) {
+            $registerId = $r->team->team_registration->first()->id ?? 'individu_' . $r->id;
+            return $r->teamId . '_' . $registerId;
+        })->map(function ($q) {
             $item = $q->first();
 
             $item->formatted_members = $q->map (function ($p) {
