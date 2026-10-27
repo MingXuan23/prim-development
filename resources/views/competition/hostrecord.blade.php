@@ -309,7 +309,8 @@
                     @forelse($participants as $participant)
                         @php
                             $member = $participant->first();
-                            $team = $member->team->team_registration->first();
+                            
+                            $team = $participant->team->team_registration->first();
                             $bridge = $team->pivot;
                         @endphp
                         <tr>
