@@ -140,6 +140,56 @@ class InstitutionSeeder extends Seeder
                 'instituteType' => 'Universiti',
                 'instituteLogo' => 'TAR_UMT_logo.png',
             ],
+            [
+                'instituteName' => 'Universiti Tunku Abdul Rahman (UTAR)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'UTAR_logo.png'
+            ],
+            [
+                'instituteName' => 'UNITAR International University (Sunway)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'UNITAR_logo.png'
+            ],
+            [
+                'instituteName' => 'Sunway University (UNITAR)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'Sunway_logo.png'
+            ],
+            [
+                'instituteName' => "Taylor's University (Taylor's)", 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'Taylor_logo.png'
+            ],
+            [
+                'instituteName' => 'UCSI University (UCSI)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'UCSI_logo.png'
+            ],
+            [
+                'instituteName' => 'INTI International University (INTI)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'INTI_logo.png'
+            ],
+            [
+                'instituteName' => 'SEGi University (SEGi)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'SEGi_logo.png'
+            ],
+            [
+                'instituteName' => 'Asia Pacific University of Technology and Innovation (APU)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'APU_logo.png'
+            ],
+            [
+                'instituteName' => 'MAHSA University (MAHSA)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'MAHSA_logo.png'
+            ],
+            [
+                'instituteName' => 'Open University Malaysia (OUM)', 
+                'instituteType' => 'Universiti', 
+                'instituteLogo' => 'OUM_logo.png'
+            ],
 
             //POLITEKNIK
             [
