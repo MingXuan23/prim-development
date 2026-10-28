@@ -115,7 +115,7 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 }
 
                 //Pra-Universiti
-                $praUni = ['Tingkatan 6', 'Matrikulasi', 'Asasi'];
+                $praUni = ['Tingkatan 6', 'Matrikulasi', 'Asasi', 'A-Level', 'Sijil Tinggi Agama Malaysia (STAM)', 'International Baccalaureate (IB)'];
                 foreach ($praUni as $i => $val) {
                     $sheet->setCellValue('Q' . ($i + 5), $val);
                 }
@@ -124,10 +124,13 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 $KVEdu = [
                     'Sijil Vokasional Malaysia (SVM) Tahun 1',
                     'Sijil Vokasional Malaysia (SVM) Tahun 2',
+                    'Sijil Kemahiran Malaysia (SKM)',
                     'Diploma Vokasional Malaysia (DVM) Tahun 1',
                     'Diploma Vokasional Malaysia (DVM) Tahun 2',
                     'Politeknik / Kolej Komuniti Diploma Tahun 1',
                     'Politeknik / Kolej Komuniti Diploma Tahun 2',
+                    'Diploma',
+                    'Advanced Diploma'
                 ];
                 foreach ($KVEdu as $i => $val) {
                     $sheet->setCellValue('R' . ($i + 5), $val);
@@ -143,6 +146,10 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                     'Degree Tahun 3',
                     'Degree Tahun 4',
                     'Degree Tahun 5',
+                    'A-Level',
+                    'Advanced Diploma',
+                    'Master',
+                    'Doctor of Philosophy (PhD)'
                 ];
                 foreach ($UniEdu as $i => $val) {
                     $sheet->setCellValue('S' . ($i + 5), $val);
@@ -158,17 +165,17 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 ];
 
                 foreach ($institutionTypes as $col => $typeName) {
-                    $sheet->setCellValue($col . '14', $typeName);
+                    $sheet->setCellValue($col . '18', $typeName);
 
                     $names = Institution::where('instituteType', $typeName)
                         ->pluck('instituteName')
                         ->toArray();
 
                     if (empty($names)) {
-                        $sheet->setCellValue($col . '15', 'Sila Taip Nama ' . $typeName);
+                        $sheet->setCellValue($col . '19', 'Sila Taip Nama ' . $typeName);
                     } else {
                         foreach ($names as $i => $name) {
-                            $sheet->setCellValue($col . ($i + 15), $name);
+                            $sheet->setCellValue($col . ($i + 19), $name);
                         }
                     }
                 }
@@ -179,7 +186,7 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 $maxRowX = Institution::where('instituteType', 'Kolej Vokasional & Politeknik')->count();
                 $maxRowY = Institution::where('instituteType', 'Universiti')->count();
 
-                $lastInstRow = max(14, $maxRowU + 14, $maxRowV + 14, $maxRowW + 14, $maxRowX + 14, $maxRowY + 14);
+                $lastInstRow = max(18, $maxRowU + 18, $maxRowV + 18, $maxRowW + 18, $maxRowX + 18, $maxRowY + 18);
 
                 $jantinaValidation = new DataValidation();
                 $jantinaValidation->setType(DataValidation::TYPE_LIST);
@@ -265,11 +272,11 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                     $sheet->getCell('H' .$row)->setDataValidation(clone $jenisValidation);
 
                     $namaValidationRow = clone $namaValidation;
-                    $namaValidationRow->setFormula1('=INDEX($o$15:$S$' . $lastInstRow . ', 0, MATCH(H' . $row . ', $O$14:$S$14, 0))');
+                    $namaValidationRow->setFormula1('=INDEX($O$19:$S$' . $lastInstRow . ', 0, MATCH(H' . $row . ', $O$18:$S$18, 0))');
                     $sheet->getCell('I' . $row)->setDataValidation($namaValidationRow);
 
                     $pengajianValidationRow = clone $pengajianValidation;
-                    $pengajianValidationRow->setFormula1('=INDEX($O$5:$S$13, 0, MATCH(H' . $row . ', $O$4:$S$4, 0))');
+                    $pengajianValidationRow->setFormula1('=INDEX($O$5:$S$16, 0, MATCH(H' . $row . ', $O$4:$S$4, 0))');
                     $sheet->getCell('J' . $row)->setDataValidation($pengajianValidationRow);
 
                     $emailValidationRowL = clone $emailValidation;
