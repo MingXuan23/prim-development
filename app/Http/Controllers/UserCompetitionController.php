@@ -15,6 +15,8 @@ class UserCompetitionController extends Controller
 {
     public function competition()
     {
+        $name = Institution::where('instituteName', 'Universiti Teknikal Malaysia Melaka (UTeM)')->first();
+
         Participant::whereIn('icNo', [
             '080603040021', 
             '050418100312', 
@@ -22,7 +24,7 @@ class UserCompetitionController extends Controller
             '080201060281',
             '071029011378'
         ])->update([
-            'institutionId' => '1'
+            'institutionId' => $name->id
         ]);
 
         return view('competition.index');
