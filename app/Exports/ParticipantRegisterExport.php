@@ -146,6 +146,7 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                     'Degree Tahun 3',
                     'Degree Tahun 4',
                     'Degree Tahun 5',
+                    'Asasi',
                     'A-Level',
                     'Advanced Diploma',
                     'Master',

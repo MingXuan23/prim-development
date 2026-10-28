@@ -539,6 +539,7 @@
                     grade.innerHTML += `<option value="Degree Tahun ${i}" ${targetGrade === `Degree Tahun ${i}` ? 'selected' : ''}>Degree Tahun ${i}</option>`;
                 }
                 
+                grade.innerHTML += `<option value="Asasi" ${targetGrade === `Asasi` ? 'selected' : ''}>Asasi</option>`;
                 grade.innerHTML += `<option value="A-Level" ${targetGrade === `A-Level` ? 'selected' : ''}>A-Level</option>`;
                 grade.innerHTML += `<option value="Advanced Diploma" ${targetGrade === `Advanced Diploma` ? 'selected' : ''}>Advanced Diploma</option>`;
                 grade.innerHTML += `<option value="Master" ${targetGrade === `Master` ? 'selected' : ''}>Master</option>`;
