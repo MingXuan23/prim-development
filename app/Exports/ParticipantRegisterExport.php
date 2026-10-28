@@ -115,7 +115,7 @@ class ParticipantRegisterExport implements WithEvents, WithTitle, ShouldAutoSize
                 }
 
                 //Pra-Universiti
-                $praUni = ['Tingkatan 6', 'Matrikulasi', 'Asasi', 'A-Level', 'Sijil Tinggi Agama Malaysia (STAM)', 'International Baccalaureate (IB)'];
+                $praUni = ['Tingkatan 6', 'Matrikulasi', 'Asasi', 'A-Level', 'Sijil Tinggi Agama Malaysia (STAM)'];
                 foreach ($praUni as $i => $val) {
                     $sheet->setCellValue('Q' . ($i + 5), $val);
                 }
