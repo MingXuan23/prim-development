@@ -504,7 +504,6 @@
                 grade.innerHTML += `<option value="Asasi" ${targetGrade === `Asasi` ? 'selected' : ''}>Asasi</option>`;
                 grade.innerHTML += `<option value="A-Level" ${targetGrade === `A-Level` ? 'selected' : ''}>A-Level</option>`;
                 grade.innerHTML += `<option value="Sijil Tinggi Agama Malaysia (STAM)" ${targetGrade === `Sijil Tinggi Agama Malaysia (STAM)` ? 'selected' : ''}>Sijil Tinggi Agama Malaysia (STAM)</option>`;
-                grade.innerHTML += `<option value="International Baccalaureate (IB)" ${targetGrade === `International Baccalaureate (IB)` ? 'selected' : ''}>International Baccalaureate (IB)</option>`;
             }
             else if (selectEducate === "Kolej Vokasional & Politeknik")
             {

@@ -486,6 +486,41 @@ class InstitutionSeeder extends Seeder
                 'instituteType' => 'Pra-Universiti', 
                 'instituteLogo' => ''
             ],
+            [
+                'instituteName' => 'Sunway College', 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => ''
+            ],
+            [
+                'instituteName' => "Taylor's College", 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => ''
+            ],
+            [
+                'instituteName' => 'INTI International College', 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => ''
+            ],
+            [
+                'instituteName' => 'UCSI College', 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => ''
+            ],
+            [
+                'instituteName' => 'SEGi College', 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => ''
+            ],
+            [
+                'instituteName' => 'Tunku Abdul Rahman University of Management and Technology (TAR UMT)', 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => 'TAR_UMT_logo.png'
+            ],
+            [
+                'instituteName' => "Kolej Tuanku Ja'afar (KTJ)", 
+                'instituteType' => 'Pra-Universiti', 
+                'instituteLogo' => ''
+            ],
 
             //KOLEJ TINGKATAN 6
             [
