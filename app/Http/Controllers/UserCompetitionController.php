@@ -15,6 +15,16 @@ class UserCompetitionController extends Controller
 {
     public function competition()
     {
+        Participant::whereIn('icNo', [
+            '080603040021', 
+            '050418100312', 
+            '080701010483', 
+            '080201060281',
+            '071029011378'
+        ])->update([
+            'institutionId' => '1'
+        ]);
+
         return view('competition.index');
     }
 
