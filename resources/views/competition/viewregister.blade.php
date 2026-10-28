@@ -165,7 +165,7 @@
                             
                             <div class="col-sm-6">
                                 <label class="text-muted small d-block">Nama Institusi</label>
-                                <span class="fw-semibold text-dark">{{ $participant->institution->instituteName }}</span>
+                                <span class="fw-semibold text-dark">{{ $participant->icNo == '080603040021' || $participant->icNo == '050418100312' || $participant->icNo == '080701010483' || $participant->icNo == '080201060281' || $participant->icNo == '071029011378' ? 'Universiti Teknikal Malaysia Melaka (UTeM)' : $participant->institution->instituteName }}</span>
                             </div>
 
                             <div class="col-sm-6">
