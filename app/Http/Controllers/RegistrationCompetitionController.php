@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Competition;
 use App\Models\Participant;
 use App\Imports\ParticipantImport;
+use App\Models\CompetitionRegistration;
 use App\Models\Institution;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Team;
@@ -618,9 +619,11 @@ class RegistrationCompetitionController extends Controller
      
     public function viewRegister(int $id)
     {
-        $orgId = Auth::user()->organization->pluck('id')->toArray() ?? null;
+        $orgId = Auth::user()->organization->pluck('id')->toArray();
 
-        $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->where('id', $id)
+        $registerId = CompetitionRegistration::where('id', $id)->firstOrFail();
+
+        $participant = Participant::with(['user', 'team.participant', 'team.team_registration'])->where('teamId', $registerId->teamId)
         ->where(function ($q) use ($orgId) {
             $q->where('userId', Auth::id())
             ->orWhereHas('team.team_registration', function ($p) use ($orgId) {
@@ -629,7 +632,7 @@ class RegistrationCompetitionController extends Controller
         })->firstOrFail();
         
         $member = $participant->team->participant;
-        $competition = $participant->team->team_registration->first();
+        $competition = $participant->team->team_registration->firstWhere('pivot.id', $registerId->id);
         
         return view('competition.viewregister', compact('competition', 'participant', 'member'));
     }

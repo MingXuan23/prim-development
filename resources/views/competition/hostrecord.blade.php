@@ -306,13 +306,13 @@
                 </thead>
 
                 <tbody>
-                    @forelse($participants as $participant)
-                        @php
-                            $member = $participant->first();
-                            
-                            $team = $participant->team->team_registration->first();
-                            $bridge = $team->pivot;
-                        @endphp
+                        @forelse($participants as $participant)
+                            @php
+                                $member = $participant->first();
+                                
+                                $team = $participant->team->team_registration->first();
+                                $bridge = $team->pivot;
+                            @endphp
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>
@@ -354,14 +354,14 @@
                             <td>
                                 <div class="d-flex justify-content-center align-items-center gap-2">
                                     @if($bridge->statusPayment == 'Pending')
-                                        <a href="{{ route('competition.viewregister', $member->id) }}" class="btn btn-outline-primary"><i class="bi bi-eye"></i> Lihat</a>
-                                        <form action="{{ route('competition.deleteregister', $member->id) }}" class="deleteRegister d-inline" data-name="{{ $member->name ?? '' }}" data-group="{{ $participant->team->groupName ?? '' }}" data-type="{{ $team->participateType }}">
+                                        <a href="{{ route('competition.viewregister', $bridge->id) }}" class="btn btn-outline-primary"><i class="bi bi-eye"></i> Lihat</a>
+                                        <form action="{{ route('competition.deleteregister', $bridge->id) }}" class="deleteRegister d-inline" data-name="{{ $member->name ?? '' }}" data-group="{{ $participant->team->groupName ?? '' }}" data-type="{{ $team->participateType }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-outline-danger btn-padam"><i class="bi bi-trash"></i> Padam</button>
                                         </form>
                                     @else
-                                        <a href="{{ route('competition.viewregister', $member->id) }}" class="btn btn-outline-primary"><i class="bi bi-eye"></i> Lihat</a>
+                                        <a href="{{ route('competition.viewregister', $bridge->id) }}" class="btn btn-outline-primary"><i class="bi bi-eye"></i> Lihat</a>
                                     @endif
                                 </div>
                             </td>
