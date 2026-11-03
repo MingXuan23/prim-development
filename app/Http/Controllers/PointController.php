@@ -37,8 +37,7 @@ class PointController extends Controller
             ->join('donation_transaction as dt', 'dt.transaction_id', 'ph.transaction_id')
             ->join('transactions as t', 't.id', 'ph.transaction_id')
             ->where('ph.status', 1)
-            ->where('t.datetime_created', '>=', today())
-            ->where('t.datetime_created', '<', today()->addDay())
+            ->whereBetween('t.datetime_created', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
             ->where('ph.referral_code_id', $referral_code->id)
             ->select(
                 DB::raw('COUNT(CASE WHEN ph.fromSubline = 0 THEN ph.id END) AS donation_leader_today'),
