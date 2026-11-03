@@ -354,7 +354,7 @@
                                             </div>
                                         @elseif($bridge->statusPayment == 'Paid' || $bridge->statusPayment == 'Free')
                                             <button type="button" id="daftar" class="btn btn-light border px-3 py-1 text-secondary fw-medium" 
-                                                    data-view-url="{{ route('competition.viewregister', $member->id) }}" data-receipt-url="{{ route('competition.receipt', $bridge->id) }}" 
+                                                    data-view-url="{{ route('competition.viewregister', $bridge->id) }}" data-receipt-url="{{ route('competition.receipt', $bridge->id) }}" 
                                                     data-status-payment="{{ $bridge->statusPayment }}" onclick="showRegisterOption(this)"><i class="bi bi-eye me-1"></i> Lihat</button>
                                             
                                             <!-- @if($team->statusResult == 'Published' && in_array($bridge->statusPayment, ['Paid', 'Free']))
