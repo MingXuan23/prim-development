@@ -220,7 +220,20 @@
                                                                         </table>
                                                                     </td>
                                                                 </tr>
+                                                                <tr class="text-center">
+                                                                    <td class="ml-auto">
+                                                                        <a href="https://play.google.com/store/apps/details?id=com.prim.prim_derma_app&pcampaignid=web_share" target="_blank"
+                                                                            class="badge border bg-black">
+                                                                            <i class="fab fa-google-play fa-lg"></i>
+                                                                            PlayStore
+                                                                        </a>
 
+                                                                        <a href="https://apps.apple.com/my/app/sedekah-subuh/id6760802064" target="_blank" class="badge border bg-black">
+                                                                            <i class="fab fa-app-store fa-lg"></i>
+                                                                            AppStore
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
                                                             </tbody>
                                                         </table>
                                                     </td>
@@ -234,19 +247,6 @@
                     </div>
                 </td>
                 <td></td>
-            </tr>
-            <tr class="text-center">
-                <div class="ml-auto">
-                    <a href="https://play.google.com/store/apps/details?id=com.prim.prim_derma_app&pcampaignid=web_share" target="_blank" class="badge border bg-black">
-                        <i class="fab fa-google-play fa-lg"></i>
-                        PlayStore
-                    </a>
-
-                    <a href="https://apps.apple.com/my/app/sedekah-subuh/id6760802064" target="_blank" class="badge border bg-black">
-                        <i class="fab fa-app-store fa-lg"></i>
-                        AppStore
-                    </a>
-                </div>
             </tr>
         </tbody>
     </table>
