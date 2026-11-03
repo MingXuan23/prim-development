@@ -246,10 +246,10 @@
                         $('#streakProgressBars #progress-bar-icon').removeClass('text-success text-danger');
                         if (streakData.streak_today) {
                             $('#streakProgressBars #progress-bar-icon').addClass('text-success');
-                            $('#streakProgressBars #progress-bar-text').html('<i class="fas fa-check-circle text-success"></i> PRiM Medal ' + (streakData.streak_startdate ?? '') + ': ' + streakData.current_streak + '/40 Hari');
+                            $('#streakProgressBars #progress-bar-text').html('<i class="fas fa-check-circle text-success"></i> PRiM Medal ' + (streakData.streak_startdate ? 'Mulai ' + streakData.streak_startdate : '') + ': ' + streakData.current_streak + '/40 Hari');
                         } else {
                             $('#streakProgressBars #progress-bar-icon').addClass('text-danger');
-                            $('#streakProgressBars #progress-bar-text').html('<i class="fas fa-exclamation-circle text-danger"></i> PRiM Medal ' + (streakData.streak_startdate ?? '') + ': ' + streakData.current_streak + '/40 Hari');
+                            $('#streakProgressBars #progress-bar-text').html('<i class="fas fa-exclamation-circle text-danger"></i> PRiM Medal ' + (streakData.streak_startdate ? 'Mulai ' + streakData.streak_startdate : '') + ': ' + streakData.current_streak + '/40 Hari');
                         }
 
                         var donationProgressPercentage = sedekah_subuh.current_streak * 2.5;
@@ -263,10 +263,10 @@
                         $('#sedekahSubuhProgressBars #progress-bar-icon').removeClass('text-success text-danger');
                         if (sedekah_subuh.streak_today) {
                             $('#sedekahSubuhProgressBars #progress-bar-icon').addClass('text-success');
-                            $('#sedekahSubuhProgressBars #progress-bar-text').html('<i class="fas fa-check-circle text-success"></i> Sedekah Subuh Mulai ' + (sedekah_subuh.streak_startdate ?? '') + ': ' + sedekah_subuh.current_streak + '/40 Hari');
+                            $('#sedekahSubuhProgressBars #progress-bar-text').html('<i class="fas fa-check-circle text-success"></i> Sedekah Subuh Mulai ' + (sedekah_subuh.streak_startdate ? 'Mulai ' + sedekah_subuh.streak_startdate : '') + ': ' + sedekah_subuh.current_streak + '/40 Hari');
                         } else {
                             $('#sedekahSubuhProgressBars #progress-bar-icon').addClass('text-danger');
-                            $('#sedekahSubuhProgressBars #progress-bar-text').html('<i class="fas fa-exclamation-circle text-danger"></i> Sedekah Subuh Mulai ' + (sedekah_subuh.streak_startdate ?? '') + ': ' + sedekah_subuh.current_streak + '/40 Hari');
+                            $('#sedekahSubuhProgressBars #progress-bar-text').html('<i class="fas fa-exclamation-circle text-danger"></i> Sedekah Subuh Mulai ' + (sedekah_subuh.streak_startdate ? 'Mulai ' + sedekah_subuh.streak_startdate : '') + ': ' + sedekah_subuh.current_streak + '/40 Hari');
                         }
 
                         var sedekahSubuhProgressPercentage = sedekah_subuh.current_streak * 2.5;
