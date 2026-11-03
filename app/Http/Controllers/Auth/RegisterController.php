@@ -125,7 +125,7 @@ class RegisterController extends Controller
             'email' => $data['email'] ?? null,
             'password' => Hash::make($data['password']),
             'telno' => $data['telno'],
-            'remember_token' => $data['_token'],
+            'remember_token' => $data['_token'] ?? null,
         ]);
         // dd($user);
 
@@ -141,7 +141,7 @@ class RegisterController extends Controller
         }
 
 
-        $referral_code = $data['referral_code'];
+        $referral_code = $data['referral_code'] ?? null;
 
         if ($referral_code != null) {
             $this->referral_code_member_registration($referral_code, $user);
@@ -165,7 +165,7 @@ class RegisterController extends Controller
         ]);
 
         // only validate icno if user registered is not admin
-        $validator->sometimes('icno', ['required', 'string', 'min:12', 'max:14'], function ($input) {
+        $validator->sometimes('icno', ['required', 'regex:/^\d{6}-?\d{2}-?\d{4}$/'], function ($input) {
             return !$input->isAdmin;
         });
 
@@ -179,32 +179,15 @@ class RegisterController extends Controller
             // check ic no seperately (some users might enter ic no with a '-' and some might won't)
             $icEntered = str_replace("-", "", $request->get('icno'));
 
-            // search for user accounts that have been registered by an organization admin
-            $userRegisteredByAdmin = DB::table("users")
-                ->where("telno", "LIKE", "%$icEntered%")
-                ->get();
+            $isUserCreatedByOrgAdmin = $this->isUserCreatedByOrgAdmin($icEntered);
 
-            if ($userRegisteredByAdmin->count() > 0) {
-                // this section is for parents that have already been registered by an admin but they didn't know
-                // when they register themselves, the error message will tell them they have been registered and which organization has helped them to register
-
-                // get organization that registered the parent's ic
-                $organization = DB::table("organizations as o")
-                    ->join("organization_user as ou", "o.id", "=", "ou.organization_id")
-                    ->where("ou.user_id", "=", $userRegisteredByAdmin->first()->id)
-                    ->orderBy("ou.id", "ASC")
-                    ->first();
-
+            if ($isUserCreatedByOrgAdmin['status']) {
                 return redirect()->back()->withErrors([
-                    "icno_registered" => "Your IC no. has already been registered by " . $organization->nama . "'s admin. Please login using your IC no. and the password provided."
+                    "icno_registered" => "Your IC no. has already been registered by " . $isUserCreatedByOrgAdmin['organization_name'] . "'s admin. Please login using your IC no. and the password provided."
                 ])->withInput();
             }
 
-            $icExisted = DB::table("users")
-                ->where("email", "LIKE", "%$icEntered%")
-                ->orWhere("telno", "LIKE", "%$icEntered%")
-                ->orWhere("icno", "=", $icEntered)
-                ->exists();
+            $icExisted = $this->isIcTaken($icEntered);
 
             if ($icExisted) {
                 // this is for parents that already registered an account but forgot
@@ -213,20 +196,105 @@ class RegisterController extends Controller
             }
         }
 
-        $user = $this->create($request->all());
-
-        // insert icno and email verified (non mass-assignable)
-        DB::table("users")->where("id", "=", $user->id)->update([
-            "icno" => str_replace("-", "", $request->get("icno")),
-        ]);
+        $user = $this->createUserWithUpdatedIcNo($request);
 
         $this->guard()->login($user);
-
         event(new Registered($user));
 
         return $this->registered($request, $user) ?: redirect($this->redirectPath());
     }
 
+    public function registerMobile(Request $request)
+    {
+        if (!$request->isJson()) {
+            return response()->json(['error' => 'Invalid request.'], 400);
+        }
+
+        // validate input
+        $validator = Validator::make($request->all(), [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
+            'icno' => ['required', 'regex:/^\d{6}-?\d{2}-?\d{4}$/'],
+            'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[@!$#%^&*()]).*$/'],
+            'telno' => ['required', 'numeric', 'min:10', 'unique:users,telno'],
+        ]);
+
+        // return error messages if validator fails
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $icEntered = str_replace("-", "", $request->get('icno'));
+
+        $isUserCreatedByOrgAdmin = $this->isUserCreatedByOrgAdmin($icEntered);
+
+        if ($isUserCreatedByOrgAdmin['status']) {
+            return response()->json(['error' => 'Your IC no. has already been registered by ' . $isUserCreatedByOrgAdmin['organization_name'] . "'s admin. Please login using your IC no. and the password provided."], 409);
+        }
+
+        $icExisted = $this->isIcTaken($icEntered);
+
+        if ($icExisted) {
+            return response()->json(['error' => 'The IC no. given has already been taken.'], 409);
+        }
+
+        $user = $this->createUserWithUpdatedIcNo($request);
+
+        return response()->json(['message' => 'Registration successful.', 'user' => $user], 201);
+    }
+
+    private function isUserCreatedByOrgAdmin($icno)
+    {
+        // this section is for parents that have already been registered by an admin but they didn't know
+        // when they register themselves, the error message will tell them they have been registered and which organization has helped them to register
+
+        // search for user accounts that have been registered by an organization admin
+        $userRegisteredByAdmin = DB::table("users")
+            ->where("telno", $icno)
+            ->first();
+
+        if (!$userRegisteredByAdmin) {
+            return ['status' => false];
+        }
+
+        // get organization that registered the parent's ic
+        $organization = DB::table("organizations as o")
+            ->join("organization_user as ou", "o.id", "=", "ou.organization_id")
+            ->where("ou.user_id", "=", $userRegisteredByAdmin->id)
+            ->orderBy("ou.id", "ASC")
+            ->first();
+
+        if (!$organization) {
+            return ['status' => true, 'organization_name' => 'an organization'];
+        }
+
+        return ['status' => true, 'organization_name' => $organization->nama];
+    }
+
+    private function createUserWithUpdatedIcNo(Request $request)
+    {
+        return DB::transaction(function () use ($request) {
+            $user = $this->create($request->all());
+
+            if ($request->filled('icno')) {
+                // insert icno and email verified (non mass-assignable)
+                DB::table("users")->where("id", "=", $user->id)->update([
+                    "icno" => str_replace("-", "", $request->get("icno")),
+                ]);
+            }
+
+            return $user->refresh();
+        });
+    }
+
+    private function isIcTaken($icno)
+    {
+        return DB::table("users")
+            ->where("email", "LIKE", "%$icno%")
+            ->orWhere("telno", $icno)
+            ->orWhere("icno", $icno)
+            ->exists();
+    }
 
     // to redirect back to intended link even after revalidation
     public function showRegistrationForm(Request $request)
