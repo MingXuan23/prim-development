@@ -19,24 +19,26 @@ class PointController extends Controller
     {
         $user_id = $request->user_id ?? Auth::id();
 
-        DonationStreak::fetchLastTransactionStatus(3, $user_id);
-
         if (!Auth::user()->hasRole('Superadmin') && Auth::id() != $user_id) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        DonationStreak::fetchLastTransactionStatus(3, $user_id);
+
         $referral_code = $this->getReferralCode(true, $user_id);
 
-        if ($referral_code == null) {
-            $controller = new ProfileController();
-            return $controller->index();
+        if (!$referral_code) {
+            return $request->ajax()
+                ? response()->json(['error' => 'Referral code not found'], 404)
+                : redirect()->route('profile.index');
         }
 
         $donationsToday = DB::table('point_history as ph')
             ->join('donation_transaction as dt', 'dt.transaction_id', 'ph.transaction_id')
             ->join('transactions as t', 't.id', 'ph.transaction_id')
             ->where('ph.status', 1)
-            ->whereDate('t.datetime_created', today())
+            ->where('t.datetime_created', '>=', today())
+            ->where('t.datetime_created', '<', today()->addDay())
             ->where('ph.referral_code_id', $referral_code->id)
             ->select(
                 DB::raw('COUNT(CASE WHEN ph.fromSubline = 0 THEN ph.id END) AS donation_leader_today'),
@@ -49,27 +51,42 @@ class PointController extends Controller
         $today_follower_donation = DB::table('point_history as ph')
             ->join('referral_code_member as rcm', 'rcm.leader_referral_code_id', 'ph.referral_code_id')
             ->where('ph.status', 1)
-            ->whereBetween('ph.created_at', [Carbon::today(), Carbon::tomorrow()])
+            ->whereBetween('ph.created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
             ->where('rcm.leader_referral_code_id', $referral_code->id)
             ->where('rcm.status', 1)
             ->whereNotNull('ph.member_id')
-            ->select('ph.member_id')
             ->distinct()
-            ->get()
-            ->count();
+            ->count('ph.member_id');
 
         $exist_leader = DB::table('referral_code_member')->where('status', 1)->where('member_user_id', $user_id)->exists();
 
         $donateToLeader = DB::table('point_history as ph')
             ->join('referral_code_member as rcm', 'rcm.leader_referral_code_id', 'ph.referral_code_id')
             ->where('ph.status', 1)
-            ->whereBetween('ph.created_at', [Carbon::today(), Carbon::tomorrow()])
+            ->whereBetween('ph.created_at', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
             ->where('rcm.member_user_id', $user_id)
             ->whereNotNull('ph.member_id')
-            ->select('ph.member_id')
             ->distinct()
-            ->get()
-            ->count();
+            ->count('ph.member_id');
+
+        $result = DonationStreak::getStreakData($user_id);
+
+        $streakData = $result['donation_streak'];
+        $sedekah_subuh = $result['sedekah_subuh'];
+
+        if ($request->ajax()) {
+            return response()->json([
+                'donation_leader_today' => $donationsToday->donation_leader_today,
+                'donation_member_today' => $donationsToday->donation_member_today,
+                'total_donation_today' => $donationsToday->total_donation_today,
+                'total_follower' => $total_follower,
+                'today_follower_donation' => $today_follower_donation,
+                'exist_leader' => $exist_leader,
+                'donateToLeader' => $donateToLeader,
+                'streakData' => $streakData,
+                'sedekah_subuh' => $sedekah_subuh,
+            ]);
+        }
 
         $col = $exist_leader && $total_follower > 0 ? 'col-md-3' : 'col-md-4';
         $donateToLeaderDiv = $exist_leader ? '  <div id="criteria4" class="' . $col . ' col-sm-12">
@@ -88,25 +105,6 @@ class PointController extends Controller
             </div>
             ' . $followerDiv . $donateToLeaderDiv . '
         </div>';
-
-        $result = DonationStreak::getStreakData();
-
-        $streakData = $result['donation_streak'];
-        $sedekah_subuh = $result['sedekah_subuh'];
-
-        if ($request->ajax()) {
-            return response()->json([
-                'donation_leader_today' => $donationsToday->donation_leader_today,
-                'donation_member_today' => $donationsToday->donation_member_today,
-                'total_donation_today' => $donationsToday->total_donation_today,
-                'total_follower' => $total_follower,
-                'today_follower_donation' => $today_follower_donation,
-                'exist_leader' => $exist_leader,
-                'donateToLeader' => $donateToLeader,
-                'streakData' => $streakData,
-                'sedekah_subuh' => $sedekah_subuh,
-            ]);
-        }
 
         return view('point.index', compact('referral_code', 'total_follower', 'progressToday', 'streakData', 'sedekah_subuh'));
     }
