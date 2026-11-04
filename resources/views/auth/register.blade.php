@@ -10,8 +10,8 @@
 
         <style>
             /* #name {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                text-transform: uppercase;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                text-transform: uppercase;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            } */
 
             ::-webkit-input-placeholder {
                 /* WebKit browsers */
@@ -45,6 +45,12 @@
         @if (session('success'))
             <div class="alert alert-success" role="alert">
                 <p class="text-center">{{ session('success') }}</p>
+            </div>
+        @elseif ($errors)
+            <div class="alert alert-danger" role="alert">
+                @foreach ($errors->all() as $error)
+                    <p class="text-center">{{ $error }}</p>
+                @endforeach
             </div>
         @endif
 
@@ -86,7 +92,7 @@
 
                                         <div class="form-group">
                                             <label for="name">Nama Penuh</label>
-                                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" required placeholder="Nama Penuh">
+                                            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror" required placeholder="Nama Penuh" value="{{ old('name') }}">
                                             @error('name')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -107,7 +113,7 @@
                                         {{-- Additional parent's icno for bayar_yuran--}}
                                         <div class="form-group">
                                             <label for="icno">No. Kad Pengenalan</label>
-                                            <input type="text" name="icno" id="icno" class="form-control @error('icno') is-invalid @enderror" placeholder="No. Kad Pengenalan">
+                                            <input type="text" name="icno" id="icno" class="form-control @error('icno') is-invalid @enderror" placeholder="No. Kad Pengenalan" value="{{ old('icno') }}">
                                             @error('icno')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -117,7 +123,8 @@
 
                                         <div class="form-group">
                                             <label for="telno">No. Telefon</label>
-                                            <input type="text" name="telno" id="telno" class="form-control phone_no @error('telno') is-invalid @enderror" placeholder="Nombor Telefon" max="11">
+                                            <input type="text" name="telno" id="telno" class="form-control phone_no @error('telno') is-invalid @enderror" placeholder="Nombor Telefon" max="11"
+                                                value="{{ old('telno') }}">
                                             @error('telno')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
