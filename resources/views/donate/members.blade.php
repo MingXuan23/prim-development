@@ -120,6 +120,9 @@
                 @endif
 
                 <div class="table-responsive">
+                    <div class="text-right mb-3">
+                        <a class="btn btn-primary" href="{{ route('donate.exportMembers') }}" target="_blank" id="btnExportMembers">Eksport Senarai Ahli</a>
+                    </div>
                     <table id="membersTable" class="table table-bordered table-striped dt-responsive nowrap" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
                         <thead>
                             <tr style="text-align:center">
@@ -208,6 +211,8 @@
 
             $('#member_name').change(function (e) {
                 var selectedUserId = $(this).val();
+
+                $('#btnExportMembers').attr('href', "{{ route('donate.exportMembers') }}?user_id=" + (selectedUserId || ''));
 
                 fetch_member(selectedUserId);
                 fetchDonationStatistics(selectedUserId);
