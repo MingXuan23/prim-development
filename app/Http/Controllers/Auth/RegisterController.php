@@ -207,7 +207,7 @@ class RegisterController extends Controller
     public function registerMobile(Request $request)
     {
         if (!$request->isJson()) {
-            return response()->json(['error' => 'Invalid request.'], 400);
+            return response()->json(['error' => 'Invalid request.', 'status' => 403], 403);
         }
 
         // validate input
@@ -221,7 +221,7 @@ class RegisterController extends Controller
 
         // return error messages if validator fails
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json(['errors' => $validator->errors(), 'status' => 409], 409);
         }
 
         $icEntered = str_replace("-", "", $request->get('icno'));
@@ -229,18 +229,21 @@ class RegisterController extends Controller
         $isUserCreatedByOrgAdmin = $this->isUserCreatedByOrgAdmin($icEntered);
 
         if ($isUserCreatedByOrgAdmin['status']) {
-            return response()->json(['error' => 'Your IC no. has already been registered by ' . $isUserCreatedByOrgAdmin['organization_name'] . "'s admin. Please login using your IC no. and the password provided."], 409);
+            return response()->json([
+                'error' => 'Your IC no. has already been registered by ' . $isUserCreatedByOrgAdmin['organization_name'] . "'s admin. Please login using your IC no. and the password provided.",
+                'status' => 409
+            ], 409);
         }
 
         $icExisted = $this->isIcTaken($icEntered);
 
         if ($icExisted) {
-            return response()->json(['error' => 'The IC no. given has already been taken.'], 409);
+            return response()->json(['error' => 'The IC no. given has already been taken.', 'status' => 409], 409);
         }
 
         $user = $this->createUserWithUpdatedIcNo($request);
 
-        return response()->json(['message' => 'Registration successful.', 'user' => $user], 201);
+        return response()->json(['message' => 'Registration successful.', 'user' => $user, 'status' => 201], 201);
     }
 
     private function isUserCreatedByOrgAdmin($icno)
