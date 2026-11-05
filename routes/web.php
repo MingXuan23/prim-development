@@ -168,6 +168,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'donate'], function () {
 
     Route::get('/members', 'DonationController@getMembersByUserIndex')->name('donate.members');
     Route::get('/search-users', 'DonationController@searchUsers')->name('donate.searchUsers');
+    Route::get('/export-members', 'PointController@exportMembers')->name('donate.exportMembers');
     //Route::get('getReferralCode', 'PointController@getReferralCode')->name('donate.getReferralCode');
 });
 
@@ -188,6 +189,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'point'], function () {
     Route::get('shareReferralLink', 'PointController@shareReferralLink')->name('point.shareReferralLink');
     Route::get('getReferralCode', 'PointController@getReferralCode')->name('point.getReferralCode');
     Route::get('reward', 'ReferralCodeRewardController@view')->name('point.viewreward');
+
+    Route::get('/getDonationStatistics', 'PointController@getDonationStatistics')->name('point.getDonationStatistics');
 });
 
 Route::get('sumbangan/{link}', 'DonationController@urlDonation')->name('URLdonate');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DonationMemberExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\User;
@@ -12,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
 use App\Http\Controllers\ProfileController;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PointController extends Controller
 {
@@ -233,6 +235,18 @@ class PointController extends Controller
         }
     }
 
+    public function exportMembers(Request $request)
+    {
+        $userId = $request->query('user_id') ?? Auth::id();
+
+        if (!Auth::user()->hasRole('Superadmin')) {
+            // return response()->json(['error' => 'Unauthorized'], 403);
+            return redirect('/home');
+        }
+
+        return Excel::download(new DonationMemberExport($userId), 'donation_members.xlsx');
+    }
+
     public function getReferralCodeMemberDatatable(Request $request)
     {
         $userId = $request->query('user_id');
@@ -245,6 +259,17 @@ class PointController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        $data = $this->getReferralCodeMemberData($userId);
+
+        return Datatables::of($data)
+            ->addColumn('level', fn($row) => $row->member_level ?? $row->base_level)
+            ->editColumn('contribution', fn($row) => $row->contribution ?? 0)
+            ->editColumn('todayContribution', fn($row) => $row->todayContribution ?? 0)
+            ->make(true);
+    }
+
+    public function getReferralCodeMemberData($userId)
+    {
         $referral_code = $this->getReferralCode(true, $userId);
 
         $totalSub = DB::table('point_history')
@@ -259,7 +284,7 @@ class PointController extends Controller
             ->groupBy('member_id')
             ->select('member_id', DB::raw('SUM(points) as today_points'));
 
-        $data = DB::table('referral_code_member as rcm')
+        return DB::table('referral_code_member as rcm')
             ->join('users as mu', 'mu.id', '=', 'rcm.member_user_id')
             ->leftJoin('referral_code_member_level as lvl', 'lvl.id', '=', 'rcm.level')
             ->leftJoinSub($totalSub, 'ph_total', 'ph_total.member_id', '=', 'rcm.id')
@@ -276,15 +301,7 @@ class PointController extends Controller
                 'ph_total.total_points as contribution',
                 'ph_today.today_points as todayContribution',
             ]);
-
-        return Datatables::of($data)
-            ->addColumn('level', fn($row) => $row->member_level ?? $row->base_level)
-            ->editColumn('contribution', fn($row) => $row->contribution ?? 0)
-            ->editColumn('todayContribution', fn($row) => $row->todayContribution ?? 0)
-            ->make(true);
     }
-
-
 
     public function getReferralCode($object = false, $user_id = null)
     {
