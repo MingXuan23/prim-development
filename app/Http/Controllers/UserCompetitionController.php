@@ -8,14 +8,23 @@ use Illuminate\Http\Request;
 use App\Exports\ParticipantRegisterExport;
 use App\Models\CompetitionRegistration;
 use App\Models\Participant;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserCompetitionController extends Controller
 {
     public function competition()
     {
-        return view('competition.index');
+        $totalParticipant = CompetitionRegistration::count();
+        $totalPaid = CompetitionRegistration::where('statusPayment', 'Paid')->count();
+        $totalCompetition = Competition::where('statusCompetition', 'Published')->count();
+
+        $transactionId = DB::table('transaction_competition')->pluck('transactionId');
+        $totalPrice = Transaction::whereIn('id', $transactionId)->where('status', 'Success')->sum('amount');
+            
+        return view('competition.index', compact('totalPaid', 'totalParticipant', 'totalCompetition', 'totalPrice'));
     }
 
     public function userCompetition(Request $req)
