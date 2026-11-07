@@ -77,8 +77,17 @@ class LoginController extends Controller
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
+        
+        $isContestPro = str_contains($request->headers->get('referer'), 'ContestPro');
 
-        return redirect('/derma');
+        if ($isContestPro)
+        {
+            return redirect('/ContestPro');
+        }
+        else 
+        {
+            return redirect('/derma');
+        }
     }
 
     public function startsWith($string, $startString)
